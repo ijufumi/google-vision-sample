@@ -3,14 +3,21 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/ijufumi/google-vision-sample/pkg/container"
+	"github.com/ijufumi/google-vision-sample/pkg/http/handlers"
 )
 
 type Router interface {
 	Run() error
 }
 
-func NewRouter(container container.Container) Router {
+func NewRouter(c container.Container) Router {
 	r := gin.Default()
+
+	api := r.Group("api/v1")
+	{
+		healthHandler := container.Invoke[handlers.HealthHandler](c)
+		api.GET("/health", healthHandler.Get)
+	}
 	return &router{engine: r}
 }
 

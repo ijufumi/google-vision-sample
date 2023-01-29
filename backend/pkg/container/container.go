@@ -6,6 +6,16 @@ import (
 )
 
 type Container interface {
+	Container() *dig.Container
+}
+
+func Invoke[T any](container Container) T {
+	var result T
+	_ = container.Container().Invoke(func(_result T) {
+		result = _result
+	})
+
+	return result
 }
 
 func NewConainer() Container {
@@ -20,4 +30,8 @@ type container struct {
 
 func (c *container) provide() {
 	_ = c.container.Provide(handlers.NewHealthHandler())
+}
+
+func (c *container) Container() *dig.Container {
+	return c.container
 }
