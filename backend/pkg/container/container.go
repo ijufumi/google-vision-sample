@@ -1,6 +1,7 @@
 package container
 
 import (
+	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/db"
 	"github.com/ijufumi/google-vision-sample/pkg/http/handlers"
 	"go.uber.org/dig"
 )
@@ -29,7 +30,10 @@ type container struct {
 }
 
 func (c *container) provide() {
+	// http
 	_ = c.container.Provide(handlers.NewHealthHandler())
+	// gateways
+	_ = c.container.Provide(db.NewDB())
 }
 
 func (c *container) Container() *dig.Container {
