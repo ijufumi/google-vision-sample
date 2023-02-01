@@ -9,11 +9,15 @@ import (
 )
 
 func NewDB(config *configs.Config) *gorm.DB {
-	dbConfig := config.DB
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True", dbConfig.User, dbConfig.Password, dbConfig.Host, dbConfig.Port, dbConfig.Name)
+	dsn := DsnString(config)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
 	return db
+}
+
+func DsnString(config *configs.Config) string {
+	dbConfig := config.DB
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True", dbConfig.User, dbConfig.Password, dbConfig.Host, dbConfig.Port, dbConfig.Name)
 }

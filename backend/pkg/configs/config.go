@@ -1,11 +1,14 @@
 package configs
 
 import (
-	"github.com/caarlos0/env/v6"
+	"github.com/caarlos0/env/v7"
 	"github.com/joho/godotenv"
 )
 
 type Config struct {
+	Migration struct {
+		Path string `env:"MIGRATION_PATH"`
+	}
 	DB struct {
 		User     string `env:"DB_USER`
 		Password string `env:"DB_PASSWORD`
