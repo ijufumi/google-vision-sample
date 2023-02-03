@@ -7,12 +7,12 @@ import (
 
 type Config struct {
 	Migration struct {
-		Path string `env:"MIGRATION_PATH" envDefault:"db/migrate"`
+		Path string `env:"MIGRATION_PATH" envDefault:"migration"`
 	}
 	DB struct {
 		User     string `env:"DB_USER"`
 		Password string `env:"DB_PASSWORD"`
-		Port     uint   `env:"DB_PORT"`
+		Port     uint   `env:"DB_PORT" envDefault:"5432"`
 		Name     string `env:"DB_NAME"`
 		Host     string `env:"DB_HOST"`
 	}
