@@ -7,7 +7,7 @@ import (
 
 type Config struct {
 	Migration struct {
-		Path string `env:"MIGRATION_PATH"`
+		Path string `env:"MIGRATION_PATH" envDefault:"db/migrate"`
 	}
 	DB struct {
 		User     string `env:"DB_USER"`
