@@ -20,7 +20,7 @@ func Invoke[T any](container Container) T {
 	return result
 }
 
-func NewConainer() Container {
+func NewContainer() Container {
 	c := container{container: dig.New()}
 	c.provide()
 	return &c
