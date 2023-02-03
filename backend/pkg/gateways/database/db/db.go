@@ -27,5 +27,5 @@ func DsnString(config *configs.Config) string {
 }
 
 func migrate(db *gorm.DB) {
-	db.AutoMigrate(&entities.ExtractionResults{})
+	_ = db.AutoMigrate(&entities.ExtractionResults{})
 }
