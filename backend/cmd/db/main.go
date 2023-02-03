@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/golang-migrate/migrate"
-	_ "github.com/golang-migrate/migrate/database/mysql"
+	_ "github.com/golang-migrate/migrate/database/postgres"
 	"github.com/ijufumi/google-vision-sample/pkg/configs"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/db"
 	"github.com/spf13/cobra"
@@ -22,6 +22,12 @@ func main() {
 	rootCmd.AddCommand(upCommand(migration))
 	rootCmd.AddCommand(downCommand(migration))
 	rootCmd.AddCommand(dropCommand(migration))
+	rootCmd.AddCommand(versionCommand(migration))
+
+	err = rootCmd.Execute()
+	if err != nil {
+		panic(err)
+	}
 }
 
 func upCommand(migration *migrate.Migrate) *cobra.Command {
@@ -56,6 +62,19 @@ func dropCommand(migration *migrate.Migrate) *cobra.Command {
 			if err != nil {
 				fmt.Println(err)
 			}
+		},
+	}
+}
+
+func versionCommand(migration *migrate.Migrate) *cobra.Command {
+	return &cobra.Command{
+		Use: "version",
+		Run: func(cmd *cobra.Command, args []string) {
+			version, _, err := migration.Version()
+			if err != nil {
+				fmt.Println(err)
+			}
+			fmt.Println(fmt.Sprintf("version is %d", version))
 		},
 	}
 }
