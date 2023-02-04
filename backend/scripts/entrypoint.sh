@@ -6,7 +6,7 @@ while [ $exit -eq 0 ]
 do
   echo "Waiting 10 seconds...."
   sleep 10s
-  /app/db db version
+  /app/db version
   if [ $? -eq 0 ]; then
     exit=1
   else
