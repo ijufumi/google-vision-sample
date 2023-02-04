@@ -7,7 +7,7 @@
 #### Create migration file
 
 ```bash
-docker-compose exec app /app/db create [name]
+docker-compose exec app /app/db create -n [name]
 ```
 
 #### Apply migration file
