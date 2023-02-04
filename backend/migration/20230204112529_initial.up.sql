@@ -5,7 +5,7 @@ create table extraction_results
     image_uri  varchar(255) not null,
     created_at timestamp    not null,
     updated_at timestamp    not null,
-    deleted_at timestamp,
+    deleted_at timestamp
 );
 
 create table extracted_texts
@@ -15,8 +15,8 @@ create table extracted_texts
     text                 varchar(255)     not null,
     top                  double precision not null,
     bottom               double precision not null,
-    left                 double precision not null,
-    right                double precision not null,
+    "left"                 double precision not null,
+    "right"                double precision not null,
     created_at           timestamp        not null,
     updated_at           timestamp        not null,
     deleted_at           timestamp
