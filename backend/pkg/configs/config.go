@@ -7,16 +7,21 @@ import (
 )
 
 type Config struct {
-	Migration struct {
-		Path string `env:"MIGRATION_PATH" envDefault:"migration"`
-	}
-	DB struct {
-		User     string `env:"DB_USER"`
-		Password string `env:"DB_PASSWORD"`
-		Port     uint   `env:"DB_PORT" envDefault:"5432"`
-		Name     string `env:"DB_NAME"`
-		Host     string `env:"DB_HOST"`
-	}
+	Migration Migration
+	DB        DB
+}
+
+type Migration struct {
+	Path      string `env:"MIGRATION_PATH" envDefault:"migration"`
+	Extension string `env:"MIGRATION_EXTENSION" envDefault:".sql"`
+}
+
+type DB struct {
+	User     string `env:"DB_USER"`
+	Password string `env:"DB_PASSWORD"`
+	Port     uint   `env:"DB_PORT" envDefault:"5432"`
+	Name     string `env:"DB_NAME"`
+	Host     string `env:"DB_HOST"`
 }
 
 func New() *Config {

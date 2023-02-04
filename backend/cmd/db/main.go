@@ -8,6 +8,10 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/configs"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/db"
 	"github.com/spf13/cobra"
+	"log"
+	"os"
+	"path/filepath"
+	"time"
 )
 
 func main() {
@@ -34,7 +38,7 @@ func main() {
 	rootCmd.AddCommand(downCommand(migration))
 	rootCmd.AddCommand(dropCommand(migration))
 	rootCmd.AddCommand(versionCommand(migration))
-	rootCmd.AddCommand(createCommand())
+	rootCmd.AddCommand(createCommand(config.Migration))
 
 	err = rootCmd.Execute()
 	if err != nil {
@@ -42,12 +46,42 @@ func main() {
 	}
 }
 
-func createCommand() *cobra.Command {
-	return &cobra.Command{
+func createCommand(config configs.Migration) *cobra.Command {
+	var ext *string
+	cmd := &cobra.Command{
 		Use: "create",
 		Run: func(cmd *cobra.Command, args []string) {
+			name := ""
+			if len(args) != 0 {
+				name = args[0]
+			}
+			dir := filepath.Clean(config.Path)
+			version := time.Now().UTC().Format("20060102150405")
+			for _, direction := range []string{"up", "down"} {
+				basename := fmt.Sprintf("%s_%s.%s%s", version, name, direction, *ext)
+				filename := filepath.Join(dir, basename)
+
+				if err := createFile(filename); err != nil {
+					panic(err)
+				}
+
+				absPath, _ := filepath.Abs(filename)
+				log.Println(absPath)
+			}
 		},
 	}
+	cmd.Flags().StringVarP(ext, "ext", "e", config.Extension, "file extension")
+	return cmd
+}
+
+func createFile(filepath string) error {
+	f, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
+
+	if err != nil {
+		return err
+	}
+
+	return f.Close()
 }
 
 func upCommand(migration *migrate.Migrate) *cobra.Command {
@@ -56,7 +90,7 @@ func upCommand(migration *migrate.Migrate) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			err := migration.Up()
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 			}
 		},
 	}
@@ -68,7 +102,7 @@ func downCommand(migration *migrate.Migrate) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			err := migration.Down()
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 			}
 		},
 	}
@@ -80,7 +114,7 @@ func dropCommand(migration *migrate.Migrate) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			err := migration.Drop()
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 			}
 		},
 	}
@@ -92,9 +126,9 @@ func versionCommand(migration *migrate.Migrate) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			version, _, err := migration.Version()
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 			}
-			fmt.Println(fmt.Sprintf("version is %d", version))
+			log.Println(fmt.Sprintf("version is %d", version))
 		},
 	}
 }
