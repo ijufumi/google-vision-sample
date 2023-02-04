@@ -9,6 +9,8 @@ services:
       - "8080:8080"
     env_file:
       - backend/.env
+    volumes:
+      - ./backend/migration:/app/migration
     platform: linux/x86_64
   db:
     container_name: db
