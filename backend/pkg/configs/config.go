@@ -1,7 +1,8 @@
 package configs
 
 import (
-	"github.com/caarlos0/env"
+	"fmt"
+	"github.com/caarlos0/env/v7"
 	"github.com/joho/godotenv"
 )
 
@@ -19,9 +20,15 @@ type Config struct {
 }
 
 func New() *Config {
-	_ = godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println(err)
+	}
 	c := Config{}
-	_ = env.Parse(&c)
+	err = env.Parse(&c)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	return &c
 }

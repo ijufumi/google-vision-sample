@@ -3,14 +3,12 @@ module github.com/ijufumi/google-vision-sample
 go 1.20
 
 require (
-	cloud.google.com/go/vision/v2 v2.6.0 // indirect
-	github.com/caarlos0/env v3.5.0+incompatible // indirect
+	github.com/caarlos0/env/v7 v7.0.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.8.2 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.11.1 // indirect
-	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/golang-migrate/migrate v3.5.4+incompatible // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
@@ -37,7 +35,6 @@ require (
 	golang.org/x/text v0.6.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gorm.io/driver/mysql v1.4.5 // indirect
 	gorm.io/driver/postgres v1.4.6 // indirect
 	gorm.io/gorm v1.24.3 // indirect
 )
