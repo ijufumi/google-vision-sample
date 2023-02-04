@@ -1,6 +1,6 @@
 module github.com/ijufumi/google-vision-sample
 
-go 1.19
+go 1.20
 
 require (
 	cloud.google.com/go/vision/v2 v2.6.0 // indirect
