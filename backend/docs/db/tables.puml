@@ -1,0 +1,34 @@
+@startuml
+enum Status {
+  running
+  succeeded
+  failed
+}
+
+entity ExtractionResults {
+  * id: ULID
+  --
+  * status: Status
+  * image_uri: string
+  * created_at: datetime
+  * updated_at: datetime
+    deleted_at: datetime
+}
+
+entity ExtractedTexts {
+  * id: ULID
+  --
+  * extraction_result_id: ULID <<FK>>
+  * text: string
+  * top: number
+  * bottom: number
+  * left: number
+  * right: number
+  * created_at: datetime
+  * updated_at: datetime
+    deleted_at: datetime
+}
+
+ExtractionResults ||..o{ ExtractedTexts
+
+@enduml
