@@ -1,1 +1,1 @@
-# google-vision-sample
+# Sample application for Google Cloud Vision
