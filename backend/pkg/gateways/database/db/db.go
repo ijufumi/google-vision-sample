@@ -9,7 +9,7 @@ import (
 )
 
 func NewDB(config *configs.Config) *gorm.DB {
-	dsn := DsnString(config)
+	dsn := dsnString(config)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
@@ -18,7 +18,7 @@ func NewDB(config *configs.Config) *gorm.DB {
 	return db
 }
 
-func DsnString(config *configs.Config) string {
+func dsnString(config *configs.Config) string {
 	dbConfig := config.DB
 	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disabl", dbConfig.Host, dbConfig.User, dbConfig.Password, dbConfig.Name, dbConfig.Port)
 }
