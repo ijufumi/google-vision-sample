@@ -14,6 +14,4 @@ do
   fi
 done
 
-/app/db db up
-
 /app/app
