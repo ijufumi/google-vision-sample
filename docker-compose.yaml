@@ -7,6 +7,22 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-#    env_file:
-#      - .env
+    env_file:
+      - .env
     platform: linux/x86_64
+  db:
+    container_name: db
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    platform: linux/x86_64
+
+volumes:
+  db-data:
