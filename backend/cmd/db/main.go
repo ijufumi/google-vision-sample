@@ -47,7 +47,7 @@ func main() {
 }
 
 func createCommand(config configs.Migration) *cobra.Command {
-	var ext *string
+	var ext string
 	cmd := &cobra.Command{
 		Use: "create",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -58,7 +58,7 @@ func createCommand(config configs.Migration) *cobra.Command {
 			dir := filepath.Clean(config.Path)
 			version := time.Now().UTC().Format("20060102150405")
 			for _, direction := range []string{"up", "down"} {
-				basename := fmt.Sprintf("%s_%s.%s%s", version, name, direction, *ext)
+				basename := fmt.Sprintf("%s_%s.%s%s", version, name, direction, ext)
 				filename := filepath.Join(dir, basename)
 
 				if err := createFile(filename); err != nil {
@@ -70,7 +70,7 @@ func createCommand(config configs.Migration) *cobra.Command {
 			}
 		},
 	}
-	cmd.Flags().StringVarP(ext, "ext", "e", config.Extension, "file extension")
+	cmd.Flags().StringVarP(&ext, "ext", "e", config.Extension, "file extension")
 	return cmd
 }
 
