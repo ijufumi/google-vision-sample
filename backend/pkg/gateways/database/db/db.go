@@ -20,5 +20,5 @@ func NewDB(config *configs.Config) *gorm.DB {
 
 func DsnString(config *configs.Config) string {
 	dbConfig := config.DB
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True", dbConfig.User, dbConfig.Password, dbConfig.Host, dbConfig.Port, dbConfig.Name)
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disabl", dbConfig.Host, dbConfig.User, dbConfig.Password, dbConfig.Name, dbConfig.Port)
 }
