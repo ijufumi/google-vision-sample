@@ -30,5 +30,6 @@ func New() *Config {
 		fmt.Println(err)
 	}
 
+	fmt.Println(fmt.Sprintf("%+v", c))
 	return &c
 }
