@@ -19,8 +19,8 @@ RUN apt-get update \
 
 COPY --from=build /app/app /app/app
 COPY --from=build /app/db /app/db
-COPY migration /app
-COPY scripts /app
+COPY migration /app/migration
+COPY scripts /app/scripts
 
 RUN chmod +x /app/scripts/entrypoint.sh
 
