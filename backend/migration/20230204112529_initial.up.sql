@@ -25,3 +25,4 @@ create table if not exists extracted_texts
 );
 
 create index if not exists idx_extracted_texts_deleted_at on extracted_texts (deleted_at);
+create index if not exists idx_extracted_texts_extraction_result_id on extracted_texts (extraction_result_id);
