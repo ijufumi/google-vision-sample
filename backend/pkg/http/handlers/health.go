@@ -15,7 +15,9 @@ func NewHealthHandler() HealthHandler {
 }
 
 func (h *healthHandler) Get(ctx *gin.Context) {
-	ctx.Status(http.StatusOK)
+	ctx.JSONP(http.StatusOK, map[string]string{
+		"status": "OK",
+	})
 }
 
 type healthHandler struct {
