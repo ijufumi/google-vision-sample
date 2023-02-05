@@ -28,6 +28,9 @@ type DB struct {
 
 type Google struct {
 	Credential string `env:"GOOGLE_CREDENTIAL"`
+	Storage    struct {
+		Bucket string `env:"GOOGLE_STORAGE_BUCKET"`
+	}
 }
 
 func New() *Config {
