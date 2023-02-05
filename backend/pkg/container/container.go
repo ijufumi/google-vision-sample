@@ -6,6 +6,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/repositories"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/clients"
 	"github.com/ijufumi/google-vision-sample/pkg/http/handlers"
+	"github.com/ijufumi/google-vision-sample/pkg/services"
 	"go.uber.org/dig"
 )
 
@@ -37,6 +38,9 @@ func (c *container) provide() {
 	_ = c.container.Provide(configs.New)
 	// handlers
 	_ = c.container.Provide(handlers.NewHealthHandler)
+	_ = c.container.Provide(handlers.NewDetectTextHandler)
+	// services
+	_ = c.container.Provide(services.NewDetectTextService)
 	// database
 	_ = c.container.Provide(db.NewDB)
 	_ = c.container.Provide(repositories.NewExtractionResultRepository)
