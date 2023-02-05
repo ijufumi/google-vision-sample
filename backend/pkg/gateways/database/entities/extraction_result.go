@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type ExtractionResults struct {
+type ExtractionResult struct {
 	gorm.Model
 	ID             string
 	Status         string
