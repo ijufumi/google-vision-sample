@@ -4,6 +4,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/configs"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/db"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/repositories"
+	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/clients"
 	"github.com/ijufumi/google-vision-sample/pkg/http/handlers"
 	"go.uber.org/dig"
 )
@@ -38,9 +39,11 @@ func (c *container) provide() {
 	_ = c.container.Provide(handlers.NewHealthHandler)
 	// database
 	_ = c.container.Provide(db.NewDB)
-	// repositories
 	_ = c.container.Provide(repositories.NewExtractionResultRepository)
 	_ = c.container.Provide(repositories.NewExtractedTextRepository)
+	// google
+	_ = c.container.Provide(clients.NewStorageAPIClient)
+	_ = c.container.Provide(clients.NewVisionAPIClient)
 }
 
 func (c *container) Container() *dig.Container {

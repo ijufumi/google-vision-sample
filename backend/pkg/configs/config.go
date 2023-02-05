@@ -9,6 +9,7 @@ import (
 type Config struct {
 	Migration Migration
 	DB        DB
+	Google    Google
 }
 
 type Migration struct {
@@ -23,6 +24,10 @@ type DB struct {
 	Port     uint   `env:"DB_PORT" envDefault:"5432"`
 	Name     string `env:"DB_NAME"`
 	Host     string `env:"DB_HOST"`
+}
+
+type Google struct {
+	Credential string `env:"GOOGLE_CREDENTIAL"`
 }
 
 func New() *Config {
