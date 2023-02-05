@@ -68,7 +68,7 @@ func createCommand(config configs.Migration) *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVarP(&ext, "ext", "e", config.Extension, "file extension")
-	cmd.Flags().StringVarP(&name, "name", "n", config.Extension, "file name")
+	cmd.Flags().StringVarP(&name, "name", "n", config.Name, "file name")
 	return cmd
 }
 

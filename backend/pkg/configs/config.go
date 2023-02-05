@@ -14,6 +14,7 @@ type Config struct {
 type Migration struct {
 	Path      string `env:"MIGRATION_PATH" envDefault:"migration"`
 	Extension string `env:"MIGRATION_EXTENSION" envDefault:".sql"`
+	Name      string `env:"MIGRATION_NAME" envDefault:"hoge"`
 }
 
 type DB struct {
