@@ -9,5 +9,6 @@ type ExtractionResult struct {
 	ID             string
 	Status         string
 	ImageUri       string
+	OutputUri      *string
 	ExtractedTexts []ExtractedText
 }
