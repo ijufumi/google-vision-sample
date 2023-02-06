@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities/enums"
@@ -8,7 +9,9 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/clients"
 	"github.com/ijufumi/google-vision-sample/pkg/models"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
+	"google.golang.org/appengine/log"
 	"gorm.io/gorm"
+	"io"
 	"os"
 )
 
@@ -34,18 +37,26 @@ func NewDetectTextService(
 }
 
 func (s *detectTextService) GetResults() ([]models.ExtractionResult, error) {
-	results, err := s.extractionResultRepository.GetAll()
+	results, err := s.extractionResultRepository.GetAll(s.db)
 	if err != nil {
 		return nil, err
 	}
 
 	var extractionResults []models.ExtractionResult
 	for _, result := range results {
+		imageUri := ""
+		if len(result.ImageKey) != 0 {
+			imageUri, _ = s.storageAPIClient.SignedURL(result.ImageKey)
+		}
+		outputUri := ""
+		if result.OutputKey != nil {
+			outputUri, _ = s.storageAPIClient.SignedURL(*result.OutputKey)
+		}
 		extractionResults = append(extractionResults, models.ExtractionResult{
 			ID:        result.ID,
 			Status:    result.Status,
-			ImageUri:  result.ImageUri,
-			OutputUri: result.OutputUri,
+			ImageUri:  imageUri,
+			OutputUri: outputUri,
 			CreatedAt: result.CreatedAt,
 			UpdatedAt: result.UpdatedAt,
 		})
@@ -61,16 +72,40 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 	if err != nil {
 		return nil
 	}
-	return s.db.Transaction(func(tx *gorm.DB) error {
-		result := entities.ExtractionResult{
-			ID:     id,
-			Status: enums.ExtractionResultStatus_Runing,
-		}
-		err := s.extractionResultRepository.Create(result)
-		if err != nil {
-			return err
-		}
+	result := entities.ExtractionResult{
+		ID:       id,
+		Status:   enums.ExtractionResultStatus_Runing,
+		ImageKey: key,
+	}
+	err = s.extractionResultRepository.Create(s.db, result)
+	if err != nil {
+		return err
+	}
+	status := enums.ExtractionResultStatus_Succeeded
+	defer func() {
+		result.Status = status
+		_ = s.extractionResultRepository.Update(s.db, result)
+	}()
 
+	outputKey, err := s.visionAPIClient.DetectText(key)
+	if err != nil {
+		status = enums.ExtractionResultStatus_Failed
+		return err
+	}
+
+	outputFile, err := s.storageAPIClient.DownloadFile(outputKey)
+	if err != nil {
+		return err
+	}
+
+	bytes, err := io.ReadAll(outputFile)
+	if err != nil {
+		return err
+	}
+
+	log.Infof(context.Background(), "%+v", string(bytes))
+
+	return s.db.Transaction(func(tx *gorm.DB) error {
 		return nil
 	})
 }
