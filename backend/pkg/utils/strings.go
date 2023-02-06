@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"github.com/oklog/ulid/v2"
 	"math/rand"
 	"time"
 )
@@ -15,4 +16,8 @@ func NewRandomString(digit int) string {
 	}
 
 	return result
+}
+
+func NewULID() string {
+	return ulid.Make().String()
 }
