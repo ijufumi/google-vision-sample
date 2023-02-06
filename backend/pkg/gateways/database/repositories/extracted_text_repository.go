@@ -6,24 +6,21 @@ import (
 )
 
 type ExtractedTextRepository interface {
-	GetByExtractionResultID(extractionResultID string) ([]entities.ExtractedText, error)
-	Create(entity entities.ExtractedText) error
-	DeleteByExtractionResultID(extractionResultID string) error
+	GetByExtractionResultID(db *gorm.DB, extractionResultID string) ([]entities.ExtractedText, error)
+	Create(db *gorm.DB, entity entities.ExtractedText) error
+	DeleteByExtractionResultID(db *gorm.DB, extractionResultID string) error
 }
 
-func NewExtractedTextRepository(db *gorm.DB) ExtractedTextRepository {
-	return &extractedTextRepository{
-		db: db,
-	}
+func NewExtractedTextRepository() ExtractedTextRepository {
+	return &extractedTextRepository{}
 }
 
 type extractedTextRepository struct {
-	db *gorm.DB
 }
 
-func (r *extractedTextRepository) GetByExtractionResultID(extractionResultID string) ([]entities.ExtractedText, error) {
+func (r *extractedTextRepository) GetByExtractionResultID(db *gorm.DB, extractionResultID string) ([]entities.ExtractedText, error) {
 	var results []entities.ExtractedText
-	if err := r.db.Where(map[string]string{
+	if err := db.Where(map[string]string{
 		"extractionResultID": extractionResultID,
 	}).Find(&results).Error; err != nil {
 		return nil, err
@@ -31,15 +28,15 @@ func (r *extractedTextRepository) GetByExtractionResultID(extractionResultID str
 	return results, nil
 }
 
-func (r *extractedTextRepository) Create(entity entities.ExtractedText) error {
-	if err := r.db.Create(&entity).Error; err != nil {
+func (r *extractedTextRepository) Create(db *gorm.DB, entity entities.ExtractedText) error {
+	if err := db.Create(&entity).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *extractedTextRepository) DeleteByExtractionResultID(extractionResultID string) error {
-	if err := r.db.Model(&entities.ExtractedText{}).Delete(map[string]string{
+func (r *extractedTextRepository) DeleteByExtractionResultID(db *gorm.DB, extractionResultID string) error {
+	if err := db.Model(&entities.ExtractedText{}).Delete(map[string]string{
 		"extractionResultID": extractionResultID,
 	}).Error; err != nil {
 		return err

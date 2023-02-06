@@ -6,34 +6,31 @@ import (
 )
 
 type ExtractionResultRepository interface {
-	GetAll() ([]entities.ExtractionResult, error)
-	GetByID(id string) (*entities.ExtractionResult, error)
-	Create(entity entities.ExtractionResult) error
-	Update(entity entities.ExtractionResult) error
-	Delete(id string) error
+	GetAll(db *gorm.DB) ([]entities.ExtractionResult, error)
+	GetByID(db *gorm.DB, id string) (*entities.ExtractionResult, error)
+	Create(db *gorm.DB, entity entities.ExtractionResult) error
+	Update(db *gorm.DB, entity entities.ExtractionResult) error
+	Delete(db *gorm.DB, id string) error
 }
 
-func NewExtractionResultRepository(db *gorm.DB) ExtractionResultRepository {
-	return &extractionResultRepository{
-		db: db,
-	}
+func NewExtractionResultRepository() ExtractionResultRepository {
+	return &extractionResultRepository{}
 }
 
 type extractionResultRepository struct {
-	db *gorm.DB
 }
 
-func (r *extractionResultRepository) GetAll() ([]entities.ExtractionResult, error) {
+func (r *extractionResultRepository) GetAll(db *gorm.DB) ([]entities.ExtractionResult, error) {
 	var results []entities.ExtractionResult
-	if err := r.db.Preload("ExtractedTexts").Find(&results).Error; err != nil {
+	if err := db.Preload("ExtractedTexts").Find(&results).Error; err != nil {
 		return nil, err
 	}
 	return results, nil
 }
 
-func (r *extractionResultRepository) GetByID(id string) (*entities.ExtractionResult, error) {
+func (r *extractionResultRepository) GetByID(db *gorm.DB, id string) (*entities.ExtractionResult, error) {
 	var result *entities.ExtractionResult
-	if err := r.db.Preload("ExtractedTexts").Where(map[string]string{
+	if err := db.Preload("ExtractedTexts").Where(map[string]string{
 		"id": id,
 	}).First(result).Error; err != nil {
 		return nil, err
@@ -41,22 +38,22 @@ func (r *extractionResultRepository) GetByID(id string) (*entities.ExtractionRes
 	return result, nil
 }
 
-func (r *extractionResultRepository) Create(entity entities.ExtractionResult) error {
-	if err := r.db.Create(&entity).Error; err != nil {
+func (r *extractionResultRepository) Create(db *gorm.DB, entity entities.ExtractionResult) error {
+	if err := db.Create(&entity).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *extractionResultRepository) Update(entity entities.ExtractionResult) error {
-	if err := r.db.Save(&entity).Error; err != nil {
+func (r *extractionResultRepository) Update(db *gorm.DB, entity entities.ExtractionResult) error {
+	if err := db.Save(&entity).Error; err != nil {
 		return nil
 	}
 	return nil
 }
 
-func (r *extractionResultRepository) Delete(id string) error {
-	if err := r.db.Model(&entities.ExtractionResult{}).Delete(map[string]string{
+func (r *extractionResultRepository) Delete(db *gorm.DB, id string) error {
+	if err := db.Model(&entities.ExtractionResult{}).Delete(map[string]string{
 		"id": id,
 	}).Error; err != nil {
 		return err
