@@ -9,7 +9,7 @@ type ExtractionResult struct {
 	gorm.Model
 	ID             string
 	Status         enums.ExtractionResultStatus
-	ImageUri       string
-	OutputUri      *string
+	ImageKey       string
+	OutputKey      *string
 	ExtractedTexts []ExtractedText
 }
