@@ -8,10 +8,13 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"io"
 	"os"
+	"time"
 )
 
 type StorageAPIClient interface {
 	UploadFile(key string, file *os.File) error
+	DownloadFile(key string) (*os.File, error)
+	SignedURL(key string) (string, error)
 }
 
 func NewStorageAPIClient(config *configs.Config) StorageAPIClient {
@@ -67,6 +70,21 @@ func (c *storageAPIClient) DownloadFile(key string) (*os.File, error) {
 		return nil, err
 	}
 	return tempFile, nil
+}
+
+func (c *storageAPIClient) SignedURL(key string) (string, error) {
+	client := c.newClient()
+	defer func() {
+		_ = client.Close()
+	}()
+	option := &storage.SignedURLOptions{
+		Expires: time.Now().UTC().Add(time.Duration(c.config.Google.Storage.SignedURL.ExpireSec) * time.Second),
+	}
+	signedURL, err := client.Bucket(c.config.Google.Storage.Bucket).SignedURL(key, option)
+	if err != nil {
+		return "", err
+	}
+	return signedURL, nil
 }
 
 func (c *storageAPIClient) newClient() *storage.Client {
