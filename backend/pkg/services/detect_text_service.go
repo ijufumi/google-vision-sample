@@ -42,7 +42,7 @@ func (s *detectTextService) GetResults() ([]models.ExtractionResult, error) {
 		return nil, err
 	}
 
-	var extractionResults []models.ExtractionResult
+	extractionResults := make([]models.ExtractionResult, 0)
 	for _, result := range results {
 		imageUri := ""
 		if len(result.ImageKey) != 0 {
