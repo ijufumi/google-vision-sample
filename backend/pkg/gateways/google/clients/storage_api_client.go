@@ -28,7 +28,10 @@ type storageAPIClient struct {
 }
 
 func (c *storageAPIClient) UploadFile(key string, file *os.File) error {
-	client := c.newClient()
+	client, err := c.newClient()
+	if err != nil {
+		return err
+	}
 	defer func() {
 		_ = client.Close()
 	}()
@@ -46,7 +49,10 @@ func (c *storageAPIClient) UploadFile(key string, file *os.File) error {
 }
 
 func (c *storageAPIClient) DownloadFile(key string) (*os.File, error) {
-	client := c.newClient()
+	client, err := c.newClient()
+	if err != nil {
+		return nil, err
+	}
 	defer func() {
 		_ = client.Close()
 	}()
@@ -73,7 +79,10 @@ func (c *storageAPIClient) DownloadFile(key string) (*os.File, error) {
 }
 
 func (c *storageAPIClient) SignedURL(key string) (string, error) {
-	client := c.newClient()
+	client, err := c.newClient()
+	if err != nil {
+		return "", err
+	}
 	defer func() {
 		_ = client.Close()
 	}()
@@ -87,11 +96,14 @@ func (c *storageAPIClient) SignedURL(key string) (string, error) {
 	return signedURL, nil
 }
 
-func (c *storageAPIClient) newClient() *storage.Client {
-	option := options.GetCredentialOption(c.config)
+func (c *storageAPIClient) newClient() (*storage.Client, error) {
+	option, err := options.GetCredentialOption(c.config)
+	if err != nil {
+		return nil, err
+	}
 	service, err := storage.NewClient(context.Background(), option)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return service
+	return service, nil
 }

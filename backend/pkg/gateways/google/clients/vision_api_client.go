@@ -21,7 +21,11 @@ func NewVisionAPIClient(config *configs.Config) VisionAPIClient {
 }
 
 func (c *visionAPIClient) DetectText(key string) (string, error) {
-	client := c.newClient()
+	client, err := c.newClient()
+	if err != nil {
+		return "", err
+	}
+
 	defer func() {
 		_ = client.Close()
 	}()
@@ -61,11 +65,14 @@ type visionAPIClient struct {
 	config *configs.Config
 }
 
-func (c *visionAPIClient) newClient() *vision.ImageAnnotatorClient {
-	option := options.GetCredentialOption(c.config)
+func (c *visionAPIClient) newClient() (*vision.ImageAnnotatorClient, error) {
+	option, err := options.GetCredentialOption(c.config)
+	if err != nil {
+		return nil, err
+	}
 	service, err := vision.NewImageAnnotatorClient(context.Background(), option)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return service
+	return service, nil
 }
