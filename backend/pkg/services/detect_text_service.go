@@ -95,6 +95,7 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 
 	outputFile, err := s.storageAPIClient.DownloadFile(outputKey)
 	if err != nil {
+		status = enums.ExtractionResultStatus_Failed
 		return err
 	}
 
