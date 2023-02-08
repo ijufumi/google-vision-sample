@@ -1,11 +1,10 @@
 package handlers
 
 import (
-	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/ijufumi/google-vision-sample/pkg/services"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
-	"google.golang.org/appengine/log"
 	"net/http"
 	"os"
 )
@@ -51,7 +50,7 @@ func (h *detectTextHandler) Post(ctx *gin.Context) {
 	_ = ctx.SaveUploadedFile(inputFile, tempFile.Name())
 	err = h.service.DetectTexts(tempFile)
 	if err != nil {
-		log.Errorf(context.Background(), "%v", err)
+		fmt.Println(err)
 		_ = ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
