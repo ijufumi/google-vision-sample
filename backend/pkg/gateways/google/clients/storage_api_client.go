@@ -58,6 +58,7 @@ func (c *storageAPIClient) DownloadFile(key string) (*os.File, error) {
 	defer func() {
 		_ = client.Close()
 	}()
+	fmt.Println(fmt.Sprintf("key is %s", key))
 	object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
 	storageReader, err := object.NewReader(context.Background())
 	if err != nil {
