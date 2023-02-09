@@ -27,8 +27,9 @@ type DB struct {
 }
 
 type Google struct {
-	Credential string `env:"GOOGLE_CREDENTIAL"`
-	Storage    struct {
+	Credential     string `env:"GOOGLE_CREDENTIAL"`
+	CredentialFile string `env:"GOOGLE_CREDENTIAL_FILE"`
+	Storage        struct {
 		Bucket    string `env:"GOOGLE_STORAGE_BUCKET"`
 		SignedURL struct {
 			ExpireSec int64 `env:"GOOGLE_STORAGE_SIGNED_URL_EXPIRE_SEC" envDefault:"3600"`
