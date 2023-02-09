@@ -8,6 +8,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/options"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"github.com/pkg/errors"
+	"google.golang.org/api/iterator"
 	"io"
 	"os"
 	"time"
@@ -16,6 +17,7 @@ import (
 type StorageAPIClient interface {
 	UploadFile(key string, file *os.File) error
 	DownloadFile(key string) (*os.File, error)
+	QueryFiles(key string) ([]string, error)
 	SignedURL(key string) (string, error)
 }
 
@@ -97,6 +99,33 @@ func (c *storageAPIClient) SignedURL(key string) (string, error) {
 		return "", errors.Wrap(err, "StorageAPIClient#SignedURL")
 	}
 	return signedURL, nil
+}
+
+func (c *storageAPIClient) QueryFiles(key string) ([]string, error) {
+	client, err := c.newClient()
+	if err != nil {
+		return nil, errors.Wrap(err, "StorageAPIClient#QueryFiles")
+	}
+	defer func() {
+		_ = client.Close()
+	}()
+	query := &storage.Query{
+		Prefix: key,
+	}
+	objects := client.Bucket(c.config.Google.Storage.Bucket).Objects(context.Background(), query)
+	files := make([]string, 0)
+	for {
+		obj, err := objects.Next()
+		if err != nil {
+			if err == iterator.Done {
+				break
+			}
+			return nil, errors.Wrap(err, "StorageAPIClient#QueryFiles#Next")
+		}
+		files = append(files, obj.Name)
+	}
+
+	return files, nil
 }
 
 func (c *storageAPIClient) newClient() (*storage.Client, error) {

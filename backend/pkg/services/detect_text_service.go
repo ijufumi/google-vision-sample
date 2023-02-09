@@ -8,6 +8,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/clients"
 	"github.com/ijufumi/google-vision-sample/pkg/models"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
+	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"io"
 	"os"
@@ -92,7 +93,17 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 		return err
 	}
 
-	outputFile, err := s.storageAPIClient.DownloadFile(outputKey)
+	queryFiles, err := s.storageAPIClient.QueryFiles(outputKey)
+	if err != nil {
+		status = enums.ExtractionResultStatus_Failed
+		return err
+	}
+
+	if len(queryFiles) == 0 {
+		return errors.New("output does not exist")
+	}
+
+	outputFile, err := s.storageAPIClient.DownloadFile(queryFiles[0])
 	if err != nil {
 		status = enums.ExtractionResultStatus_Failed
 		return err
