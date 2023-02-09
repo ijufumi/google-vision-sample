@@ -8,7 +8,7 @@ import (
 
 type ExtractedTextRepository interface {
 	GetByExtractionResultID(db *gorm.DB, extractionResultID string) ([]entities.ExtractedText, error)
-	Create(db *gorm.DB, entity entities.ExtractedText) error
+	Create(db *gorm.DB, entity ...entities.ExtractedText) error
 	DeleteByExtractionResultID(db *gorm.DB, extractionResultID string) error
 }
 
@@ -29,7 +29,7 @@ func (r *extractedTextRepository) GetByExtractionResultID(db *gorm.DB, extractio
 	return results, nil
 }
 
-func (r *extractedTextRepository) Create(db *gorm.DB, entity entities.ExtractedText) error {
+func (r *extractedTextRepository) Create(db *gorm.DB, entity ...entities.ExtractedText) error {
 	if err := db.Create(&entity).Error; err != nil {
 		return errors.Wrap(err, "ExtractedTextRepository#Create")
 	}

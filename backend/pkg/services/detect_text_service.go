@@ -1,11 +1,13 @@
 package services
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities/enums"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/repositories"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/clients"
+	googleModels "github.com/ijufumi/google-vision-sample/pkg/gateways/google/models"
 	"github.com/ijufumi/google-vision-sample/pkg/models"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"github.com/pkg/errors"
@@ -115,9 +117,50 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 		return err
 	}
 
-	fmt.Println(fmt.Sprintf("%+v", string(bytes)))
+	var detectResponse googleModels.DetectTextResponses
+	if err = json.Unmarshal(bytes, &detectResponse); err != nil {
+		status = enums.ExtractionResultStatus_Failed
+		return err
+	}
 
-	return nil
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		extractedTexts := make([]entities.ExtractedText, 0)
+		for _, response := range detectResponse.Responses {
+			for _, page := range response.FullTextAnnotation.Pages {
+				for _, block := range page.Blocks {
+					for _, paragraph := range block.Paragraphs {
+						texts := ""
+						for _, word := range paragraph.Words {
+							for _, symbol := range word.Symbols {
+								texts += symbol.Text
+							}
+						}
+						vertices := paragraph.BoundingBox.Vertices
+						top := utils.MaxInArray(vertices[0].X)
+						bottom := utils.MaxInArray(vertices[0].X)
+						left := utils.MaxInArray(vertices[0].X)
+						right := utils.MaxInArray(vertices[0].X)
+						extractedText := entities.ExtractedText{
+							ID:                 utils.NewULID(),
+							ExtractionResultID: result.ID,
+							Text:               texts,
+							Top:                top,
+							Bottom:             bottom,
+							Left:               left,
+							Right:              right,
+						}
+
+						extractedTexts = append(extractedTexts, extractedText)
+					}
+				}
+			}
+		}
+		err := s.extractedTextRepository.Create(tx, extractedTexts...)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 type detectTextService struct {
