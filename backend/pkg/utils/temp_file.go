@@ -5,8 +5,11 @@ import (
 )
 
 func NewTempFile() (*os.File, error) {
+	return NewTempFileWithName(NewRandomString(10))
+}
+
+func NewTempFileWithName(fileName string) (*os.File, error) {
 	tempDir := os.TempDir()
-	fileName := NewRandomString(10)
 	file, err := os.CreateTemp(tempDir, fileName)
 	if err != nil {
 		return nil, err

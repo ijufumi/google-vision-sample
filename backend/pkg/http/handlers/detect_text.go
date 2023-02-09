@@ -40,7 +40,7 @@ func (h *detectTextHandler) Post(ctx *gin.Context) {
 		_ = ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	tempFile, err := utils.NewTempFile()
+	tempFile, err := utils.NewTempFileWithName(inputFile.Filename)
 	if err != nil {
 		fmt.Println(err)
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)

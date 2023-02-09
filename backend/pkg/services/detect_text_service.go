@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 	"io"
 	"os"
+	"path/filepath"
 )
 
 type DetectTextService interface {
@@ -64,7 +65,7 @@ func (s *detectTextService) GetResults() ([]models.ExtractionResult, error) {
 
 func (s *detectTextService) DetectTexts(file *os.File) error {
 	id := utils.NewULID()
-	key := fmt.Sprintf("%s/%s", id, utils.NewRandomString(10))
+	key := fmt.Sprintf("%s/%s", id, filepath.Base(file.Name()))
 
 	err := s.storageAPIClient.UploadFile(key, file)
 	if err != nil {

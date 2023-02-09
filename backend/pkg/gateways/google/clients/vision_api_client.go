@@ -31,8 +31,10 @@ func (c *visionAPIClient) DetectText(key string) (string, error) {
 		_ = client.Close()
 	}()
 
-	imageUri := fmt.Sprintf("gs://%s/%s", c.config.Google.Storage.Bucket, key)
-	outputUri := fmt.Sprintf("gs://%s/%s-output-%d.json", c.config.Google.Storage.Bucket, key, time.Now().UTC().Unix())
+	imageUri := MakeToGCSUri(c.config.Google.Storage.Bucket, key)
+	outputKey := fmt.Sprintf("%s-output-%d.json", key, time.Now().UTC().Unix())
+	outputUri := fmt.Sprintf("gs://%s/%s", c.config.Google.Storage.Bucket, outputKey)
+
 	fmt.Println(fmt.Sprintf("imageUri is %s", imageUri))
 	fmt.Println(fmt.Sprintf("outputUri is %s", outputUri))
 	request := &visionpb.AsyncBatchAnnotateImagesRequest{
@@ -61,7 +63,7 @@ func (c *visionAPIClient) DetectText(key string) (string, error) {
 		return "", errors.Wrap(err, "VisionAPIClient#DetectText")
 	}
 
-	return outputUri, nil
+	return outputKey, nil
 }
 
 type visionAPIClient struct {

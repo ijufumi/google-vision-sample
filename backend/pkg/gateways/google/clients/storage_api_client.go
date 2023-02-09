@@ -3,6 +3,7 @@ package clients
 import (
 	"cloud.google.com/go/storage"
 	"context"
+	"fmt"
 	"github.com/ijufumi/google-vision-sample/pkg/configs"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/options"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
@@ -104,4 +105,8 @@ func (c *storageAPIClient) newClient() (*storage.Client, error) {
 		return nil, errors.Wrap(err, "StorageAPIClient#newClient")
 	}
 	return service, nil
+}
+
+func MakeToGCSUri(bucket, key string) string {
+	return fmt.Sprintf("gs://%s/%s", bucket, key)
 }
