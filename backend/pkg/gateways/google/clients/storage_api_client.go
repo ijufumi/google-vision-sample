@@ -6,6 +6,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/configs"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/options"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
+	"github.com/pkg/errors"
 	"io"
 	"os"
 	"time"
@@ -30,7 +31,7 @@ type storageAPIClient struct {
 func (c *storageAPIClient) UploadFile(key string, file *os.File) error {
 	client, err := c.newClient()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "StorageAPIClient#UploadFile")
 	}
 	defer func() {
 		_ = client.Close()
@@ -43,7 +44,7 @@ func (c *storageAPIClient) UploadFile(key string, file *os.File) error {
 	}()
 
 	if _, err := io.Copy(storageWriter, file); err != nil {
-		return err
+		return errors.Wrap(err, "StorageAPIClient#UploadFile")
 	}
 	return nil
 }
@@ -51,7 +52,7 @@ func (c *storageAPIClient) UploadFile(key string, file *os.File) error {
 func (c *storageAPIClient) DownloadFile(key string) (*os.File, error) {
 	client, err := c.newClient()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "StorageAPIClient#DownloadFile")
 	}
 	defer func() {
 		_ = client.Close()
@@ -59,21 +60,21 @@ func (c *storageAPIClient) DownloadFile(key string) (*os.File, error) {
 	object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
 	storageReader, err := object.NewReader(context.Background())
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "StorageAPIClient#DownloadFile")
 	}
 	defer func() {
 		_ = storageReader.Close()
 	}()
 	tempFile, err := utils.NewTempFile()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "StorageAPIClient#DownloadFile")
 	}
 	if _, err = io.Copy(tempFile, storageReader); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "StorageAPIClient#DownloadFile")
 	}
 	_, err = tempFile.Seek(0, 0)
 	if _, err = io.Copy(tempFile, storageReader); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "StorageAPIClient#DownloadFile")
 	}
 	return tempFile, nil
 }
@@ -81,7 +82,7 @@ func (c *storageAPIClient) DownloadFile(key string) (*os.File, error) {
 func (c *storageAPIClient) SignedURL(key string) (string, error) {
 	client, err := c.newClient()
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "StorageAPIClient#SignedURL")
 	}
 	defer func() {
 		_ = client.Close()
@@ -91,7 +92,7 @@ func (c *storageAPIClient) SignedURL(key string) (string, error) {
 	}
 	signedURL, err := client.Bucket(c.config.Google.Storage.Bucket).SignedURL(key, option)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "StorageAPIClient#SignedURL")
 	}
 	return signedURL, nil
 }
@@ -100,7 +101,7 @@ func (c *storageAPIClient) newClient() (*storage.Client, error) {
 	option := options.GetCredentialOption(c.config)
 	service, err := storage.NewClient(context.Background(), option)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "StorageAPIClient#newClient")
 	}
 	return service, nil
 }

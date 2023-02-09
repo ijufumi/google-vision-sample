@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities"
+	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
 
@@ -23,14 +24,14 @@ func (r *extractedTextRepository) GetByExtractionResultID(db *gorm.DB, extractio
 	if err := db.Where(map[string]string{
 		"extractionResultID": extractionResultID,
 	}).Find(&results).Error; err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "ExtractedTextRepository#GetByExtractionResultID")
 	}
 	return results, nil
 }
 
 func (r *extractedTextRepository) Create(db *gorm.DB, entity entities.ExtractedText) error {
 	if err := db.Create(&entity).Error; err != nil {
-		return err
+		return errors.Wrap(err, "ExtractedTextRepository#Create")
 	}
 	return nil
 }
@@ -39,7 +40,7 @@ func (r *extractedTextRepository) DeleteByExtractionResultID(db *gorm.DB, extrac
 	if err := db.Model(&entities.ExtractedText{}).Delete(map[string]string{
 		"extractionResultID": extractionResultID,
 	}).Error; err != nil {
-		return err
+		return errors.Wrap(err, "ExtractionResultRepository#DeleteByExtractionResultID")
 	}
 	return nil
 }

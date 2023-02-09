@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/ijufumi/google-vision-sample/pkg/configs"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/options"
+	"github.com/pkg/errors"
 	"time"
 )
 
@@ -23,7 +24,7 @@ func NewVisionAPIClient(config *configs.Config) VisionAPIClient {
 func (c *visionAPIClient) DetectText(key string) (string, error) {
 	client, err := c.newClient()
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "VisionAPIClient#DetectText")
 	}
 
 	defer func() {
@@ -51,11 +52,11 @@ func (c *visionAPIClient) DetectText(key string) (string, error) {
 	}
 	operation, err := client.AsyncBatchAnnotateImages(context.Background(), request)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "VisionAPIClient#DetectText")
 	}
 	_, err = operation.Wait(context.Background())
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "VisionAPIClient#DetectText")
 	}
 
 	return outputUri, nil
@@ -69,7 +70,7 @@ func (c *visionAPIClient) newClient() (*vision.ImageAnnotatorClient, error) {
 	option := options.GetCredentialOption(c.config)
 	service, err := vision.NewImageAnnotatorClient(context.Background(), option)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "VisionAPIClient#newClient")
 	}
 	return service, nil
 }
