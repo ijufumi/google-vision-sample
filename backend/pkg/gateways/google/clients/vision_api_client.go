@@ -33,11 +33,13 @@ func (c *visionAPIClient) DetectText(key string) (string, error) {
 
 	imageUri := fmt.Sprintf("gs://%s/%s", c.config.Google.Storage.Bucket, key)
 	outputUri := fmt.Sprintf("gs://%s/%s-output-%d.json", c.config.Google.Storage.Bucket, key, time.Now().UTC().Unix())
+	fmt.Println(fmt.Sprintf("imageUri is %s", imageUri))
+	fmt.Println(fmt.Sprintf("outputUri is %s", outputUri))
 	request := &visionpb.AsyncBatchAnnotateImagesRequest{
 		Requests: []*visionpb.AnnotateImageRequest{
 			&visionpb.AnnotateImageRequest{
 				Image: &visionpb.Image{
-					Source: &visionpb.ImageSource{GcsImageUri: imageUri},
+					Source: &visionpb.ImageSource{ImageUri: imageUri},
 				},
 				Features: []*visionpb.Feature{
 					&visionpb.Feature{Type: visionpb.Feature_TEXT_DETECTION},
