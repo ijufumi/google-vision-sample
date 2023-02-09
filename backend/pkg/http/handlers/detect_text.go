@@ -36,18 +36,25 @@ func (h *detectTextHandler) Get(ctx *gin.Context) {
 func (h *detectTextHandler) Post(ctx *gin.Context) {
 	inputFile, err := ctx.FormFile("file")
 	if err != nil {
+		fmt.Println(err)
 		_ = ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 	tempFile, err := utils.NewTempFile()
 	if err != nil {
+		fmt.Println(err)
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 	defer func() {
 		_ = os.Remove(tempFile.Name())
 	}()
-	_ = ctx.SaveUploadedFile(inputFile, tempFile.Name())
+	err = ctx.SaveUploadedFile(inputFile, tempFile.Name())
+	if err != nil {
+		fmt.Println(err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 	err = h.service.DetectTexts(tempFile)
 	if err != nil {
 		fmt.Println(err)
