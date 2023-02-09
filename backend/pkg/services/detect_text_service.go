@@ -1,7 +1,6 @@
 package services
 
 import (
-	"context"
 	"fmt"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities/enums"
@@ -9,7 +8,6 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/clients"
 	"github.com/ijufumi/google-vision-sample/pkg/models"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
-	"google.golang.org/appengine/log"
 	"gorm.io/gorm"
 	"io"
 	"os"
@@ -70,7 +68,7 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 
 	err := s.storageAPIClient.UploadFile(key, file)
 	if err != nil {
-		return nil
+		return err
 	}
 	result := entities.ExtractionResult{
 		ID:       id,
@@ -101,14 +99,13 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 
 	bytes, err := io.ReadAll(outputFile)
 	if err != nil {
+		status = enums.ExtractionResultStatus_Failed
 		return err
 	}
 
-	log.Infof(context.Background(), "%+v", string(bytes))
+	fmt.Println(fmt.Sprintf("%+v", string(bytes)))
 
-	return s.db.Transaction(func(tx *gorm.DB) error {
-		return nil
-	})
+	return nil
 }
 
 type detectTextService struct {
