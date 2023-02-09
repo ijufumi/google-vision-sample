@@ -58,10 +58,12 @@ func (c *visionAPIClient) DetectText(key string) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "VisionAPIClient#DetectText")
 	}
-	_, err = operation.Wait(context.Background())
+	response, err := operation.Wait(context.Background())
 	if err != nil {
 		return "", errors.Wrap(err, "VisionAPIClient#DetectText")
 	}
+
+	fmt.Println(fmt.Sprintf("%+v", response))
 
 	return outputKey, nil
 }
