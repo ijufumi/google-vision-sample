@@ -97,10 +97,7 @@ func (c *storageAPIClient) SignedURL(key string) (string, error) {
 }
 
 func (c *storageAPIClient) newClient() (*storage.Client, error) {
-	option, err := options.GetCredentialOption(c.config)
-	if err != nil {
-		return nil, err
-	}
+	option := options.GetCredentialOption(c.config)
 	service, err := storage.NewClient(context.Background(), option)
 	if err != nil {
 		return nil, err

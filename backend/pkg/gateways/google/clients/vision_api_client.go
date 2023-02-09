@@ -66,10 +66,7 @@ type visionAPIClient struct {
 }
 
 func (c *visionAPIClient) newClient() (*vision.ImageAnnotatorClient, error) {
-	option, err := options.GetCredentialOption(c.config)
-	if err != nil {
-		return nil, err
-	}
+	option := options.GetCredentialOption(c.config)
 	service, err := vision.NewImageAnnotatorClient(context.Background(), option)
 	if err != nil {
 		return nil, err
