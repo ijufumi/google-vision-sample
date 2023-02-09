@@ -21,6 +21,7 @@ COPY --from=build /app/app /app/app
 COPY --from=build /app/db /app/db
 COPY migration /app/migration
 COPY scripts /app/scripts
+COPY configs /app/configs
 
 RUN chmod +x /app/scripts/entrypoint.sh
 
