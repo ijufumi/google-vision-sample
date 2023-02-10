@@ -10,8 +10,9 @@ import (
 )
 
 type DetectTextHandler interface {
-	Get(ctx *gin.Context)
-	Post(ctx *gin.Context)
+	Gets(ctx *gin.Context)
+	GetByID(ctx *gin.Context)
+	Create(ctx *gin.Context)
 }
 
 func NewDetectTextHandler(service services.DetectTextService) DetectTextHandler {
@@ -24,7 +25,7 @@ type detectTextHandler struct {
 	service services.DetectTextService
 }
 
-func (h *detectTextHandler) Get(ctx *gin.Context) {
+func (h *detectTextHandler) Gets(ctx *gin.Context) {
 	results, err := h.service.GetResults()
 	if err != nil {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
@@ -33,7 +34,17 @@ func (h *detectTextHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, results)
 }
 
-func (h *detectTextHandler) Post(ctx *gin.Context) {
+func (h *detectTextHandler) GetByID(ctx *gin.Context) {
+	id := ctx.Param("id")
+	result, err := h.service.GetResultByID(id)
+	if err != nil {
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, result)
+}
+
+func (h *detectTextHandler) Create(ctx *gin.Context) {
 	inputFile, err := ctx.FormFile("file")
 	if err != nil {
 		fmt.Println(err)

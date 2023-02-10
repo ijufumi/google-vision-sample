@@ -18,7 +18,8 @@ import (
 )
 
 type DetectTextService interface {
-	GetResults() ([]models.ExtractionResult, error)
+	GetResults() ([]*models.ExtractionResult, error)
+	GetResultByID(id string) (*models.ExtractionResult, error)
 	DetectTexts(file *os.File) error
 }
 
@@ -38,32 +39,25 @@ func NewDetectTextService(
 	}
 }
 
-func (s *detectTextService) GetResults() ([]models.ExtractionResult, error) {
+func (s *detectTextService) GetResults() ([]*models.ExtractionResult, error) {
 	results, err := s.extractionResultRepository.GetAll(s.db)
 	if err != nil {
 		return nil, err
 	}
 
-	extractionResults := make([]models.ExtractionResult, 0)
+	extractionResults := make([]*models.ExtractionResult, 0)
 	for _, result := range results {
-		imageUri := ""
-		if len(result.ImageKey) != 0 {
-			imageUri, _ = s.storageAPIClient.SignedURL(result.ImageKey)
-		}
-		outputUri := ""
-		if result.OutputKey != nil {
-			outputUri, _ = s.storageAPIClient.SignedURL(*result.OutputKey)
-		}
-		extractionResults = append(extractionResults, models.ExtractionResult{
-			ID:        result.ID,
-			Status:    result.Status,
-			ImageUri:  imageUri,
-			OutputUri: outputUri,
-			CreatedAt: result.CreatedAt,
-			UpdatedAt: result.UpdatedAt,
-		})
+		extractionResults = append(extractionResults, s.buildExtractionResultResponse(result))
 	}
 	return extractionResults, nil
+}
+
+func (s *detectTextService) GetResultByID(id string) (*models.ExtractionResult, error) {
+	result, err := s.extractionResultRepository.GetByID(s.db, id)
+	if err != nil {
+		return nil, err
+	}
+	return s.buildExtractionResultResponse(result), nil
 }
 
 func (s *detectTextService) DetectTexts(file *os.File) error {
@@ -167,6 +161,39 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 		}
 		return nil
 	})
+}
+
+func (s *detectTextService) buildExtractionResultResponse(entity *entities.ExtractionResult) *models.ExtractionResult {
+	imageUri := ""
+	if len(entity.ImageKey) != 0 {
+		imageUri, _ = s.storageAPIClient.SignedURL(entity.ImageKey)
+	}
+	outputUri := ""
+	if entity.OutputKey != nil {
+		outputUri, _ = s.storageAPIClient.SignedURL(*entity.OutputKey)
+	}
+	extractedTexts := make([]models.ExtractedText, 0)
+
+	for _, extractedText := range entity.ExtractedTexts {
+		extractedTexts = append(extractedTexts, models.ExtractedText{
+			ID:                 extractedText.ID,
+			ExtractionResultID: extractedText.ExtractionResultID,
+			Text:               extractedText.Text,
+			Top:                extractedText.Top,
+			Bottom:             extractedText.Bottom,
+			Left:               extractedText.Left,
+			Right:              extractedText.Right,
+		})
+	}
+	return &models.ExtractionResult{
+		ID:             entity.ID,
+		Status:         entity.Status,
+		ImageUri:       imageUri,
+		OutputUri:      outputUri,
+		CreatedAt:      entity.CreatedAt,
+		UpdatedAt:      entity.UpdatedAt,
+		ExtractedTexts: extractedTexts,
+	}
 }
 
 type detectTextService struct {

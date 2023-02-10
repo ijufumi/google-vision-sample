@@ -6,10 +6,11 @@ import (
 )
 
 type ExtractionResult struct {
-	ID        string                       `json:"id"`
-	Status    enums.ExtractionResultStatus `json:"status"`
-	ImageUri  string                       `json:"image_uri"`
-	OutputUri string                       `json:"output_uri"`
-	CreatedAt time.Time                    `json:"created_at"`
-	UpdatedAt time.Time                    `json:"updated_at"`
+	ID             string                       `json:"id"`
+	Status         enums.ExtractionResultStatus `json:"status"`
+	ImageUri       string                       `json:"imageUri"`
+	OutputUri      string                       `json:"outputUri"`
+	CreatedAt      time.Time                    `json:"createdAt"`
+	UpdatedAt      time.Time                    `json:"updatedAt"`
+	ExtractedTexts []ExtractedText              `json:"extractedTexts"`
 }

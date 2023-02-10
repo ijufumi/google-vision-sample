@@ -7,7 +7,7 @@ import (
 )
 
 type ExtractionResultRepository interface {
-	GetAll(db *gorm.DB) ([]entities.ExtractionResult, error)
+	GetAll(db *gorm.DB) ([]*entities.ExtractionResult, error)
 	GetByID(db *gorm.DB, id string) (*entities.ExtractionResult, error)
 	Create(db *gorm.DB, entity entities.ExtractionResult) error
 	Update(db *gorm.DB, entity entities.ExtractionResult) error
@@ -21,9 +21,9 @@ func NewExtractionResultRepository() ExtractionResultRepository {
 type extractionResultRepository struct {
 }
 
-func (r *extractionResultRepository) GetAll(db *gorm.DB) ([]entities.ExtractionResult, error) {
-	var results []entities.ExtractionResult
-	if err := db.Preload("ExtractedTexts").Find(&results).Error; err != nil {
+func (r *extractionResultRepository) GetAll(db *gorm.DB) ([]*entities.ExtractionResult, error) {
+	var results []*entities.ExtractionResult
+	if err := db.Find(&results).Error; err != nil {
 		return nil, errors.Wrap(err, "ExtractionResultRepository#GetAll")
 	}
 	return results, nil
