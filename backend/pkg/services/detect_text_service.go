@@ -136,10 +136,16 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 							}
 						}
 						vertices := paragraph.BoundingBox.Vertices
-						top := utils.MaxInArray(vertices[0].X)
-						bottom := utils.MaxInArray(vertices[0].X)
-						left := utils.MaxInArray(vertices[0].X)
-						right := utils.MaxInArray(vertices[0].X)
+						xArray := make([]float64, 0)
+						yArray := make([]float64, 0)
+						for _, _vertices := range vertices {
+							xArray = append(xArray, _vertices.X)
+							yArray = append(yArray, _vertices.Y)
+						}
+						top := utils.MinInArray(xArray...)
+						bottom := utils.MaxInArray(xArray...)
+						left := utils.MinInArray(yArray...)
+						right := utils.MaxInArray(yArray...)
 						extractedText := entities.ExtractedText{
 							ID:                 utils.NewULID(),
 							ExtractionResultID: result.ID,
