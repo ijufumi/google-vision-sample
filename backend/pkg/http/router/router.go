@@ -19,6 +19,7 @@ func NewRouter(c container.Container) Router {
 		api.GET("/health", healthHandler.Get)
 		detectTextHandler := container.Invoke[handlers.DetectTextHandler](c)
 		api.GET("/detect_texts", detectTextHandler.Gets)
+		api.GET("/detect_texts/:id", detectTextHandler.GetByID)
 		api.POST("/detect_texts", detectTextHandler.Create)
 	}
 	return &router{engine: r}
