@@ -183,6 +183,8 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Extra
 			Bottom:             extractedText.Bottom,
 			Left:               extractedText.Left,
 			Right:              extractedText.Right,
+			CreatedAt:          extractedText.CreatedAt.Unix(),
+			UpdatedAt:          extractedText.UpdatedAt.Unix(),
 		})
 	}
 	return &models.ExtractionResult{
@@ -190,8 +192,8 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Extra
 		Status:         entity.Status,
 		ImageUri:       imageUri,
 		OutputUri:      outputUri,
-		CreatedAt:      entity.CreatedAt,
-		UpdatedAt:      entity.UpdatedAt,
+		CreatedAt:      entity.CreatedAt.Unix(),
+		UpdatedAt:      entity.UpdatedAt.Unix(),
 		ExtractedTexts: extractedTexts,
 	}
 }

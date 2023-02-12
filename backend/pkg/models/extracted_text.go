@@ -8,4 +8,6 @@ type ExtractedText struct {
 	Bottom             float64 `json:"bottom"`
 	Left               float64 `json:"left"`
 	Right              float64 `json:"right"`
+	CreatedAt          int64   `json:"createdAt"`
+	UpdatedAt          int64   `json:"updatedAt"`
 }

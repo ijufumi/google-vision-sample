@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities/enums"
-	"time"
 )
 
 type ExtractionResult struct {
@@ -10,7 +9,7 @@ type ExtractionResult struct {
 	Status         enums.ExtractionResultStatus `json:"status"`
 	ImageUri       string                       `json:"imageUri"`
 	OutputUri      string                       `json:"outputUri"`
-	CreatedAt      time.Time                    `json:"createdAt"`
-	UpdatedAt      time.Time                    `json:"updatedAt"`
+	CreatedAt      int64                        `json:"createdAt"`
+	UpdatedAt      int64                        `json:"updatedAt"`
 	ExtractedTexts []ExtractedText              `json:"extractedTexts"`
 }
