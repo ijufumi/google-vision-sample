@@ -17,6 +17,7 @@
     "web-vitals": "^2.1.0"
   },
   "dependencies": {
+    "evergreen-ui": "^7.1.3",
     "react": "^18.2.0"
   },
   "scripts": {
