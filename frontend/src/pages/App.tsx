@@ -1,4 +1,5 @@
-import React, { FC, Fragment, useState, useEffect } from 'react'
+import React, { FC, useState, useEffect } from 'react'
+import { Pane } from 'evergreen-ui'
 import ExtractionResult from "../models/ExtractionResult";
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase";
 
@@ -21,15 +22,15 @@ const App: FC<Props> = () => {
             setInitialized(true)
         }
         initialize()
-    }, [])
+    }, [useCase])
 
     if (!initialized) {
         return null
     }
 
-    return <Fragment>
+    return <Pane display="flex" flexDirection="column">
 
-    </Fragment>
+    </Pane>
 }
 
 export default App;
