@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect } from "react"
-import { Pane, Button, UploadIcon, Text, Table } from "evergreen-ui"
+import { Pane, Button, UploadIcon, TrashIcon, EyeOpenIcon, Text, Table, IconButton, majorScale } from "evergreen-ui"
 import ExtractionResult from "../models/ExtractionResult"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 
@@ -59,7 +59,8 @@ const App: FC<Props> = () => {
                 <Table.TextCell>{result.createdAt}</Table.TextCell>
                 <Table.TextCell>{result.updatedAt}</Table.TextCell>
                 <Table.Cell>
-
+                  <IconButton icon={EyeOpenIcon} marginRight={majorScale(2)} />
+                  <IconButton icon={TrashIcon} intent="danger" />
                 </Table.Cell>
               </Table.Row>
             ))}
