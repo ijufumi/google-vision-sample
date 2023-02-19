@@ -8,7 +8,7 @@ export interface Props {
   onClose: () => {}
 }
 
-const ResultViewer: FC<Props> = ({ extractionResultId, onClose }) => {
+const ResultViewerDialog: FC<Props> = ({ extractionResultId, onClose }) => {
   const [initialized, setInitialized] = useState<boolean>(false)
   const [extractionResult, setExtractionResult] = useState<ExtractionResult|undefined>(undefined)
   const isShown = useMemo(() => !!extractionResultId, [extractionResultId])
@@ -43,4 +43,4 @@ const ResultViewer: FC<Props> = ({ extractionResultId, onClose }) => {
   )
 }
 
-export default ResultViewer
+export default ResultViewerDialog
