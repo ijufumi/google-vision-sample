@@ -55,10 +55,10 @@ const FileUploadDialog: FC<Props> = ({ isShown, onClose, onUpload }) => {
         }}
         values={files}
       />
+      <Pane>
+        <Button type="button" onClick={handleUpload}>Upload</Button>
+      </Pane>
     </Dialog>
-    <Pane>
-      <Button type="button" onClick={handleUpload}>Upload</Button>
-    </Pane>
   </Pane>
 }
 
