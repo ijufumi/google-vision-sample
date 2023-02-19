@@ -68,7 +68,7 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 	if err != nil {
 		return err
 	}
-	result := entities.ExtractionResult{
+	result := &entities.ExtractionResult{
 		ID:       id,
 		Status:   enums.ExtractionResultStatus_Runing,
 		ImageKey: key,
@@ -77,6 +77,7 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 	if err != nil {
 		return err
 	}
+	result, _ = s.extractionResultRepository.GetByID(s.db, id)
 	status := enums.ExtractionResultStatus_Succeeded
 	defer func() {
 		result.Status = status
