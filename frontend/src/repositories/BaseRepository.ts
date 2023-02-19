@@ -131,6 +131,7 @@ abstract class BaseRepository {
             bodyData = requestAsForm ? (body as FormData) : JSON.stringify(body);
         }
         const response = await fetch(`${apiEndpoint}${path}`, {
+            mode: 'cors',
             method: method.toString(),
             headers: Object.assign({}, header ? header : {}),
             body: bodyData,
