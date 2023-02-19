@@ -23,12 +23,20 @@ const FileUploadDialog: FC<Props> = ({ isShown, onClose, onUpload }) => {
     }
   }
 
+  const handleClose = () => {
+    setFiles([])
+    onClose()
+  }
+
   return <Pane>
     <Dialog
       isShown={isShown}
       title="File uploading"
-      onCloseComplete={onClose}
-      confirmLabel="Close"
+      onCloseComplete={handleClose}
+      confirmLabel="Upload"
+      cancelLabel="Close"
+      onConfirm={handleUpload}
+      isConfirmDisabled={files.length === 0}
     >
       <FileUploader
         label="Upload File"
@@ -55,9 +63,6 @@ const FileUploadDialog: FC<Props> = ({ isShown, onClose, onUpload }) => {
         }}
         values={files}
       />
-      <Pane>
-        <Button type="button" onClick={handleUpload}>Upload</Button>
-      </Pane>
     </Dialog>
   </Pane>
 }
