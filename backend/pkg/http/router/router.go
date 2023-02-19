@@ -13,7 +13,10 @@ type Router interface {
 
 func NewRouter(c container.Container) Router {
 	r := gin.Default()
-	r.Use(cors.Default())
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowCredentials = true
+	corsConfig.AllowAllOrigins = true
+	r.Use(cors.New(corsConfig))
 
 	api := r.Group("api/v1")
 	{
