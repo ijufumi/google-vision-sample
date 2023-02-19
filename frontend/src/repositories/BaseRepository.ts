@@ -130,10 +130,11 @@ abstract class BaseRepository {
         if (body) {
             bodyData = requestAsForm ? (body as FormData) : JSON.stringify(body);
         }
+        const baseHeaders = { "Content-Type": "application/json;charset=utf-8" };
         const response = await fetch(`${apiEndpoint}${path}`, {
             mode: 'cors',
             method: method.toString(),
-            headers: Object.assign({}, header ? header : {}),
+            headers: Object.assign(baseHeaders, header ? header : {}),
             body: bodyData,
         }).catch((e) => {
             throw new UnexpectedError(`No response error with ${e}`);
