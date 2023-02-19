@@ -133,6 +133,7 @@ abstract class BaseRepository {
         const baseHeaders = { "Content-Type": "application/json;charset=utf-8" };
         const response = await fetch(`${apiEndpoint}${path}`, {
             mode: 'cors',
+            cache: 'no-cache',
             method: method.toString(),
             headers: Object.assign(baseHeaders, header ? header : {}),
             body: bodyData,
