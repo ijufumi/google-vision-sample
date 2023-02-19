@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect } from "react"
-import { Pane, Button, UploadIcon, TrashIcon, EyeOpenIcon, Text, Table, IconButton, majorScale, toaster } from "evergreen-ui"
+import { Pane, Button, UploadIcon, TrashIcon, EyeOpenIcon, Text, Heading, Table, IconButton, majorScale, toaster } from "evergreen-ui"
 import ExtractionResult from "../models/ExtractionResult"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 import FileUploadDialog from "../components/FileUploadDialog"
@@ -18,6 +18,13 @@ const App: FC<Props> = () => {
     const initialize = async () => {
       const _extractionResults = await useCase.getExtractionResults()
       if (_extractionResults) {
+        if (_extractionResults.length < 20) {
+          Array.from(Array(20 - _extractionResults.length).keys()).forEach((v) => {
+            _extractionResults.push({
+              id: String(v),
+            } as ExtractionResult)
+          })
+        }
         setExtractionResults(_extractionResults)
       } else {
         console.error("something wrong...")
@@ -42,13 +49,6 @@ const App: FC<Props> = () => {
   }
 
   const renderResults = () => {
-    if (extractionResults.length === 0) {
-      return (
-        <Pane>
-          <Text>There was no results</Text>
-        </Pane>
-      )
-    }
     return (
       <Pane>
         <Table>
@@ -62,33 +62,54 @@ const App: FC<Props> = () => {
             <Table.TextHeaderCell>Operations</Table.TextHeaderCell>
           </Table.Head>
           <Table.VirtualBody>
-            {extractionResults.map(result => (
-              <Table.Row key={result.id}>
-                <Table.TextCell>{result.id}</Table.TextCell>
-                <Table.TextCell>{result.status}</Table.TextCell>
-                <Table.TextCell>{result.imageUri}</Table.TextCell>
-                <Table.TextCell>{result.outputUri}</Table.TextCell>
-                <Table.TextCell>{result.createdAt}</Table.TextCell>
-                <Table.TextCell>{result.updatedAt}</Table.TextCell>
-                <Table.Cell>
-                  <IconButton icon={EyeOpenIcon} marginRight={majorScale(2)} />
-                  <IconButton icon={TrashIcon} intent="danger" />
-                </Table.Cell>
-              </Table.Row>
-            ))}
+            {renderData()}
           </Table.VirtualBody>
         </Table>
       </Pane>
     )
   }
 
-  return <Pane display="flex" flexDirection="column">
-    <Pane display="flex" alignContent="flex-end">
-      <Button appearance="primary" iconAfter={UploadIcon}>
-        Upload
-      </Button>
+  const renderData = () => {
+    if (extractionResults.length === 0) {
+      return (
+        <Table.Row>
+          <Table.Cell>
+            <Heading size={700}>There was no results</Heading>
+          </Table.Cell>
+        </Table.Row>
+      )
+    }
+
+    return <React.Fragment>
+      {extractionResults.map(result => (
+        <Table.Row key={result.id}>
+          <Table.TextCell>{result.id}</Table.TextCell>
+          <Table.TextCell>{result.status}</Table.TextCell>
+          <Table.TextCell>{result.imageUri}</Table.TextCell>
+          <Table.TextCell>{result.outputUri}</Table.TextCell>
+          <Table.TextCell>{result.createdAt}</Table.TextCell>
+          <Table.TextCell>{result.updatedAt}</Table.TextCell>
+          <Table.Cell>
+            <IconButton icon={EyeOpenIcon} marginRight={majorScale(2)} />
+            <IconButton icon={TrashIcon} intent="danger" />
+          </Table.Cell>
+        </Table.Row>
+      ))}
+    </React.Fragment>
+  }
+
+  return <Pane display="flex" flexDirection="column" backgroundColor="#FFFFFF" margin="20px" height="calc(100vh - 40px)">
+    <Pane padding="20px">
+      <Pane display="flex" justifyContent="space-between" width="100%" paddingBottom="40px">
+        <Heading size={900}>
+          Google Vision API Client
+        </Heading>
+        <Button appearance="primary" iconAfter={UploadIcon} onClick={() => setShowFileUploadDialog(true)}>
+          Upload
+        </Button>
+      </Pane>
+      {renderResults()}
     </Pane>
-    {renderResults()}
     <FileUploadDialog
       isShown={showFileUploadDialog}
       onClose={() => setShowFileUploadDialog(false)}
