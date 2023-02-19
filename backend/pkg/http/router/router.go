@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ijufumi/google-vision-sample/pkg/container"
 	"github.com/ijufumi/google-vision-sample/pkg/http/handlers"
-	"time"
 )
 
 type Router interface {
@@ -14,14 +13,7 @@ type Router interface {
 
 func NewRouter(c container.Container) Router {
 	r := gin.Default()
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"*"},
-		AllowHeaders:     []string{"Origin"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: false,
-		MaxAge:           12 * time.Hour,
-	}))
+	r.Use(cors.Default())
 
 	api := r.Group("api/v1")
 	{
