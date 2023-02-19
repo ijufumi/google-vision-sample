@@ -1,7 +1,8 @@
 import React, { FC, useState, useEffect } from "react"
-import { Pane, Button, UploadIcon, TrashIcon, EyeOpenIcon, Text, Table, IconButton, majorScale } from "evergreen-ui"
+import { Pane, Button, UploadIcon, TrashIcon, EyeOpenIcon, Text, Table, IconButton, majorScale, toaster } from "evergreen-ui"
 import ExtractionResult from "../models/ExtractionResult"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
+import FileUploadDialog from "../components/FileUploadDialog"
 
 interface Props {
 }
@@ -9,6 +10,7 @@ interface Props {
 const App: FC<Props> = () => {
   const [initialized, setInitialized] = useState<boolean>(false)
   const [extractionResults, setExtractionResults] = useState<ExtractionResult[]>([])
+  const [showFileUploadDialog, setShowFileUploadDialog] = useState<boolean>(false)
 
   const useCase = new ExtractionUseCaseImpl()
 
@@ -27,6 +29,16 @@ const App: FC<Props> = () => {
 
   if (!initialized) {
     return null
+  }
+
+  const handleFileUpload = async (file: File) => {
+    const result = await useCase.startExtraction(file)
+    if (result) {
+      toaster.success("Uploading succeeded")
+      setShowFileUploadDialog(false)
+    } else {
+      toaster.danger("Uploading failed")
+    }
   }
 
   const renderResults = () => {
@@ -77,6 +89,11 @@ const App: FC<Props> = () => {
       </Button>
     </Pane>
     {renderResults()}
+    <FileUploadDialog
+      isShown={showFileUploadDialog}
+      onClose={() => setShowFileUploadDialog(false)}
+      onUpload={handleFileUpload}
+    />
   </Pane>
 }
 
