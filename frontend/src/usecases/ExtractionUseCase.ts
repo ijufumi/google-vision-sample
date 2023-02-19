@@ -1,5 +1,6 @@
 import {ExtractionResultRepository, ExtractionResultRepositoryImpl} from "../repositories/ExtractionResultRepository";
 import ExtractionResult from "../models/ExtractionResult";
+import {ENDPOINT_URL} from '../configs/config'
 
 export interface ExtractionUseCase {
     startExtraction(file: File): Promise<boolean>
@@ -11,7 +12,7 @@ export default class ExtractionUseCaseImpl implements ExtractionUseCase{
     private extractionRepository: ExtractionResultRepository
 
     constructor() {
-        this.extractionRepository = new ExtractionResultRepositoryImpl("/detect_texts")
+        this.extractionRepository = new ExtractionResultRepositoryImpl(`${ENDPOINT_URL}/detect_texts`)
     }
 
     getExtractionResult = async (id: string) => {
