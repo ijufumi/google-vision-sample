@@ -15,19 +15,24 @@ const App: FC<Props> = () => {
   const useCase = new ExtractionUseCaseImpl()
 
   useEffect(() => {
+    if (initialized) {
+      return
+    }
     const initialize = async () => {
       const _extractionResults = await useCase.getExtractionResults()
+      console.info("initialize...")
       if (_extractionResults) {
         if (_extractionResults.length < 20) {
-          Array.from(Array(20 - _extractionResults.length).keys()).forEach((v) => {
-            _extractionResults.push({
+          const extra = Array.from(Array(20 - _extractionResults.length).keys()).map((v) => {
+            return {
               id: String(v),
-            } as ExtractionResult)
+            } as ExtractionResult
           })
+          _extractionResults.push(...extra)
         }
         setExtractionResults(_extractionResults)
       } else {
-        console.error("something wrong...")
+        toaster.danger("Something wrong...")
       }
       setInitialized(true)
     }
@@ -61,41 +66,25 @@ const App: FC<Props> = () => {
             <Table.TextHeaderCell>UpdatedAt</Table.TextHeaderCell>
             <Table.TextHeaderCell>Operations</Table.TextHeaderCell>
           </Table.Head>
-          <Table.VirtualBody>
-            {renderData()}
-          </Table.VirtualBody>
+          <Table.Body>
+            {extractionResults.map(result => (
+              <Table.Row key={result.id}>
+                <Table.TextCell>{result.id}</Table.TextCell>
+                <Table.TextCell>{result.status}</Table.TextCell>
+                <Table.TextCell>{result.imageUri}</Table.TextCell>
+                <Table.TextCell>{result.outputUri}</Table.TextCell>
+                <Table.TextCell>{result.createdAt}</Table.TextCell>
+                <Table.TextCell>{result.updatedAt}</Table.TextCell>
+                <Table.Cell>
+                  <IconButton icon={EyeOpenIcon} marginRight={majorScale(2)} />
+                  <IconButton icon={TrashIcon} intent="danger" />
+                </Table.Cell>
+              </Table.Row>
+            ))}
+          </Table.Body>
         </Table>
       </Pane>
     )
-  }
-
-  const renderData = () => {
-    if (extractionResults.length === 0) {
-      return (
-        <Table.Row>
-          <Table.Cell>
-            <Heading size={700}>There was no results</Heading>
-          </Table.Cell>
-        </Table.Row>
-      )
-    }
-
-    return <React.Fragment>
-      {extractionResults.map(result => (
-        <Table.Row key={result.id}>
-          <Table.TextCell>{result.id}</Table.TextCell>
-          <Table.TextCell>{result.status}</Table.TextCell>
-          <Table.TextCell>{result.imageUri}</Table.TextCell>
-          <Table.TextCell>{result.outputUri}</Table.TextCell>
-          <Table.TextCell>{result.createdAt}</Table.TextCell>
-          <Table.TextCell>{result.updatedAt}</Table.TextCell>
-          <Table.Cell>
-            <IconButton icon={EyeOpenIcon} marginRight={majorScale(2)} />
-            <IconButton icon={TrashIcon} intent="danger" />
-          </Table.Cell>
-        </Table.Row>
-      ))}
-    </React.Fragment>
   }
 
   return <Pane display="flex" flexDirection="column" backgroundColor="#FFFFFF" margin="20px" height="calc(100vh - 40px)">
