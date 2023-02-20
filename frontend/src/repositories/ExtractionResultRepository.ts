@@ -13,11 +13,11 @@ export class ExtractionResultRepositoryImpl extends BaseRepository implements Ex
     create = async (args: { file: File }) => {
         const formData = new FormData()
         formData.set("file", args.file)
-        await this._upload({path: "/", body: formData})
+        await this._upload({path: "", body: formData})
     }
 
     getAll = async () => {
-        const results = await this._get({path: "/"})
+        const results = await this._get({path: ""})
         return results.map((p: Props) => new ExtractionResult(p))
     }
 
