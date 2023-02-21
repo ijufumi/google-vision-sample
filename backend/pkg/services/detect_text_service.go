@@ -21,6 +21,7 @@ type DetectTextService interface {
 	GetResults() ([]*models.ExtractionResult, error)
 	GetResultByID(id string) (*models.ExtractionResult, error)
 	DetectTexts(file *os.File) error
+	DeleteResult(id string) error
 }
 
 func NewDetectTextService(
@@ -161,6 +162,16 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 			return err
 		}
 		return nil
+	})
+}
+
+func (s *detectTextService) DeleteResult(id string) error {
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		err := s.extractedTextRepository.DeleteByExtractionResultID(tx, id)
+		if err != nil {
+			return err
+		}
+		return s.extractionResultRepository.Delete(tx, id)
 	})
 }
 

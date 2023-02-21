@@ -13,6 +13,7 @@ type DetectTextHandler interface {
 	Gets(ctx *gin.Context)
 	GetByID(ctx *gin.Context)
 	Create(ctx *gin.Context)
+	Delete(ctx *gin.Context)
 }
 
 func NewDetectTextHandler(service services.DetectTextService) DetectTextHandler {
@@ -70,6 +71,17 @@ func (h *detectTextHandler) Create(ctx *gin.Context) {
 	if err != nil {
 		fmt.Println(err)
 		_ = ctx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	ctx.Status(http.StatusOK)
+}
+
+func (h *detectTextHandler) Delete(ctx *gin.Context) {
+	id := ctx.Param("id")
+	err := h.service.DeleteResult(id)
+	if err != nil {
+		fmt.Println(err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 	ctx.Status(http.StatusOK)
