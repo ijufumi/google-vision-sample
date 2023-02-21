@@ -6,6 +6,7 @@ export interface ExtractionUseCase {
     startExtraction(file: File): Promise<boolean>
     getExtractionResults(): Promise<ExtractionResult[]|undefined>
     getExtractionResult(id: string): Promise<ExtractionResult|undefined>
+    deleteExtractionResult(id: string): Promise<boolean>
 }
 
 export default class ExtractionUseCaseImpl implements ExtractionUseCase{
@@ -17,7 +18,7 @@ export default class ExtractionUseCaseImpl implements ExtractionUseCase{
 
     getExtractionResult = async (id: string) => {
         try {
-            return  await this.extractionRepository.getById({id})
+            return await this.extractionRepository.getById({id})
         } catch (e) {
             console.error(e)
         }
@@ -43,4 +44,13 @@ export default class ExtractionUseCaseImpl implements ExtractionUseCase{
         return false
     }
 
+    deleteExtractionResult = async (id: string) => {
+        try {
+            await this.extractionRepository.delete({id})
+            return true
+        } catch (e) {
+            console.error(e)
+        }
+        return false
+    }
 }

@@ -53,6 +53,16 @@ const App: FC<Props> = () => {
     }
   }
 
+  const handleDelete = async (id: string) => {
+    // TODO: Add confirmation
+    const result = await useCase.deleteExtractionResult(id)
+    if (result) {
+      toaster.success("Deleting succeeded")
+    } else {
+      toaster.danger("Deleting failed")
+    }
+  }
+
   const renderResults = () => {
     return (
       <Pane>
@@ -77,7 +87,7 @@ const App: FC<Props> = () => {
                 <Table.TextCell>{result.updatedAt}</Table.TextCell>
                 <Table.Cell>
                   <IconButton icon={EyeOpenIcon} marginRight={majorScale(2)} />
-                  <IconButton icon={TrashIcon} intent="danger" />
+                  <IconButton icon={TrashIcon} intent="danger" onClick={() => handleDelete(result.id)}/>
                 </Table.Cell>
               </Table.Row>
             ))}

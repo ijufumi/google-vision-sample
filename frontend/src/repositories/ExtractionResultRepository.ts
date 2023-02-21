@@ -7,6 +7,8 @@ export interface ExtractionResultRepository {
     getById(args: { id: string }): Promise<ExtractionResult>
 
     create(args: { file: File }): Promise<void>
+
+    delete(args: { id: string }): Promise<void>
 }
 
 export class ExtractionResultRepositoryImpl extends BaseRepository implements ExtractionResultRepository {
@@ -24,5 +26,9 @@ export class ExtractionResultRepositoryImpl extends BaseRepository implements Ex
     getById = async (args: { id: string }) => {
         const result = await this._get({path: `/${args.id}`})
         return new ExtractionResult(result)
+    }
+
+    delete = async (args: { id: string }) => {
+        await this._delete({path: `/${args.id}`})
     }
 }
