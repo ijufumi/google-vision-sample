@@ -13,6 +13,8 @@ type Router interface {
 
 func NewRouter(c container.Container) Router {
 	r := gin.Default()
+	r.RedirectTrailingSlash = false
+	r.RedirectFixedPath = false
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowCredentials = true
 	corsConfig.AllowAllOrigins = true
