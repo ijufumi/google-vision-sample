@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from "react"
+import React, { FC, useState, useEffect, useMemo } from "react"
 import { Pane, Button, UploadIcon, TrashIcon, EyeOpenIcon, Text, Heading, Table, IconButton, majorScale, toaster } from "evergreen-ui"
 import ExtractionResult from "../models/ExtractionResult"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
@@ -12,7 +12,7 @@ const App: FC<Props> = () => {
   const [extractionResults, setExtractionResults] = useState<ExtractionResult[]>([])
   const [showFileUploadDialog, setShowFileUploadDialog] = useState<boolean>(false)
 
-  const useCase = new ExtractionUseCaseImpl()
+  const useCase = useMemo(() => new ExtractionUseCaseImpl(), [])
 
   useEffect(() => {
     if (initialized) {
@@ -37,7 +37,7 @@ const App: FC<Props> = () => {
       setInitialized(true)
     }
     initialize()
-  }, [])
+  }, [initialized, useCase])
 
   if (!initialized) {
     return null
