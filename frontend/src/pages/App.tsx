@@ -15,26 +15,22 @@ const App: FC<Props> = () => {
 
   const useCase = useMemo(() => new ExtractionUseCaseImpl(), [])
 
+  const loadExtractionResults = async () => {
+    const _extractionResults = await useCase.getExtractionResults()
+    console.info("initialize...")
+    if (_extractionResults) {
+      setExtractionResults(_extractionResults)
+    } else {
+      toaster.danger("Something wrong...")
+    }
+  }
+
   useEffect(() => {
     if (initialized) {
       return
     }
     const initialize = async () => {
-      const _extractionResults = await useCase.getExtractionResults()
-      console.info("initialize...")
-      if (_extractionResults) {
-        if (_extractionResults.length < 20) {
-          const extra = Array.from(Array(20 - _extractionResults.length).keys()).map((v) => {
-            return {
-              id: String(v),
-            } as ExtractionResult
-          })
-          _extractionResults.push(...extra)
-        }
-        setExtractionResults(_extractionResults)
-      } else {
-        toaster.danger("Something wrong...")
-      }
+      await loadExtractionResults()
       setInitialized(true)
     }
     initialize()
@@ -64,7 +60,9 @@ const App: FC<Props> = () => {
     }
     const result = await useCase.deleteExtractionResult(deleteTargetId)
     if (result) {
+      setDeleteTargetId('')
       toaster.success("Deleting succeeded")
+      await loadExtractionResults()
     } else {
       toaster.danger("Deleting failed")
     }
