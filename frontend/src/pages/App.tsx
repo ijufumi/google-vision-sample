@@ -41,10 +41,10 @@ const App: FC<Props> = () => {
   }
 
   const handleFileUpload = async (file: File) => {
+    setShowFileUploadDialog(false)
     const result = await useCase.startExtraction(file)
     if (result) {
       toaster.success("Uploading succeeded")
-      setShowFileUploadDialog(false)
     } else {
       toaster.danger("Uploading failed")
     }
