@@ -23,13 +23,14 @@ abstract class BaseRepository {
         auth?: boolean;
         headers?: Record<string, string>;
     }) => {
+        const baseHeaders = { "Content-Type": "application/json;charset=utf-8" };
         return await this._request(
             Methods.Get,
             this.apiEndpoint,
             args.path,
             args.auth,
             undefined,
-            args.headers
+            Object.assign(baseHeaders, args.headers ? args.headers : {})
         );
     };
 
@@ -38,13 +39,14 @@ abstract class BaseRepository {
         auth?: boolean;
         headers?: Record<string, string>;
     }) => {
+        const baseHeaders = { "Content-Type": "application/json;charset=utf-8" };
         return await this._request(
             Methods.Delete,
             this.apiEndpoint,
             args.path,
             args.auth,
             undefined,
-            args.headers
+          Object.assign(baseHeaders, args.headers ? args.headers : {})
         );
     };
 
@@ -130,12 +132,11 @@ abstract class BaseRepository {
         if (body) {
             bodyData = requestAsForm ? (body as FormData) : JSON.stringify(body);
         }
-        const baseHeaders = { "Content-Type": "application/json;charset=utf-8" };
         const response = await fetch(`${apiEndpoint}${path}`, {
             mode: 'cors',
             cache: 'no-cache',
             method: method.toString(),
-            headers: Object.assign(baseHeaders, header ? header : {}),
+            headers: Object.assign({}, header ? header : {}),
             body: bodyData,
         }).catch((e) => {
             throw new UnexpectedError(`No response error with ${e}`);
