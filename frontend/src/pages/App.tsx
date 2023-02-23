@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect, useMemo } from "react"
-import { Pane, Button, UploadIcon, TrashIcon, EyeOpenIcon, Text, Heading, Table, IconButton, majorScale, toaster } from "evergreen-ui"
+import { Pane, Button, UploadIcon, TrashIcon, EyeOpenIcon, Dialog, Text, Heading, Table, IconButton, majorScale, toaster } from "evergreen-ui"
 import ExtractionResult from "../models/ExtractionResult"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 import FileUploadDialog from "../components/FileUploadDialog"
@@ -11,6 +11,7 @@ const App: FC<Props> = () => {
   const [initialized, setInitialized] = useState<boolean>(false)
   const [extractionResults, setExtractionResults] = useState<ExtractionResult[]>([])
   const [showFileUploadDialog, setShowFileUploadDialog] = useState<boolean>(false)
+  const [deleteTargetId, setDeleteTargetId] = useState<string>('')
 
   const useCase = useMemo(() => new ExtractionUseCaseImpl(), [])
 
@@ -53,9 +54,15 @@ const App: FC<Props> = () => {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    // TODO: Add confirmation
-    const result = await useCase.deleteExtractionResult(id)
+  const confirmDelete = (id: string) => {
+    setDeleteTargetId(id)
+  }
+
+  const handleDelete = async () => {
+    if (!deleteTargetId) {
+      return
+    }
+    const result = await useCase.deleteExtractionResult(deleteTargetId)
     if (result) {
       toaster.success("Deleting succeeded")
     } else {
@@ -87,7 +94,7 @@ const App: FC<Props> = () => {
                 <Table.TextCell>{result.updatedAt}</Table.TextCell>
                 <Table.Cell>
                   <IconButton icon={EyeOpenIcon} marginRight={majorScale(2)} />
-                  <IconButton icon={TrashIcon} intent="danger" onClick={() => handleDelete(result.id)}/>
+                  <IconButton icon={TrashIcon} intent="danger" onClick={() => confirmDelete(result.id)}/>
                 </Table.Cell>
               </Table.Row>
             ))}
@@ -114,6 +121,15 @@ const App: FC<Props> = () => {
       onClose={() => setShowFileUploadDialog(false)}
       onUpload={handleFileUpload}
     />
+    <Dialog
+      isShown={!!deleteTargetId}
+      title="Are you sure deleting?"
+      onCloseComplete={() => setDeleteTargetId('')}
+      onConfirm={handleDelete}
+      confirmLabel="Delete"
+    >
+      <Text size={600}>Would you like to delete it?</Text>
+    </Dialog>
   </Pane>
 }
 
