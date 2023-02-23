@@ -36,8 +36,8 @@ export default class ExtractionUseCaseImpl implements ExtractionUseCase{
 
     startExtraction = async (file: File) => {
         try {
-            await this.extractionRepository.create({file})
-            return true
+            const result = await this.extractionRepository.create({file})
+            return result.status
         } catch (e) {
             console.error(e)
         }
@@ -46,8 +46,8 @@ export default class ExtractionUseCaseImpl implements ExtractionUseCase{
 
     deleteExtractionResult = async (id: string) => {
         try {
-            await this.extractionRepository.delete({id})
-            return true
+            const result = await this.extractionRepository.delete({id})
+            return result.status
         } catch (e) {
             console.error(e)
         }

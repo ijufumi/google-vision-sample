@@ -1,21 +1,23 @@
 import BaseRepository from "./BaseRepository";
 import ExtractionResult, { Props } from "../models/ExtractionResult";
+import Status from "../models/Status"
 
 export interface ExtractionResultRepository {
     getAll(): Promise<ExtractionResult[]>
 
     getById(args: { id: string }): Promise<ExtractionResult>
 
-    create(args: { file: File }): Promise<void>
+    create(args: { file: File }): Promise<Status>
 
-    delete(args: { id: string }): Promise<void>
+    delete(args: { id: string }): Promise<Status>
 }
 
 export class ExtractionResultRepositoryImpl extends BaseRepository implements ExtractionResultRepository {
     create = async (args: { file: File }) => {
         const formData = new FormData()
         formData.set("file", args.file)
-        await this._upload({path: "", body: formData})
+        const result = await this._upload({path: "", body: formData})
+        return new Status(result)
     }
 
     getAll = async () => {
@@ -29,6 +31,7 @@ export class ExtractionResultRepositoryImpl extends BaseRepository implements Ex
     }
 
     delete = async (args: { id: string }) => {
-        await this._delete({path: `/${args.id}`})
+        const result = await this._delete({path: `/${args.id}`})
+        return new Status(result)
     }
 }
