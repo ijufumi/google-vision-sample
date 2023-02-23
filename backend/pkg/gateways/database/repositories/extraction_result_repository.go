@@ -31,9 +31,7 @@ func (r *extractionResultRepository) GetAll(db *gorm.DB) ([]*entities.Extraction
 
 func (r *extractionResultRepository) GetByID(db *gorm.DB, id string) (*entities.ExtractionResult, error) {
 	var result *entities.ExtractionResult
-	if err := db.Preload("ExtractedTexts").Where(map[string]string{
-		"id": id,
-	}).First(result).Error; err != nil {
+	if err := db.Preload("ExtractedTexts").Where("id = ?", id).First(result).Error; err != nil {
 		return nil, errors.Wrap(err, "ExtractionResultRepository#GetByID")
 	}
 	return result, nil
