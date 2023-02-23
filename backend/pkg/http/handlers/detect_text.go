@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/ijufumi/google-vision-sample/pkg/models"
 	"github.com/ijufumi/google-vision-sample/pkg/services"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"net/http"
@@ -73,7 +74,7 @@ func (h *detectTextHandler) Create(ctx *gin.Context) {
 		_ = ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, models.Status{Status: true})
 }
 
 func (h *detectTextHandler) Delete(ctx *gin.Context) {
@@ -84,5 +85,5 @@ func (h *detectTextHandler) Delete(ctx *gin.Context) {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, models.Status{Status: true})
 }
