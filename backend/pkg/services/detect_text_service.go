@@ -11,6 +11,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/models"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"io"
 	"os"
@@ -29,6 +30,7 @@ func NewDetectTextService(
 	visionAPIClient clients.VisionAPIClient,
 	extractionResultRepository repositories.ExtractionResultRepository,
 	extractedTextRepository repositories.ExtractedTextRepository,
+	logger *zap.Logger,
 	db *gorm.DB,
 ) DetectTextService {
 	return &detectTextService{
@@ -36,6 +38,7 @@ func NewDetectTextService(
 		visionAPIClient:            visionAPIClient,
 		extractionResultRepository: extractionResultRepository,
 		extractedTextRepository:    extractedTextRepository,
+		logger:                     logger,
 		db:                         db,
 	}
 }
@@ -181,12 +184,19 @@ func (s *detectTextService) DeleteResult(id string) error {
 
 func (s *detectTextService) buildExtractionResultResponse(entity *entities.ExtractionResult) *models.ExtractionResult {
 	imageUri := ""
+	var err error
 	if len(entity.ImageKey) != 0 {
-		imageUri, _ = s.storageAPIClient.SignedURL(entity.ImageKey)
+		imageUri, err = s.storageAPIClient.SignedURL(entity.ImageKey)
+		if err != nil {
+			s.logger.Error(err.Error())
+		}
 	}
 	outputUri := ""
 	if entity.OutputKey != nil {
-		outputUri, _ = s.storageAPIClient.SignedURL(*entity.OutputKey)
+		outputUri, err = s.storageAPIClient.SignedURL(*entity.OutputKey)
+		if err != nil {
+			s.logger.Error(err.Error())
+		}
 	}
 	extractedTexts := make([]models.ExtractedText, 0)
 
@@ -220,4 +230,5 @@ type detectTextService struct {
 	extractionResultRepository repositories.ExtractionResultRepository
 	extractedTextRepository    repositories.ExtractedTextRepository
 	db                         *gorm.DB
+	logger                     *zap.Logger
 }
