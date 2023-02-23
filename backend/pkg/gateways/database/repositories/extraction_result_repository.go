@@ -54,7 +54,7 @@ func (r *extractionResultRepository) Update(db *gorm.DB, entity *entities.Extrac
 }
 
 func (r *extractionResultRepository) Delete(db *gorm.DB, id string) error {
-	if err := db.Delete(&entities.ExtractionResult{}, id).Error; err != nil {
+	if err := db.Where("id = ?", id).Delete(&entities.ExtractionResult{}).Error; err != nil {
 		return errors.Wrap(err, "ExtractionResultRepository#Delete")
 	}
 	return nil
