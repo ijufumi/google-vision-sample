@@ -37,9 +37,7 @@ func (r *extractedTextRepository) Create(db *gorm.DB, entity ...entities.Extract
 }
 
 func (r *extractedTextRepository) DeleteByExtractionResultID(db *gorm.DB, extractionResultID string) error {
-	if err := db.Where(map[string]string{
-		"extractionResultID": extractionResultID,
-	}).Delete(&entities.ExtractedText{}).Error; err != nil {
+	if err := db.Where("extraction_result_id", extractionResultID).Delete(&entities.ExtractedText{}).Error; err != nil {
 		return errors.Wrap(err, "ExtractionResultRepository#DeleteByExtractionResultID")
 	}
 	return nil
