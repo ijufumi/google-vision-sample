@@ -69,57 +69,65 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 	if err != nil {
 		return err
 	}
-	result := &entities.ExtractionResult{
-		ID:       id,
-		Status:   enums.ExtractionResultStatus_Runing,
-		ImageKey: key,
-	}
-	err = s.extractionResultRepository.Create(s.db, result)
-	if err != nil {
-		return err
-	}
-	result, _ = s.extractionResultRepository.GetByID(s.db, id)
+
+	var result *entities.ExtractionResult
+
 	status := enums.ExtractionResultStatus_Succeeded
 	defer func() {
-		result.Status = status
-		_ = s.extractionResultRepository.Update(s.db, result)
+		if result != nil {
+			result.Status = status
+			_ = s.extractionResultRepository.Update(s.db, result)
+		}
 	}()
 
-	outputKey, err := s.visionAPIClient.DetectText(key)
-	if err != nil {
-		status = enums.ExtractionResultStatus_Failed
-		return err
-	}
-
-	queryFiles, err := s.storageAPIClient.QueryFiles(outputKey)
-	if err != nil {
-		status = enums.ExtractionResultStatus_Failed
-		return err
-	}
-
-	if len(queryFiles) == 0 {
-		return errors.New("output does not exist")
-	}
-
-	outputFile, err := s.storageAPIClient.DownloadFile(queryFiles[0])
-	if err != nil {
-		status = enums.ExtractionResultStatus_Failed
-		return err
-	}
-
-	bytes, err := io.ReadAll(outputFile)
-	if err != nil {
-		status = enums.ExtractionResultStatus_Failed
-		return err
-	}
-
-	var detectResponse googleModels.DetectTextResponses
-	if err = json.Unmarshal(bytes, &detectResponse); err != nil {
-		status = enums.ExtractionResultStatus_Failed
-		return err
-	}
-
 	return s.db.Transaction(func(tx *gorm.DB) error {
+		extractionResult := &entities.ExtractionResult{
+			ID:       id,
+			Status:   enums.ExtractionResultStatus_Runing,
+			ImageKey: key,
+		}
+		err = s.extractionResultRepository.Create(s.db, extractionResult)
+		if err != nil {
+			return err
+		}
+		extractionResult, err = s.extractionResultRepository.GetByID(s.db, id)
+		if err != nil {
+			return err
+		}
+		result = extractionResult
+		outputKey, err := s.visionAPIClient.DetectText(key)
+		if err != nil {
+			status = enums.ExtractionResultStatus_Failed
+			return err
+		}
+
+		queryFiles, err := s.storageAPIClient.QueryFiles(outputKey)
+		if err != nil {
+			status = enums.ExtractionResultStatus_Failed
+			return err
+		}
+
+		if len(queryFiles) == 0 {
+			return errors.New("output does not exist")
+		}
+
+		outputFile, err := s.storageAPIClient.DownloadFile(queryFiles[0])
+		if err != nil {
+			status = enums.ExtractionResultStatus_Failed
+			return err
+		}
+
+		bytes, err := io.ReadAll(outputFile)
+		if err != nil {
+			status = enums.ExtractionResultStatus_Failed
+			return err
+		}
+
+		var detectResponse googleModels.DetectTextResponses
+		if err = json.Unmarshal(bytes, &detectResponse); err != nil {
+			status = enums.ExtractionResultStatus_Failed
+			return err
+		}
 		extractedTexts := make([]entities.ExtractedText, 0)
 		for _, response := range detectResponse.Responses {
 			for _, page := range response.FullTextAnnotation.Pages {
@@ -144,7 +152,7 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 						right := utils.MaxInArray(yArray...)
 						extractedText := entities.ExtractedText{
 							ID:                 utils.NewULID(),
-							ExtractionResultID: result.ID,
+							ExtractionResultID: extractionResult.ID,
 							Text:               texts,
 							Top:                top,
 							Bottom:             bottom,
@@ -157,11 +165,7 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 				}
 			}
 		}
-		err := s.extractedTextRepository.Create(tx, extractedTexts...)
-		if err != nil {
-			return err
-		}
-		return nil
+		return s.extractedTextRepository.Create(tx, extractedTexts...)
 	})
 }
 
