@@ -6,6 +6,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/repositories"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/clients"
 	"github.com/ijufumi/google-vision-sample/pkg/http/handlers"
+	"github.com/ijufumi/google-vision-sample/pkg/loggers"
 	"github.com/ijufumi/google-vision-sample/pkg/services"
 	"go.uber.org/dig"
 )
@@ -36,6 +37,8 @@ type container struct {
 func (c *container) provide() {
 	// config
 	_ = c.container.Provide(configs.New)
+	// logger
+	_ = c.container.Provide(loggers.NewLogger)
 	// handlers
 	_ = c.container.Provide(handlers.NewHealthHandler)
 	_ = c.container.Provide(handlers.NewDetectTextHandler)

@@ -2,15 +2,20 @@ package db
 
 import (
 	"fmt"
-
 	"github.com/ijufumi/google-vision-sample/pkg/configs"
+	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"moul.io/zapgorm2"
 )
 
-func NewDB(config *configs.Config) *gorm.DB {
+func NewDB(config *configs.Config, zapLogger *zap.Logger) *gorm.DB {
 	dsn := dsnString(config)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	logger := zapgorm2.New(zapLogger)
+	logger.SetAsDefault() // optional:
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger,
+	})
 	if err != nil {
 		panic(err)
 	}

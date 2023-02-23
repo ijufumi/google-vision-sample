@@ -30,11 +30,11 @@ func (r *extractionResultRepository) GetAll(db *gorm.DB) ([]*entities.Extraction
 }
 
 func (r *extractionResultRepository) GetByID(db *gorm.DB, id string) (*entities.ExtractionResult, error) {
-	var result *entities.ExtractionResult
-	if err := db.Preload("ExtractedTexts").Where("id = ?", id).First(result).Error; err != nil {
+	var result entities.ExtractionResult
+	if err := db.Preload("ExtractedTexts").Where("id = ?", id).First(&result).Error; err != nil {
 		return nil, errors.Wrap(err, "ExtractionResultRepository#GetByID")
 	}
-	return result, nil
+	return &result, nil
 }
 
 func (r *extractionResultRepository) Create(db *gorm.DB, entity *entities.ExtractionResult) error {
