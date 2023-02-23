@@ -7,6 +7,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/ijufumi/google-vision-sample/pkg/configs"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/db"
+	"github.com/ijufumi/google-vision-sample/pkg/loggers"
 	"github.com/spf13/cobra"
 	"log"
 	"os"
@@ -16,8 +17,9 @@ import (
 
 func main() {
 	config := configs.New()
+	logger := loggers.NewLogger()
 	sourcePath := fmt.Sprintf("file://%s", config.Migration.Path)
-	database := db.NewDB(config)
+	database := db.NewDB(config, logger)
 	sqlDB, err := database.DB()
 	if err != nil {
 		panic(err)
