@@ -1,5 +1,5 @@
 import React, { FC, useState, useCallback } from 'react'
-import { Dialog, Pane, FileUploader, FileCard, FileRejection, Button } from "evergreen-ui"
+import { Dialog, Pane, FileUploader, FileCard, FileRejection } from "evergreen-ui"
 
 interface Props {
   isShown: boolean
