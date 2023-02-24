@@ -111,6 +111,7 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 		}
 
 		if len(queryFiles) == 0 {
+			status = enums.ExtractionResultStatus_Failed
 			return errors.New("output does not exist")
 		}
 
@@ -119,6 +120,19 @@ func (s *detectTextService) DetectTexts(file *os.File) error {
 			status = enums.ExtractionResultStatus_Failed
 			return err
 		}
+
+		result.OutputKey = &queryFiles[0]
+		err = s.extractionResultRepository.Update(s.db, result)
+		if err != nil {
+			status = enums.ExtractionResultStatus_Failed
+			return err
+		}
+		extractionResult, err = s.extractionResultRepository.GetByID(s.db, id)
+		if err != nil {
+			status = enums.ExtractionResultStatus_Failed
+			return err
+		}
+		result = extractionResult
 
 		bytes, err := io.ReadAll(outputFile)
 		if err != nil {
