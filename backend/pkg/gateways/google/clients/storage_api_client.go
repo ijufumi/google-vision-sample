@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/api/iterator"
 	"io"
+	"net/http"
 	"os"
 	"time"
 )
@@ -93,6 +94,7 @@ func (c *storageAPIClient) SignedURL(key string) (string, error) {
 	}()
 	option := &storage.SignedURLOptions{
 		Expires: time.Now().UTC().Add(time.Duration(c.config.Google.Storage.SignedURL.ExpireSec) * time.Second),
+		Method:  http.MethodGet,
 	}
 	signedURL, err := client.Bucket(c.config.Google.Storage.Bucket).SignedURL(key, option)
 	if err != nil {
