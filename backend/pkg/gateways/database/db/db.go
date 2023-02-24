@@ -6,13 +6,15 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	gormLogger "gorm.io/gorm/logger"
 	"moul.io/zapgorm2"
 )
 
 func NewDB(config *configs.Config, zapLogger *zap.Logger) *gorm.DB {
 	dsn := dsnString(config)
 	logger := zapgorm2.New(zapLogger)
-	logger.SetAsDefault() // optional:
+	logger.SetAsDefault()
+	logger.LogMode(gormLogger.Info)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger,
 	})
