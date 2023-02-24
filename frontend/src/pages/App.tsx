@@ -48,6 +48,7 @@ const App: FC<Props> = () => {
     } else {
       toaster.danger("Uploading failed")
     }
+    await loadExtractionResults()
   }
 
   const confirmDelete = (id: string) => {
@@ -62,10 +63,10 @@ const App: FC<Props> = () => {
     if (result) {
       setDeleteTargetId('')
       toaster.success("Deleting succeeded")
-      await loadExtractionResults()
     } else {
       toaster.danger("Deleting failed")
     }
+    await loadExtractionResults()
   }
 
   const renderResults = () => {
