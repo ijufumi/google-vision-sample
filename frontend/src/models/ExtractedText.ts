@@ -1,3 +1,5 @@
+import { formatToDate } from "../components/dates"
+
 export interface Props {
     id: string
     extractionResultID: string
@@ -32,5 +34,13 @@ export default class ExtractedText {
         this.right = props.right
         this.createdAt = props.createdAt
         this.updatedAt = props.updatedAt
+    }
+
+    get readableCreatedAt(){
+        return formatToDate(this.createdAt)
+    }
+
+    get readableUpdatedAt(){
+        return formatToDate(this.updatedAt)
     }
 }

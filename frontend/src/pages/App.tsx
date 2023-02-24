@@ -89,8 +89,8 @@ const App: FC<Props> = () => {
                 <Table.TextCell>{result.status}</Table.TextCell>
                 <Table.TextCell>{result.imageUri}</Table.TextCell>
                 <Table.TextCell>{result.outputUri}</Table.TextCell>
-                <Table.TextCell>{result.createdAt}</Table.TextCell>
-                <Table.TextCell>{result.updatedAt}</Table.TextCell>
+                <Table.TextCell>{result.readableCreatedAt}</Table.TextCell>
+                <Table.TextCell>{result.readableUpdatedAt}</Table.TextCell>
                 <Table.Cell>
                   <IconButton icon={EyeOpenIcon} marginRight={majorScale(2)} />
                   <IconButton icon={TrashIcon} intent="danger" onClick={() => confirmDelete(result.id)}/>

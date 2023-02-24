@@ -1,4 +1,5 @@
 import ExtractedText, {Props as ExtractedTextProps} from "./ExtractedText";
+import { formatToDate } from "../components/dates"
 
 export enum ExtractionResultStatus {
     Running = "running",
@@ -37,5 +38,13 @@ export default class ExtractionResult {
         } else {
             this.extractedTexts = []
         }
+    }
+
+    get readableCreatedAt(){
+        return formatToDate(this.createdAt)
+    }
+
+    get readableUpdatedAt(){
+        return formatToDate(this.updatedAt)
     }
 }
