@@ -19,6 +19,7 @@ type StorageAPIClient interface {
 	UploadFile(key string, file *os.File) error
 	DownloadFile(key string) (*os.File, error)
 	QueryFiles(key string) ([]string, error)
+	DeleteFile(key string) error
 	SignedURL(key string) (string, error)
 }
 
@@ -128,6 +129,22 @@ func (c *storageAPIClient) QueryFiles(key string) ([]string, error) {
 	}
 
 	return files, nil
+}
+
+func (c *storageAPIClient) DeleteFile(key string) error {
+	client, err := c.newClient()
+	if err != nil {
+		return errors.Wrap(err, "StorageAPIClient#DeleteFile")
+	}
+	defer func() {
+		_ = client.Close()
+	}()
+	object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
+	err = object.Delete(context.Background())
+	if err != nil {
+		return errors.Wrap(err, "StorageAPIClient#DeleteFile#Delete")
+	}
+	return nil
 }
 
 func (c *storageAPIClient) newClient() (*storage.Client, error) {

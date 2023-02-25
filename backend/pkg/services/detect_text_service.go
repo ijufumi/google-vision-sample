@@ -192,6 +192,22 @@ func (s *detectTextService) DeleteResult(id string) error {
 		if err != nil {
 			return err
 		}
+		extractionResult, err := s.extractionResultRepository.GetByID(s.db, id)
+		if err != nil {
+			return err
+		}
+		if len(extractionResult.ImageKey) != 0 {
+			err = s.storageAPIClient.DeleteFile(extractionResult.ImageKey)
+			if err != nil {
+				s.logger.Error(err.Error())
+			}
+		}
+		if extractionResult.OutputKey != nil && len(*extractionResult.OutputKey) != 0 {
+			err = s.storageAPIClient.DeleteFile(*extractionResult.OutputKey)
+			if err != nil {
+				s.logger.Error(err.Error())
+			}
+		}
 		return s.extractionResultRepository.Delete(tx, id)
 	})
 }
@@ -206,7 +222,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Extra
 		}
 	}
 	outputUri := ""
-	if entity.OutputKey != nil {
+	if entity.OutputKey != nil && len(*entity.OutputKey) != 0 {
 		outputUri, err = s.storageAPIClient.SignedURL(*entity.OutputKey)
 		if err != nil {
 			s.logger.Error(err.Error())
