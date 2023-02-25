@@ -3,12 +3,14 @@ import { Pane, Button, UploadIcon, TrashIcon, EyeOpenIcon, Dialog, Text, Heading
 import ExtractionResult from "../models/ExtractionResult"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 import FileUploadDialog from "../components/FileUploadDialog"
+import Loader from "../components/Loader"
 
 interface Props {
 }
 
 const App: FC<Props> = () => {
   const [initialized, setInitialized] = useState<boolean>(false)
+  const [showLoader, setShowLoader] = useState<boolean>(false)
   const [extractionResults, setExtractionResults] = useState<ExtractionResult[]>([])
   const [showFileUploadDialog, setShowFileUploadDialog] = useState<boolean>(false)
   const [deleteTargetId, setDeleteTargetId] = useState<string>('')
@@ -42,7 +44,9 @@ const App: FC<Props> = () => {
 
   const handleFileUpload = async (file: File) => {
     setShowFileUploadDialog(false)
+    setShowLoader(true)
     const result = await useCase.startExtraction(file)
+    setShowLoader(false)
     if (result) {
       toaster.success("Uploading succeeded")
     } else {
@@ -59,7 +63,10 @@ const App: FC<Props> = () => {
     if (!deleteTargetId) {
       return
     }
+    setShowLoader(true)
+    setDeleteTargetId('')
     const result = await useCase.deleteExtractionResult(deleteTargetId)
+    setShowLoader(false)
     if (result) {
       setDeleteTargetId('')
       toaster.success("Deleting succeeded")
@@ -129,6 +136,7 @@ const App: FC<Props> = () => {
     >
       <Text size={600}>Would you like to delete it?</Text>
     </Dialog>
+    <Loader isShown={showLoader} />
   </Pane>
 }
 
