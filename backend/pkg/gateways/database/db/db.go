@@ -14,9 +14,8 @@ func NewDB(config *configs.Config, zapLogger *zap.Logger) *gorm.DB {
 	dsn := dsnString(config)
 	logger := zapgorm2.New(zapLogger)
 	logger.SetAsDefault()
-	logger.LogMode(gormLogger.Info)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger,
+		Logger: logger.LogMode(gormLogger.Info),
 	})
 	if err != nil {
 		panic(err)
