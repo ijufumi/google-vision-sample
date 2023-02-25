@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect, useMemo } from "react"
-import { Pane, Button, UploadIcon, TrashIcon, EyeOpenIcon, Dialog, Text, Heading, Table, IconButton, majorScale, toaster } from "evergreen-ui"
-import ExtractionResult from "../models/ExtractionResult"
+import { Pane, Button, UploadIcon, TrashIcon, EyeOpenIcon, Dialog, Text, Heading, Table, IconButton, Badge, majorScale, toaster } from "evergreen-ui"
+import ExtractionResult, { ExtractionResultStatus } from "../models/ExtractionResult"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 import FileUploadDialog from "../components/FileUploadDialog"
 import Loader from "../components/Loader"
@@ -76,6 +76,27 @@ const App: FC<Props> = () => {
     await loadExtractionResults()
   }
 
+  const renderStatus = (status: ExtractionResultStatus) => {
+    let color: "red" | "blue" | "green" = "red"
+    if (status === ExtractionResultStatus.Running) {
+      color = "blue"
+    }
+    if (status === ExtractionResultStatus.Succeeded) {
+      color = "green"
+    }
+    return <Badge color={color} style={{
+      borderRadius: "10px",
+      height: "30px",
+      width: "100px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      margin: "5px",
+    }}>
+      {status}
+    </Badge>
+  }
+
   const renderResults = () => {
     return (
       <Pane>
@@ -93,7 +114,7 @@ const App: FC<Props> = () => {
             {extractionResults.map(result => (
               <Table.Row key={result.id}>
                 <Table.TextCell>{result.id}</Table.TextCell>
-                <Table.TextCell>{result.status}</Table.TextCell>
+                <Table.TextCell>{renderStatus(result.status)}</Table.TextCell>
                 <Table.TextCell>{result.imageUri}</Table.TextCell>
                 <Table.TextCell>{result.outputUri}</Table.TextCell>
                 <Table.TextCell>{result.readableCreatedAt}</Table.TextCell>
