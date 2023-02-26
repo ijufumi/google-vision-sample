@@ -116,10 +116,10 @@ const App: FC<Props> = () => {
                 <Table.TextCell>{result.id}</Table.TextCell>
                 <Table.TextCell>{renderStatus(result.status)}</Table.TextCell>
                 <Table.TextCell>
-                  {result.imageUri && <IconButton icon={DocumentOpenIcon} appearance="minimal" />}
+                  {result.imageKey && <IconButton icon={DocumentOpenIcon} appearance="minimal" />}
                 </Table.TextCell>
                 <Table.TextCell>
-                  {result.outputUri && <IconButton icon={DocumentOpenIcon} appearance="minimal" />}
+                  {result.outputKey && <IconButton icon={DocumentOpenIcon} appearance="minimal" />}
                 </Table.TextCell>
                 <Table.TextCell>{result.readableCreatedAt}</Table.TextCell>
                 <Table.TextCell>{result.readableUpdatedAt}</Table.TextCell>

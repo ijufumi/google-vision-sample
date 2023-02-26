@@ -10,8 +10,8 @@ export enum ExtractionResultStatus {
 export interface Props {
     id: string
     status: ExtractionResultStatus
-    imageUri: string
-    outputUri: string
+    imageKey: string
+    outputKey: string
     createdAt: number
     updatedAt: number
     extractedTexts: ExtractedTextProps[]
@@ -20,8 +20,8 @@ export interface Props {
 export default class ExtractionResult {
     readonly id: string
     readonly status: ExtractionResultStatus
-    readonly imageUri: string
-    readonly outputUri: string
+    readonly imageKey: string
+    readonly outputKey: string
     readonly createdAt: number
     readonly updatedAt: number
     readonly extractedTexts: ExtractedText[]
@@ -29,8 +29,8 @@ export default class ExtractionResult {
     constructor(props: Props) {
         this.id = props.id
         this.status = props.status
-        this.imageUri = props.imageUri
-        this.outputUri = props.outputUri
+        this.imageKey = props.imageKey
+        this.outputKey = props.outputKey
         this.createdAt = props.createdAt
         this.updatedAt = props.updatedAt
         if (props.extractedTexts) {
