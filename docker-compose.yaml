@@ -14,13 +14,14 @@ services:
     container_name: app
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.debug
     ports:
       - "8080:8080"
+      - "4000:4000"
     env_file:
       - backend/.env
     volumes:
-      - ./backend/migration:/app/migration
+      - ./backend:/backend
     platform: linux/x86_64
   db:
     container_name: db
