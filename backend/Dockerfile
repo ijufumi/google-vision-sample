@@ -6,7 +6,7 @@ COPY . .
 
 RUN go mod download
 
-RUN go build -o app /app/cmd/app/
+RUN go build -o app /app/
 RUN go build -o db /app/cmd/db/
 
 FROM debian:bullseye-slim as deploy
