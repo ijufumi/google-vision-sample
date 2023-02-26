@@ -7,7 +7,7 @@ import (
 )
 
 type SignedURLHandler interface {
-	Get(ctx *gin.Context)
+	GetByKey(ctx *gin.Context)
 }
 
 type signedURLHandler struct {
@@ -20,7 +20,7 @@ func NewSignedURL(detectTextService services.DetectTextService) SignedURLHandler
 	}
 }
 
-func (h *signedURLHandler) Get(ctx *gin.Context) {
+func (h *signedURLHandler) GetByKey(ctx *gin.Context) {
 	key := ctx.Param("key")
 	signedURL, err := h.detectTextService.GetSignedURL(key)
 	if err != nil {
