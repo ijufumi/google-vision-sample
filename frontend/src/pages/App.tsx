@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useMemo } from "react"
+import React, { FC, useState, useEffect, useMemo, useCallback } from "react"
 import { Pane, Button, UploadIcon, TrashIcon, EyeOpenIcon, Dialog, Text, Heading, Table, IconButton, Badge, majorScale, toaster } from "evergreen-ui"
 import ExtractionResult, { ExtractionResultStatus } from "../models/ExtractionResult"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
@@ -17,7 +17,7 @@ const App: FC<Props> = () => {
 
   const useCase = useMemo(() => new ExtractionUseCaseImpl(), [])
 
-  const loadExtractionResults = async () => {
+  const loadExtractionResults = useCallback(async () => {
     const _extractionResults = await useCase.getExtractionResults()
     console.info("initialize...")
     if (_extractionResults) {
@@ -25,7 +25,7 @@ const App: FC<Props> = () => {
     } else {
       toaster.danger("Something wrong...")
     }
-  }
+  }, [useCase])
 
   useEffect(() => {
     if (initialized) {
@@ -36,7 +36,7 @@ const App: FC<Props> = () => {
       setInitialized(true)
     }
     initialize()
-  }, [initialized, useCase])
+  }, [initialized, loadExtractionResults])
 
   if (!initialized) {
     return null
