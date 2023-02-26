@@ -1,0 +1,7 @@
+FROM node:alpine
+
+WORKDIR /frontend
+ENV CI=true
+RUN yarn install
+
+CMD ["yarn", "start"]
