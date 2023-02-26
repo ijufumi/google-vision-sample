@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { Overlay, Spinner, Pane } from "evergreen-ui"
+import { Overlay, Pane } from "evergreen-ui"
 import { Watch} from "react-loader-spinner"
 
 export interface Props{
