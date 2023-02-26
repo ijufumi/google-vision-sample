@@ -21,6 +21,7 @@ import (
 type DetectTextService interface {
 	GetResults() ([]*models.ExtractionResult, error)
 	GetResultByID(id string) (*models.ExtractionResult, error)
+	GetSignedURL(key string) (*models.SignedURL, error)
 	DetectTexts(file *os.File) error
 	DeleteResult(id string) error
 }
@@ -62,6 +63,14 @@ func (s *detectTextService) GetResultByID(id string) (*models.ExtractionResult, 
 		return nil, err
 	}
 	return s.buildExtractionResultResponse(result), nil
+}
+
+func (s *detectTextService) GetSignedURL(key string) (*models.SignedURL, error) {
+	signedURL, err := s.storageAPIClient.SignedURL(key)
+	if err != nil {
+		return nil, err
+	}
+	return &models.SignedURL{URL: signedURL}, nil
 }
 
 func (s *detectTextService) DetectTexts(file *os.File) error {

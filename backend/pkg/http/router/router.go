@@ -30,6 +30,9 @@ func NewRouter(c container.Container) Router {
 		api.GET("/detect_texts/:id", detectTextHandler.GetByID)
 		api.POST("/detect_texts", detectTextHandler.Create)
 		api.DELETE("/detect_texts/:id", detectTextHandler.Delete)
+
+		signedURLHandler := container.Invoke[handlers.SignedURLHandler](c)
+		api.GET("/signed_url", signedURLHandler.Get)
 	}
 	return &router{engine: r}
 }
