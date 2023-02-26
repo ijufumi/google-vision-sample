@@ -222,21 +222,6 @@ func (s *detectTextService) DeleteResult(id string) error {
 }
 
 func (s *detectTextService) buildExtractionResultResponse(entity *entities.ExtractionResult) *models.ExtractionResult {
-	imageUri := ""
-	var err error
-	if len(entity.ImageKey) != 0 {
-		imageUri, err = s.storageAPIClient.SignedURL(entity.ImageKey)
-		if err != nil {
-			s.logger.Error(err.Error())
-		}
-	}
-	outputUri := ""
-	if entity.OutputKey != nil && len(*entity.OutputKey) != 0 {
-		outputUri, err = s.storageAPIClient.SignedURL(*entity.OutputKey)
-		if err != nil {
-			s.logger.Error(err.Error())
-		}
-	}
 	extractedTexts := make([]models.ExtractedText, 0)
 
 	for _, extractedText := range entity.ExtractedTexts {
@@ -252,11 +237,15 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Extra
 			UpdatedAt:          extractedText.UpdatedAt.Unix(),
 		})
 	}
+	outputKey := ""
+	if entity.OutputKey != nil {
+		outputKey = *entity.OutputKey
+	}
 	return &models.ExtractionResult{
 		ID:             entity.ID,
 		Status:         entity.Status,
-		ImageUri:       imageUri,
-		OutputUri:      outputUri,
+		ImageKey:       entity.ImageKey,
+		OutputKey:      outputKey,
 		CreatedAt:      entity.CreatedAt.Unix(),
 		UpdatedAt:      entity.UpdatedAt.Unix(),
 		ExtractedTexts: extractedTexts,

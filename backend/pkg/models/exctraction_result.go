@@ -7,8 +7,8 @@ import (
 type ExtractionResult struct {
 	ID             string                       `json:"id"`
 	Status         enums.ExtractionResultStatus `json:"status"`
-	ImageUri       string                       `json:"imageUri"`
-	OutputUri      string                       `json:"outputUri"`
+	ImageKey       string                       `json:"imageKey"`
+	OutputKey      string                       `json:"outputKey"`
 	CreatedAt      int64                        `json:"createdAt"`
 	UpdatedAt      int64                        `json:"updatedAt"`
 	ExtractedTexts []ExtractedText              `json:"extractedTexts"`
