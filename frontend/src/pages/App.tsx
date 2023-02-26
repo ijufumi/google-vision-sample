@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect, useMemo, useCallback } from "react"
-import { Pane, Button, UploadIcon, TrashIcon, EyeOpenIcon, Dialog, Text, Heading, Table, IconButton, Badge, majorScale, toaster } from "evergreen-ui"
+import { Pane, Button, Dialog, Text, Heading, Table, IconButton, Badge, majorScale, toaster, UploadIcon, TrashIcon, EyeOpenIcon, DocumentOpenIcon } from "evergreen-ui"
 import ExtractionResult, { ExtractionResultStatus } from "../models/ExtractionResult"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 import FileUploadDialog from "../components/FileUploadDialog"
@@ -115,8 +115,12 @@ const App: FC<Props> = () => {
               <Table.Row key={result.id}>
                 <Table.TextCell>{result.id}</Table.TextCell>
                 <Table.TextCell>{renderStatus(result.status)}</Table.TextCell>
-                <Table.TextCell>{result.imageUri}</Table.TextCell>
-                <Table.TextCell>{result.outputUri}</Table.TextCell>
+                <Table.TextCell>
+                  {result.imageUri && <IconButton icon={DocumentOpenIcon} appearance="minimal" />}
+                </Table.TextCell>
+                <Table.TextCell>
+                  {result.outputUri && <IconButton icon={DocumentOpenIcon} appearance="minimal" />}
+                </Table.TextCell>
                 <Table.TextCell>{result.readableCreatedAt}</Table.TextCell>
                 <Table.TextCell>{result.readableUpdatedAt}</Table.TextCell>
                 <Table.Cell>
