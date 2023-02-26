@@ -8,7 +8,5 @@ COPY go.sum go.sum
 RUN go mod download
 RUN go install github.com/codegangsta/gin@latest
 
-WORKDIR /backend/cmd/app
-
 # Basically, gin takes more time than starting db.
 CMD ["gin", "--appPort", "8080", "--port", "4000", "--immediate", "--all"]
