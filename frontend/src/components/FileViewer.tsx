@@ -8,9 +8,10 @@ import Loader from "./Loader"
 export interface Props {
   key: string
   isShown: boolean
+  onClose: () => void
 }
 
-const FileViewer: FC<Props> = ({ key, isShown }) => {
+const FileViewer: FC<Props> = ({ key, isShown, onClose }) => {
   const [loaded, setLoaded] = useState<boolean>(false)
   const [blobData, setBlobData] = useState<Blob|undefined>(undefined)
   const [textData, setTextData] = useState<string>('')
@@ -58,7 +59,7 @@ const FileViewer: FC<Props> = ({ key, isShown }) => {
   }
 
   return <Pane>
-    <Dialog isShown={isShown}>
+    <Dialog isShown={isShown} onConfirm={onClose} hasCancel={false}>
       {renderFile()}
     </Dialog>
   </Pane>
