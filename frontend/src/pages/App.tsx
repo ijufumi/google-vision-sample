@@ -4,6 +4,7 @@ import ExtractionResult, { ExtractionResultStatus } from "../models/ExtractionRe
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 import FileUploadDialog from "../components/FileUploadDialog"
 import Loader from "../components/Loader"
+import FileViewer from "../components/FileViewer"
 
 interface Props {
 }
@@ -14,6 +15,7 @@ const App: FC<Props> = () => {
   const [extractionResults, setExtractionResults] = useState<ExtractionResult[]>([])
   const [showFileUploadDialog, setShowFileUploadDialog] = useState<boolean>(false)
   const [deleteTargetId, setDeleteTargetId] = useState<string>('')
+  const [fileKey, setFileKey] = useState<string>('')
 
   const useCase = useMemo(() => new ExtractionUseCaseImpl(), [])
 
@@ -116,10 +118,10 @@ const App: FC<Props> = () => {
                 <Table.TextCell>{result.id}</Table.TextCell>
                 <Table.TextCell>{renderStatus(result.status)}</Table.TextCell>
                 <Table.TextCell>
-                  {result.imageKey && <IconButton icon={DocumentOpenIcon} appearance="minimal" />}
+                  {result.imageKey && <IconButton icon={DocumentOpenIcon} appearance="minimal" onClick={() => setFileKey(result.imageKey)} />}
                 </Table.TextCell>
                 <Table.TextCell>
-                  {result.outputKey && <IconButton icon={DocumentOpenIcon} appearance="minimal" />}
+                  {result.outputKey && <IconButton icon={DocumentOpenIcon} appearance="minimal" onClick={() => setFileKey(result.outputKey)} />}
                 </Table.TextCell>
                 <Table.TextCell>{result.readableCreatedAt}</Table.TextCell>
                 <Table.TextCell>{result.readableUpdatedAt}</Table.TextCell>
@@ -162,6 +164,7 @@ const App: FC<Props> = () => {
       <Text size={600}>Would you like to delete it?</Text>
     </Dialog>
     <Loader isShown={showLoader} />
+    <FileViewer fileKey={fileKey} isShown={!fileKey} onClose={() => setFileKey('')} />
   </Pane>
 }
 
