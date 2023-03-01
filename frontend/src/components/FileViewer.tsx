@@ -1,7 +1,7 @@
-import React, { FC, useMemo, useEffect, useState } from "react"
-import { Pane, Dialog } from "evergreen-ui"
+import React, { FC, useEffect, useMemo, useState } from "react"
+import { Dialog, Pane } from "evergreen-ui"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
-import { readAsFile } from "./files"
+import { readAsBlob, readAsText, isTextType } from "./files"
 import Loader from "./Loader"
 
 
@@ -12,15 +12,22 @@ export interface Props {
 
 const FileViewer: FC<Props> = ({ key, isShown }) => {
   const [loaded, setLoaded] = useState<boolean>(false)
-  const [file, setFile] = useState<File|undefined>(undefined)
+  const [blobData, setBlobData] = useState<Blob|undefined>(undefined)
+  const [textData, setTextData] = useState<string>('')
+  const [contentType, setContentType] = useState<string>('')
   const useCase = useMemo(() => new ExtractionUseCaseImpl(), [])
 
   useEffect(() => {
     const loadFile = async () => {
       const signedUrl = await useCase.getSignedUrl(key)
       if (signedUrl) {
-        const _file = await readAsFile(signedUrl.url)
-        setFile(_file)
+        const fileData = await readAsBlob(signedUrl.url)
+        setContentType(fileData.type)
+        if (isTextType(fileData.type)) {
+          setTextData(await readAsText(fileData))
+        } else {
+          setBlobData(fileData)
+        }
       }
       setLoaded(true)
     }
@@ -28,15 +35,22 @@ const FileViewer: FC<Props> = ({ key, isShown }) => {
   }, [key, useCase])
 
   const renderFile = () => {
-    if (!file) {
+    if (!blobData && !textData) {
       return null
     }
-    if (file.type.startsWith("image/")) {
-      const image = React.createElement("img", {
-        src: URL.createObjectURL(file)
-      })
-      return image
+    if (textData.length) {
+      if (contentType === "application/json") {
+        return React.createElement("pre", JSON.stringify(JSON.parse(textData)))
+      }
     }
+    if (blobData) {
+      if (contentType.startsWith("image/")) {
+        return  React.createElement("img", {
+          src: URL.createObjectURL(blobData)
+        })
+      }
+    }
+    return null
   }
 
   if (!loaded) {
@@ -45,7 +59,7 @@ const FileViewer: FC<Props> = ({ key, isShown }) => {
 
   return <Pane>
     <Dialog isShown={isShown}>
-      { renderFile() }
+      {renderFile()}
     </Dialog>
   </Pane>
 }
