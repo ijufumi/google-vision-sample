@@ -1,7 +1,8 @@
-import React, { FC, useCallback, useMemo, useEffect, useState } from "react"
+import React, { FC, useMemo, useEffect, useState } from "react"
 import { Pane, Dialog } from "evergreen-ui"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 import { readAsFile } from "./files"
+import Loader from "./Loader"
 
 
 export interface Props {
@@ -31,14 +32,20 @@ const FileViewer: FC<Props> = ({ key, isShown }) => {
       return null
     }
     if (file.type.startsWith("image/")) {
-      const image = new Image()
-      image.src = URL.createObjectURL(file)
+      const image = React.createElement("img", {
+        src: URL.createObjectURL(file)
+      })
       return image
     }
   }
 
+  if (!loaded) {
+    return <Loader isShown={!loaded} />
+  }
+
   return <Pane>
     <Dialog isShown={isShown}>
+      { renderFile() }
     </Dialog>
   </Pane>
 }
