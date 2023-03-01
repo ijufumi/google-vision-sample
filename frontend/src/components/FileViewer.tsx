@@ -6,12 +6,12 @@ import Loader from "./Loader"
 
 
 export interface Props {
-  key: string
+  fileKey: string
   isShown: boolean
   onClose: () => void
 }
 
-const FileViewer: FC<Props> = ({ key, isShown, onClose }) => {
+const FileViewer: FC<Props> = ({ fileKey, isShown, onClose }) => {
   const [loaded, setLoaded] = useState<boolean>(false)
   const [blobData, setBlobData] = useState<Blob|undefined>(undefined)
   const [textData, setTextData] = useState<string>('')
@@ -20,7 +20,7 @@ const FileViewer: FC<Props> = ({ key, isShown, onClose }) => {
 
   useEffect(() => {
     const loadFile = async () => {
-      const signedUrl = await useCase.getSignedUrl(key)
+      const signedUrl = await useCase.getSignedUrl(fileKey)
       if (signedUrl) {
         const fileData = await readAsBlob(signedUrl.url)
         setContentType(fileData.type)
@@ -33,7 +33,7 @@ const FileViewer: FC<Props> = ({ key, isShown, onClose }) => {
       setLoaded(true)
     }
     loadFile()
-  }, [key, useCase])
+  }, [fileKey, useCase])
 
   const renderFile = () => {
     if (!blobData && !textData) {
