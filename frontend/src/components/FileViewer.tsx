@@ -63,3 +63,5 @@ const FileViewer: FC<Props> = ({ key, isShown }) => {
     </Dialog>
   </Pane>
 }
+
+export default FileViewer
