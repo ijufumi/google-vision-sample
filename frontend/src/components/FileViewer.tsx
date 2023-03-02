@@ -54,7 +54,7 @@ const FileViewer: FC<Props> = ({ fileKey, isShown, onClose }) => {
     return null
   }
 
-  if (!loaded) {
+  if (isShown && !loaded) {
     return <Loader isShown={!loaded} />
   }
 
