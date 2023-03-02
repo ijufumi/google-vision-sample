@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useMemo, useState } from "react"
-import { Dialog, Pane } from "evergreen-ui"
+import { Dialog, Pane, toaster } from "evergreen-ui"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 import { readAsBlob, readAsText, isTextType } from "./files"
 import Loader from "./Loader"
@@ -19,21 +19,37 @@ const FileViewer: FC<Props> = ({ fileKey, isShown, onClose }) => {
   const useCase = useMemo(() => new ExtractionUseCaseImpl(), [])
 
   useEffect(() => {
+    if (loaded) {
+      return
+    }
     const loadFile = async () => {
+      if (!fileKey) {
+        return
+      }
       const signedUrl = await useCase.getSignedUrl(fileKey)
       if (signedUrl) {
-        const fileData = await readAsBlob(signedUrl.url)
-        setContentType(fileData.type)
-        if (isTextType(fileData.type)) {
-          setTextData(await readAsText(fileData))
-        } else {
-          setBlobData(fileData)
+        try {
+          const fileData = await readAsBlob(signedUrl.url)
+          setContentType(fileData.type)
+          if (isTextType(fileData.type)) {
+            setTextData(await readAsText(fileData))
+          } else {
+            setBlobData(fileData)
+          }
+        } catch (e) {
+          console.error(e)
+          toaster.danger("Failed to load file")
+          onClose()
         }
+      } else {
+        toaster.danger("Failed to load file")
+        onClose()
       }
       setLoaded(true)
     }
     loadFile()
-  }, [fileKey, useCase])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const renderFile = () => {
     if (!blobData && !textData) {

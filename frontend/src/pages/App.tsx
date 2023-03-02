@@ -34,11 +34,13 @@ const App: FC<Props> = () => {
       return
     }
     const initialize = async () => {
+      console.info("initialize2...")
       await loadExtractionResults()
       setInitialized(true)
     }
     initialize()
-  }, [initialized, loadExtractionResults])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if (!initialized) {
     return null
