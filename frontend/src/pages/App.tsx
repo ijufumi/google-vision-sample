@@ -164,7 +164,7 @@ const App: FC<Props> = () => {
       <Text size={600}>Would you like to delete it?</Text>
     </Dialog>
     <Loader isShown={showLoader} />
-    <FileViewer fileKey={fileKey} isShown={!fileKey} onClose={() => setFileKey('')} />
+    <FileViewer fileKey={fileKey} isShown={!!fileKey} onClose={() => setFileKey('')} />
   </Pane>
 }
 
