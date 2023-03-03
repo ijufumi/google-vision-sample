@@ -39,12 +39,7 @@ const App: FC<Props> = () => {
       setInitialized(true)
     }
     initialize()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  if (!initialized) {
-    return null
-  }
+  }, [initialized, loadExtractionResults])
 
   const handleFileUpload = async (file: File) => {
     setShowFileUploadDialog(false)
