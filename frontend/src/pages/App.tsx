@@ -151,17 +151,19 @@ const App: FC<Props> = () => {
       onClose={() => setShowFileUploadDialog(false)}
       onUpload={handleFileUpload}
     />
-    <Dialog
+    {!!deleteTargetId &&
+      <Dialog
+      key={deleteTargetId}
       isShown={!!deleteTargetId}
       title="Are you sure deleting?"
-      onCloseComplete={() => setDeleteTargetId('')}
+      onCloseComplete={() => setDeleteTargetId("")}
       onConfirm={handleDelete}
       confirmLabel="Delete"
     >
       <Text size={600}>Would you like to delete it?</Text>
-    </Dialog>
+    </Dialog>}
     <Loader isShown={showLoader} />
-    <FileViewer fileKey={fileKey} isShown={!!fileKey} onClose={() => setFileKey('')} />
+    {!!fileKey && <FileViewer key={fileKey} fileKey={fileKey} isShown={!!fileKey} onClose={() => setFileKey('')} />}
   </Pane>
 }
 
