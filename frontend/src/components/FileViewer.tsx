@@ -53,7 +53,7 @@ const FileViewer: FC<Props> = ({ fileKey, isShown, onClose }) => {
 
   const renderFile = () => {
     if (!blobData && !textData) {
-      return null
+      return <div />
     }
     if (textData.length) {
       if (contentType === "application/json") {
@@ -67,7 +67,7 @@ const FileViewer: FC<Props> = ({ fileKey, isShown, onClose }) => {
         })
       }
     }
-    return null
+    return <div />
   }
 
   if (isShown && !loaded) {
