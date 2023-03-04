@@ -21,7 +21,7 @@ func NewSignedURL(detectTextService services.DetectTextService) SignedURLHandler
 }
 
 func (h *signedURLHandler) GetByKey(ctx *gin.Context) {
-	key := ctx.Param("key")
+	key := ctx.Query("key")
 	signedURL, err := h.detectTextService.GetSignedURL(key)
 	if err != nil {
 		_ = ctx.AbortWithError(http.StatusBadRequest, err)
