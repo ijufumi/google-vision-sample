@@ -22,7 +22,7 @@ type DetectTextService interface {
 	GetResults() ([]*models.ExtractionResult, error)
 	GetResultByID(id string) (*models.ExtractionResult, error)
 	GetSignedURL(key string) (*models.SignedURL, error)
-	DetectTexts(file *os.File) error
+	DetectTexts(file *os.File, contentType string) error
 	DeleteResult(id string) error
 }
 
@@ -73,11 +73,11 @@ func (s *detectTextService) GetSignedURL(key string) (*models.SignedURL, error) 
 	return &models.SignedURL{URL: signedURL}, nil
 }
 
-func (s *detectTextService) DetectTexts(file *os.File) error {
+func (s *detectTextService) DetectTexts(file *os.File, contentType string) error {
 	id := utils.NewULID()
 	key := fmt.Sprintf("%s/%s", id, filepath.Base(file.Name()))
 
-	err := s.storageAPIClient.UploadFile(key, file)
+	err := s.storageAPIClient.UploadFile(key, file, contentType)
 	if err != nil {
 		return err
 	}
