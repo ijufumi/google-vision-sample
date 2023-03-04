@@ -23,6 +23,7 @@ type StorageAPIClient interface {
 	QueryFiles(key string) ([]string, error)
 	DeleteFile(key string) error
 	SignedURL(key string) (string, error)
+	UpdateContentType(key, contentType string) error
 	SetupCORSOnBucket() error
 }
 
@@ -153,6 +154,23 @@ func (c *storageAPIClient) DeleteFile(key string) error {
 	err = object.Delete(context.Background())
 	if err != nil {
 		return errors.Wrap(err, "StorageAPIClient#DeleteFile#Delete")
+	}
+	return nil
+}
+
+func (c *storageAPIClient) UpdateContentType(key, contentType string) error {
+	client, err := c.newClient()
+	if err != nil {
+		return errors.Wrap(err, "StorageAPIClient#UpdateContentType")
+	}
+	defer func() {
+		_ = client.Close()
+	}()
+	fmt.Println(fmt.Sprintf("key is %s", key))
+	object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
+	_, err = object.Update(context.Background(), storage.ObjectAttrsToUpdate{ContentType: contentType})
+	if err != nil {
+		return errors.Wrap(err, "StorageAPIClient#UpdateContentType#Update")
 	}
 	return nil
 }

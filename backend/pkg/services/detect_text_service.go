@@ -154,6 +154,13 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 			status = enums.ExtractionResultStatus_Failed
 			return err
 		}
+
+		err = s.storageAPIClient.UpdateContentType(*result.OutputKey, "application/json")
+		if err != nil {
+			status = enums.ExtractionResultStatus_Failed
+			return err
+		}
+
 		extractedTexts := make([]entities.ExtractedText, 0)
 		for _, response := range detectResponse.Responses {
 			for _, page := range response.FullTextAnnotation.Pages {
