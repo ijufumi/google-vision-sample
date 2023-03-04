@@ -33,6 +33,9 @@ func NewRouter(c container.Container) Router {
 
 		signedURLHandler := container.Invoke[handlers.SignedURLHandler](c)
 		api.GET("/signed_urls", signedURLHandler.GetByKey)
+
+		configsHandler := container.Invoke[handlers.ConfigsHandler](c)
+		api.POST("/configs/cors", configsHandler.SetupCORS)
 	}
 	return &router{engine: r}
 }
