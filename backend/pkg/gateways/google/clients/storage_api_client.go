@@ -8,6 +8,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/options"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/iterator"
 	"io"
@@ -25,13 +26,15 @@ type StorageAPIClient interface {
 	SetupCORSOnBucket() error
 }
 
-func NewStorageAPIClient(config *configs.Config) StorageAPIClient {
+func NewStorageAPIClient(config *configs.Config, logger *zap.Logger) StorageAPIClient {
 	return &storageAPIClient{
 		config: config,
+		logger: logger,
 	}
 }
 
 type storageAPIClient struct {
+	logger    *zap.Logger
 	config    *configs.Config
 	jwtConfig *jwt.Config
 }
@@ -97,14 +100,16 @@ func (c *storageAPIClient) SignedURL(key string) (string, error) {
 		_ = client.Close()
 	}()
 	option := &storage.SignedURLOptions{
-		Scheme:  storage.SigningSchemeV4,
-		Expires: time.Now().UTC().Add(time.Duration(c.config.Google.Storage.SignedURL.ExpireSec) * time.Second),
-		Method:  http.MethodGet,
+		Scheme:     storage.SigningSchemeV4,
+		PrivateKey: c.jwtConfig.PrivateKey,
+		Expires:    time.Now().UTC().Add(time.Duration(c.config.Google.Storage.SignedURL.ExpireSec) * time.Second),
+		Method:     http.MethodGet,
 	}
 	signedURL, err := client.Bucket(c.config.Google.Storage.Bucket).SignedURL(key, option)
 	if err != nil {
 		return "", errors.Wrap(err, "StorageAPIClient#SignedURL")
 	}
+	c.logger.Info(fmt.Sprintf("[%s]signed url is %s", key, signedURL))
 	return signedURL, nil
 }
 
