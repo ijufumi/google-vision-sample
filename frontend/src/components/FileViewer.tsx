@@ -62,13 +62,26 @@ const FileViewer: FC<Props> = ({ fileKey, isShown, onClose }) => {
     }
     if (textData.length) {
       if (contentType === "application/json") {
-        return React.createElement("pre", JSON.stringify(JSON.parse(textData)))
+        return React.createElement("div", {
+          height: "100%",
+          width: "100%",
+          style: {
+            border: "1px solid #000000",
+            borderRadius: "10px",
+            whiteSpace: "break-spaces"
+          },
+        }, JSON.stringify(JSON.parse(textData), undefined, 2))
       }
     }
     if (blobData) {
       if (contentType.startsWith("image/")) {
         return  React.createElement("img", {
-          src: URL.createObjectURL(blobData)
+          src: URL.createObjectURL(blobData),
+          height: "100%",
+          width: "100%",
+          style: {
+            objectFit: "contain"
+          }
         })
       }
     }
@@ -81,8 +94,18 @@ const FileViewer: FC<Props> = ({ fileKey, isShown, onClose }) => {
   }
 
   return <Pane>
-    <Dialog isShown={isShown} onConfirm={onClose} hasCancel={false} confirmLabel={"OK"}>
-      {renderFile()}
+    <Dialog
+      isShown={isShown}
+      onConfirm={onClose}
+      hasCancel={false}
+      confirmLabel={"OK"}
+      shouldCloseOnOverlayClick={false}
+      shouldCloseOnEscapePress={false}
+      width={"1000px"}
+    >
+      <Pane height="700px" width="100%">
+        {renderFile()}
+      </Pane>
     </Dialog>
   </Pane>
 }
