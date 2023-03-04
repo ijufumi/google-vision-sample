@@ -8,6 +8,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/options"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"github.com/pkg/errors"
+	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/iterator"
 	"io"
 	"net/http"
@@ -31,7 +32,8 @@ func NewStorageAPIClient(config *configs.Config) StorageAPIClient {
 }
 
 type storageAPIClient struct {
-	config *configs.Config
+	config    *configs.Config
+	jwtConfig *jwt.Config
 }
 
 func (c *storageAPIClient) UploadFile(key string, file *os.File) error {
@@ -95,6 +97,7 @@ func (c *storageAPIClient) SignedURL(key string) (string, error) {
 		_ = client.Close()
 	}()
 	option := &storage.SignedURLOptions{
+		Scheme:  storage.SigningSchemeV4,
 		Expires: time.Now().UTC().Add(time.Duration(c.config.Google.Storage.SignedURL.ExpireSec) * time.Second),
 		Method:  http.MethodGet,
 	}
@@ -160,7 +163,7 @@ func (c *storageAPIClient) SetupCORSOnBucket() error {
 	corsConfig := storage.BucketAttrsToUpdate{
 		CORS: []storage.CORS{
 			{
-				MaxAge:          time.Hour,
+				MaxAge:          time.Duration(c.config.Google.Storage.SignedURL.ExpireSec) * time.Second,
 				Methods:         []string{"GET"},
 				Origins:         []string{"*"},
 				ResponseHeaders: []string{"Access-Control-Allow-Origin"},
@@ -177,6 +180,11 @@ func (c *storageAPIClient) newClient() (*storage.Client, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "StorageAPIClient#newClient")
 	}
+	jwtConfig, err := options.GetJWTConfig(c.config)
+	if err != nil {
+		return nil, errors.Wrap(err, "StorageAPIClient#GetJWTConfig")
+	}
+	c.jwtConfig = jwtConfig
 	return service, nil
 }
 
