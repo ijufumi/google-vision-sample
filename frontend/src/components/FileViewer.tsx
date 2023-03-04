@@ -48,11 +48,16 @@ const FileViewer: FC<Props> = ({ fileKey, isShown, onClose }) => {
       setLoaded(true)
     }
     loadFile()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [fileKey, loaded, onClose, useCase])
+
+  const showUnsupportedFileAlert = () => {
+    toaster.warning("Unsupported file...")
+    onClose()
+  }
 
   const renderFile = () => {
     if (!blobData && !textData) {
+      showUnsupportedFileAlert()
       return <div />
     }
     if (textData.length) {
@@ -67,6 +72,7 @@ const FileViewer: FC<Props> = ({ fileKey, isShown, onClose }) => {
         })
       }
     }
+    showUnsupportedFileAlert()
     return <div />
   }
 
@@ -75,7 +81,7 @@ const FileViewer: FC<Props> = ({ fileKey, isShown, onClose }) => {
   }
 
   return <Pane>
-    <Dialog isShown={isShown} onConfirm={onClose} hasCancel={false}>
+    <Dialog isShown={isShown} onConfirm={onClose} hasCancel={false} confirmLabel={"OK"}>
       {renderFile()}
     </Dialog>
   </Pane>
