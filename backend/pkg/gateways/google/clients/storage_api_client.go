@@ -21,6 +21,7 @@ type StorageAPIClient interface {
 	QueryFiles(key string) ([]string, error)
 	DeleteFile(key string) error
 	SignedURL(key string) (string, error)
+	SetupCORSOnBucket() error
 }
 
 func NewStorageAPIClient(config *configs.Config) StorageAPIClient {
@@ -145,6 +146,29 @@ func (c *storageAPIClient) DeleteFile(key string) error {
 		return errors.Wrap(err, "StorageAPIClient#DeleteFile#Delete")
 	}
 	return nil
+}
+
+func (c *storageAPIClient) SetupCORSOnBucket() error {
+	client, err := c.newClient()
+	if err != nil {
+		return errors.Wrap(err, "StorageAPIClient#DeleteFile")
+	}
+	defer func() {
+		_ = client.Close()
+	}()
+	bucket := client.Bucket(c.config.Google.Storage.Bucket)
+	corsConfig := storage.BucketAttrsToUpdate{
+		CORS: []storage.CORS{
+			{
+				MaxAge:          time.Hour,
+				Methods:         []string{"GET"},
+				Origins:         []string{"*"},
+				ResponseHeaders: []string{"Access-Control-Allow-Origin"},
+			},
+		},
+	}
+	_, err = bucket.Update(context.Background(), corsConfig)
+	return err
 }
 
 func (c *storageAPIClient) newClient() (*storage.Client, error) {

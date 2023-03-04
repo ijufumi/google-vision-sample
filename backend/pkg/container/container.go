@@ -43,8 +43,10 @@ func (c *container) provide() {
 	_ = c.container.Provide(handlers.NewHealthHandler)
 	_ = c.container.Provide(handlers.NewDetectTextHandler)
 	_ = c.container.Provide(handlers.NewSignedURL)
+	_ = c.container.Provide(handlers.NewConfigsHandler)
 	// services
 	_ = c.container.Provide(services.NewDetectTextService)
+	_ = c.container.Provide(services.NewConfigurationService)
 	// database
 	_ = c.container.Provide(db.NewDB)
 	_ = c.container.Provide(repositories.NewExtractionResultRepository)
