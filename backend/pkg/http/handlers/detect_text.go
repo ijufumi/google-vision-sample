@@ -68,7 +68,7 @@ func (h *detectTextHandler) Create(ctx *gin.Context) {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	err = h.service.DetectTexts(tempFile)
+	err = h.service.DetectTexts(tempFile, inputFile.Header.Get("Content-Type"))
 	if err != nil {
 		fmt.Println(err)
 		_ = ctx.AbortWithError(http.StatusBadRequest, err)
