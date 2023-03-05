@@ -5,6 +5,7 @@ import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 import FileUploadDialog from "../components/FileUploadDialog"
 import Loader from "../components/Loader"
 import FileViewer from "../components/FileViewer"
+import ResultViewerDialog from "../components/ResultViewerDialog"
 
 interface Props {
 }
@@ -15,6 +16,7 @@ const App: FC<Props> = () => {
   const [extractionResults, setExtractionResults] = useState<ExtractionResult[]>([])
   const [showFileUploadDialog, setShowFileUploadDialog] = useState<boolean>(false)
   const [deleteTargetId, setDeleteTargetId] = useState<string>('')
+  const [showResultTargetId, setShowResultTargetId] = useState<string>('')
   const [fileKey, setFileKey] = useState<string>('')
 
   const useCase = useMemo(() => new ExtractionUseCaseImpl(), [])
@@ -123,7 +125,7 @@ const App: FC<Props> = () => {
                 <Table.TextCell>{result.readableCreatedAt}</Table.TextCell>
                 <Table.TextCell>{result.readableUpdatedAt}</Table.TextCell>
                 <Table.Cell>
-                  <IconButton icon={EyeOpenIcon} marginRight={majorScale(2)} />
+                  <IconButton icon={EyeOpenIcon} marginRight={majorScale(2)} onClick={() => setShowResultTargetId(result.id)} />
                   <IconButton icon={TrashIcon} intent="danger" onClick={() => confirmDelete(result.id)}/>
                 </Table.Cell>
               </Table.Row>
@@ -164,6 +166,7 @@ const App: FC<Props> = () => {
     </Dialog>}
     <Loader isShown={showLoader} />
     {!!fileKey && <FileViewer key={fileKey} fileKey={fileKey} isShown={!!fileKey} onClose={() => setFileKey('')} />}
+    {!!showResultTargetId && <ResultViewerDialog key={showResultTargetId} extractionResultId={showResultTargetId} onClose={() => setShowResultTargetId('')} /> }
   </Pane>
 }
 
