@@ -9,4 +9,3 @@ repos:
     rev: v8.35.0
     hooks:
       -   id: eslint
-          files: '.*\.(ts|tsx)'
