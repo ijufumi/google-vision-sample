@@ -1,23 +1,42 @@
 import React, { FC, useState, useEffect, useMemo, useCallback } from "react"
-import { Pane, Button, Dialog, Text, Heading, Table, IconButton, Badge, majorScale, toaster, UploadIcon, TrashIcon, EyeOpenIcon, DocumentOpenIcon } from "evergreen-ui"
-import ExtractionResult, { ExtractionResultStatus } from "../models/ExtractionResult"
+import {
+  Pane,
+  Button,
+  Dialog,
+  Text,
+  Heading,
+  Table,
+  IconButton,
+  Badge,
+  majorScale,
+  toaster,
+  UploadIcon,
+  TrashIcon,
+  EyeOpenIcon,
+  DocumentOpenIcon,
+} from "evergreen-ui"
+import ExtractionResult, {
+  ExtractionResultStatus,
+} from "../models/ExtractionResult"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 import FileUploadDialog from "../components/FileUploadDialog"
 import Loader from "../components/Loader"
 import FileViewer from "../components/FileViewer"
 import ResultViewerDialog from "../components/ResultViewerDialog"
 
-interface Props {
-}
+interface Props {}
 
 const App: FC<Props> = () => {
   const [initialized, setInitialized] = useState<boolean>(false)
   const [showLoader, setShowLoader] = useState<boolean>(false)
-  const [extractionResults, setExtractionResults] = useState<ExtractionResult[]>([])
-  const [showFileUploadDialog, setShowFileUploadDialog] = useState<boolean>(false)
-  const [deleteTargetId, setDeleteTargetId] = useState<string>('')
-  const [showResultTargetId, setShowResultTargetId] = useState<string>('')
-  const [fileKey, setFileKey] = useState<string>('')
+  const [extractionResults, setExtractionResults] = useState<
+    ExtractionResult[]
+  >([])
+  const [showFileUploadDialog, setShowFileUploadDialog] =
+    useState<boolean>(false)
+  const [deleteTargetId, setDeleteTargetId] = useState<string>("")
+  const [showResultTargetId, setShowResultTargetId] = useState<string>("")
+  const [fileKey, setFileKey] = useState<string>("")
 
   const useCase = useMemo(() => new ExtractionUseCaseImpl(), [])
 
@@ -65,11 +84,11 @@ const App: FC<Props> = () => {
       return
     }
     setShowLoader(true)
-    setDeleteTargetId('')
+    setDeleteTargetId("")
     const result = await useCase.deleteExtractionResult(deleteTargetId)
     setShowLoader(false)
     if (result) {
-      setDeleteTargetId('')
+      setDeleteTargetId("")
       toaster.success("Deleting succeeded")
     } else {
       toaster.danger("Deleting failed")
@@ -85,17 +104,22 @@ const App: FC<Props> = () => {
     if (status === ExtractionResultStatus.Succeeded) {
       color = "green"
     }
-    return <Badge color={color} style={{
-      borderRadius: "10px",
-      height: "30px",
-      width: "100px",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      margin: "5px",
-    }}>
-      {status}
-    </Badge>
+    return (
+      <Badge
+        color={color}
+        style={{
+          borderRadius: "10px",
+          height: "30px",
+          width: "100px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          margin: "5px",
+        }}
+      >
+        {status}
+      </Badge>
+    )
   }
 
   const renderResults = () => {
@@ -112,21 +136,41 @@ const App: FC<Props> = () => {
             <Table.TextHeaderCell>Operations</Table.TextHeaderCell>
           </Table.Head>
           <Table.Body>
-            {extractionResults.map(result => (
+            {extractionResults.map((result) => (
               <Table.Row key={result.id}>
                 <Table.TextCell>{result.id}</Table.TextCell>
                 <Table.TextCell>{renderStatus(result.status)}</Table.TextCell>
                 <Table.TextCell>
-                  {result.imageKey && <IconButton icon={DocumentOpenIcon} appearance="minimal" onClick={() => setFileKey(result.imageKey)} />}
+                  {result.imageKey && (
+                    <IconButton
+                      icon={DocumentOpenIcon}
+                      appearance="minimal"
+                      onClick={() => setFileKey(result.imageKey)}
+                    />
+                  )}
                 </Table.TextCell>
                 <Table.TextCell>
-                  {result.outputKey && <IconButton icon={DocumentOpenIcon} appearance="minimal" onClick={() => setFileKey(result.outputKey)} />}
+                  {result.outputKey && (
+                    <IconButton
+                      icon={DocumentOpenIcon}
+                      appearance="minimal"
+                      onClick={() => setFileKey(result.outputKey)}
+                    />
+                  )}
                 </Table.TextCell>
                 <Table.TextCell>{result.readableCreatedAt}</Table.TextCell>
                 <Table.TextCell>{result.readableUpdatedAt}</Table.TextCell>
                 <Table.Cell>
-                  <IconButton icon={EyeOpenIcon} marginRight={majorScale(2)} onClick={() => setShowResultTargetId(result.id)} />
-                  <IconButton icon={TrashIcon} intent="danger" onClick={() => confirmDelete(result.id)}/>
+                  <IconButton
+                    icon={EyeOpenIcon}
+                    marginRight={majorScale(2)}
+                    onClick={() => setShowResultTargetId(result.id)}
+                  />
+                  <IconButton
+                    icon={TrashIcon}
+                    intent="danger"
+                    onClick={() => confirmDelete(result.id)}
+                  />
                 </Table.Cell>
               </Table.Row>
             ))}
@@ -136,38 +180,67 @@ const App: FC<Props> = () => {
     )
   }
 
-  return <Pane display="flex" flexDirection="column" backgroundColor="#FFFFFF" margin="20px" height="calc(100vh - 40px)">
-    <Pane padding="20px">
-      <Pane display="flex" justifyContent="space-between" width="100%" paddingBottom="40px">
-        <Heading size={900}>
-          Google Vision API Client
-        </Heading>
-        <Button appearance="primary" iconAfter={UploadIcon} onClick={() => setShowFileUploadDialog(true)}>
-          Upload
-        </Button>
-      </Pane>
-      {renderResults()}
-    </Pane>
-    <FileUploadDialog
-      isShown={showFileUploadDialog}
-      onClose={() => setShowFileUploadDialog(false)}
-      onUpload={handleFileUpload}
-    />
-    {!!deleteTargetId &&
-      <Dialog
-      key={deleteTargetId}
-      isShown={!!deleteTargetId}
-      title="Are you sure deleting?"
-      onCloseComplete={() => setDeleteTargetId("")}
-      onConfirm={handleDelete}
-      confirmLabel="Delete"
+  return (
+    <Pane
+      display="flex"
+      flexDirection="column"
+      backgroundColor="#FFFFFF"
+      margin="20px"
+      height="calc(100vh - 40px)"
     >
-      <Text size={600}>Would you like to delete it?</Text>
-    </Dialog>}
-    <Loader isShown={showLoader} />
-    {!!fileKey && <FileViewer key={fileKey} fileKey={fileKey} isShown={!!fileKey} onClose={() => setFileKey('')} />}
-    {!!showResultTargetId && <ResultViewerDialog key={showResultTargetId} extractionResultId={showResultTargetId} onClose={() => setShowResultTargetId('')} /> }
-  </Pane>
+      <Pane padding="20px">
+        <Pane
+          display="flex"
+          justifyContent="space-between"
+          width="100%"
+          paddingBottom="40px"
+        >
+          <Heading size={900}>Google Vision API Client</Heading>
+          <Button
+            appearance="primary"
+            iconAfter={UploadIcon}
+            onClick={() => setShowFileUploadDialog(true)}
+          >
+            Upload
+          </Button>
+        </Pane>
+        {renderResults()}
+      </Pane>
+      <FileUploadDialog
+        isShown={showFileUploadDialog}
+        onClose={() => setShowFileUploadDialog(false)}
+        onUpload={handleFileUpload}
+      />
+      {!!deleteTargetId && (
+        <Dialog
+          key={deleteTargetId}
+          isShown={!!deleteTargetId}
+          title="Are you sure deleting?"
+          onCloseComplete={() => setDeleteTargetId("")}
+          onConfirm={handleDelete}
+          confirmLabel="Delete"
+        >
+          <Text size={600}>Would you like to delete it?</Text>
+        </Dialog>
+      )}
+      <Loader isShown={showLoader} />
+      {!!fileKey && (
+        <FileViewer
+          key={fileKey}
+          fileKey={fileKey}
+          isShown={!!fileKey}
+          onClose={() => setFileKey("")}
+        />
+      )}
+      {!!showResultTargetId && (
+        <ResultViewerDialog
+          key={showResultTargetId}
+          extractionResultId={showResultTargetId}
+          onClose={() => setShowResultTargetId("")}
+        />
+      )}
+    </Pane>
+  )
 }
 
 export default App
