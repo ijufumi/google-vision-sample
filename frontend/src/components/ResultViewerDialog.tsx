@@ -68,7 +68,6 @@ const ResultViewerDialog: FC<Props> = ({ extractionResultId, onClose }) => {
         shouldCloseOnEscapePress={false}
         shouldCloseOnOverlayClick={false}
         width={"1000px"}
-
       >
         <Pane width="100%" height="700px" display="flex">
           <Pane width="47%" marginRight={"5px"}>
