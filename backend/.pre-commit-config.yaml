@@ -4,3 +4,4 @@ repos:
     hooks:
       -   id: golangci-lint
           entry: cd backend && golangci-lint run ./...
+          pass_filenames: true
