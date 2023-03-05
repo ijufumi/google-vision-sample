@@ -1,4 +1,5 @@
 @startuml
+
 enum Status {
   running
   succeeded
