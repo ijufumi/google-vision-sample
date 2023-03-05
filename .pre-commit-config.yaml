@@ -13,5 +13,5 @@ repos:
 -   repo: https://github.com/pre-commit/mirrors-eslint
     rev: v8.35.0
     hooks:
-    -   id: eslint
-        files: '^frontend/.*\.(ts|tsx)'
+      -   id: eslint
+          files: '^frontend/.*\.(ts|tsx)'
