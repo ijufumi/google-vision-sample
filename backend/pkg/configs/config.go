@@ -2,7 +2,7 @@ package configs
 
 import (
 	"fmt"
-	"github.com/caarlos0/env/v7"
+	env "github.com/caarlos0/env/v7"
 	"github.com/joho/godotenv"
 )
 

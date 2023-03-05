@@ -1,7 +1,9 @@
 package entities
 
+import "gorm.io/gorm"
+
 type ExtractedText struct {
-	BaseEntity
+	gorm.Model
 	ID                 string
 	ExtractionResultID string
 	Text               string
