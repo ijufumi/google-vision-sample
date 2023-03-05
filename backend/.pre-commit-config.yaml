@@ -5,4 +5,4 @@ repos:
       -   id: golangci-lint
           files: '.*\.(go)'
           entry: golangci-lint run ./...
-          pass_filenames: true
+          pass_filenames: false
