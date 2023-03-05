@@ -1,0 +1,26 @@
+name: Create PlantUML Images
+
+on:
+  push:
+    paths:
+      - backend/docs/db/tables.puml
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install packages
+        run: |
+          brew install plantuml
+      - name: Create Images
+        run: |
+          cat backend/docs/db/tables.puml | plantuml -tsvg -p > ./docs/tables.svg
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v5
+        with:
+          message: 'Create image files by GitHub Action(create-plantuml-images.yml).'
+          add: './docs/tables.svg'
+          push: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
