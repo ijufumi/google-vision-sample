@@ -9,7 +9,8 @@ entity ExtractionResults {
   * id: ULID
   --
   * status: Status
-  * image_uri: string
+  * image_key: string
+    output_key: string
   * created_at: datetime
   * updated_at: datetime
     deleted_at: datetime
