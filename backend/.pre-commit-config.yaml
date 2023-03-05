@@ -3,5 +3,5 @@ repos:
     rev: v1.51.0
     hooks:
       -   id: golangci-lint
-          files: 'backend/.*\.(go)'
-          entry: golangci-lint run ./...
+          files: '.*\.(go)'
+          entry: golangci-lint run ./backend/...
