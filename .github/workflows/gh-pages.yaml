@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - backend/docs/db/tables.puml
+  workflow_dispatch:
 
 jobs:
   build:
