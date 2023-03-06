@@ -5,7 +5,7 @@ enum Status {
   failed
 }
 
-entity ExtractionResults {
+entity Jobs {
   * id: ULID
   --
   * status: Status
@@ -16,10 +16,23 @@ entity ExtractionResults {
     deleted_at: datetime
 }
 
-entity ExtractedTexts {
+entity Files {
   * id: ULID
   --
-  * extraction_result_id: ULID <<FK>>
+  * job_id: ULID <<FK>>
+  * is_output: number
+  * file_key: string
+  * content_type: string
+  * size: number
+  * created_at: datetime
+  * updated_at: datetime
+    deleted_at: datetime
+}
+
+entity Texts {
+  * id: ULID
+  --
+  * job_id: ULID <<FK>>
   * text: string
   * top: number
   * bottom: number
@@ -30,6 +43,7 @@ entity ExtractedTexts {
     deleted_at: datetime
 }
 
-ExtractionResults ||..o{ ExtractedTexts
+Jobs ||..o{ Texts
+Jobs ||..o{ Files
 
 @enduml
