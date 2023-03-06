@@ -1,5 +1,9 @@
 # Sample application for Google Cloud Vision
 
+## ERD
+
+![ERD](./docs/tables.svg)
+
 ## How to
 
 ### Run app
