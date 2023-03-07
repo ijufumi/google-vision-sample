@@ -5,11 +5,10 @@ import (
 	"gorm.io/gorm"
 )
 
-type ExtractionResult struct {
+type Job struct {
 	gorm.Model
 	ID             string
-	Status         enums.ExtractionResultStatus
-	ImageKey       string
-	OutputKey      *string
+	Status         enums.JobStatus
 	ExtractedTexts []ExtractedText
+	Files          []File
 }

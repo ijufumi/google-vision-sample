@@ -19,8 +19,8 @@ import (
 )
 
 type DetectTextService interface {
-	GetResults() ([]*models.ExtractionResult, error)
-	GetResultByID(id string) (*models.ExtractionResult, error)
+	GetResults() ([]*models.Job, error)
+	GetResultByID(id string) (*models.Job, error)
 	GetSignedURL(key string) (*models.SignedURL, error)
 	DetectTexts(file *os.File, contentType string) error
 	DeleteResult(id string) error
@@ -29,36 +29,38 @@ type DetectTextService interface {
 func NewDetectTextService(
 	storageAPIClient clients.StorageAPIClient,
 	visionAPIClient clients.VisionAPIClient,
-	extractionResultRepository repositories.ExtractionResultRepository,
+	jobRepository repositories.JobRepository,
 	extractedTextRepository repositories.ExtractedTextRepository,
+	fileRepository repositories.FileRepository,
 	logger *zap.Logger,
 	db *gorm.DB,
 ) DetectTextService {
 	return &detectTextService{
-		storageAPIClient:           storageAPIClient,
-		visionAPIClient:            visionAPIClient,
-		extractionResultRepository: extractionResultRepository,
-		extractedTextRepository:    extractedTextRepository,
-		logger:                     logger,
-		db:                         db,
+		storageAPIClient:        storageAPIClient,
+		visionAPIClient:         visionAPIClient,
+		jobRepository:           jobRepository,
+		extractedTextRepository: extractedTextRepository,
+		fileRepository:          fileRepository,
+		logger:                  logger,
+		db:                      db,
 	}
 }
 
-func (s *detectTextService) GetResults() ([]*models.ExtractionResult, error) {
-	results, err := s.extractionResultRepository.GetAll(s.db)
+func (s *detectTextService) GetResults() ([]*models.Job, error) {
+	results, err := s.jobRepository.GetAll(s.db)
 	if err != nil {
 		return nil, err
 	}
 
-	extractionResults := make([]*models.ExtractionResult, 0)
+	extractionResults := make([]*models.Job, 0)
 	for _, result := range results {
 		extractionResults = append(extractionResults, s.buildExtractionResultResponse(result))
 	}
 	return extractionResults, nil
 }
 
-func (s *detectTextService) GetResultByID(id string) (*models.ExtractionResult, error) {
-	result, err := s.extractionResultRepository.GetByID(s.db, id)
+func (s *detectTextService) GetResultByID(id string) (*models.Job, error) {
+	result, err := s.jobRepository.GetByID(s.db, id)
 	if err != nil {
 		return nil, err
 	}
@@ -75,93 +77,111 @@ func (s *detectTextService) GetSignedURL(key string) (*models.SignedURL, error) 
 
 func (s *detectTextService) DetectTexts(file *os.File, contentType string) error {
 	id := utils.NewULID()
-	key := fmt.Sprintf("%s/%s", id, filepath.Base(file.Name()))
+	inputFileID := utils.NewULID()
+	key := fmt.Sprintf("%s/%s/%s", id, inputFileID, filepath.Base(file.Name()))
 
 	err := s.storageAPIClient.UploadFile(key, file, contentType)
 	if err != nil {
 		return err
 	}
 
-	var result *entities.ExtractionResult
+	var result *entities.Job
 
-	status := enums.ExtractionResultStatus_Succeeded
+	status := enums.JobStatus_Succeeded
 	defer func() {
 		if result != nil {
 			result.Status = status
-			_ = s.extractionResultRepository.Update(s.db, result)
+			_ = s.jobRepository.Update(s.db, result)
 		}
 	}()
 
 	return s.db.Transaction(func(tx *gorm.DB) error {
-		extractionResult := &entities.ExtractionResult{
-			ID:       id,
-			Status:   enums.ExtractionResultStatus_Runing,
-			ImageKey: key,
+		extractionResult := &entities.Job{
+			ID:     id,
+			Status: enums.JobStatus_Runing,
 		}
-		err = s.extractionResultRepository.Create(s.db, extractionResult)
+		err = s.jobRepository.Create(tx, extractionResult)
 		if err != nil {
 			return err
 		}
-		extractionResult, err = s.extractionResultRepository.GetByID(s.db, id)
+		err = s.fileRepository.Create(tx, &entities.File{
+			ID:                 inputFileID,
+			ExtractionResultID: id,
+			IsOutput:           false,
+			FileKey:            key,
+			ContentType:        contentType,
+			Size:               0,
+		})
+		if err != nil {
+			return err
+		}
+		extractionResult, err = s.jobRepository.GetByID(tx, id)
 		if err != nil {
 			return err
 		}
 		result = extractionResult
 		outputKey, err := s.visionAPIClient.DetectText(key)
 		if err != nil {
-			status = enums.ExtractionResultStatus_Failed
+			status = enums.JobStatus_Failed
 			return err
 		}
 
 		queryFiles, err := s.storageAPIClient.QueryFiles(outputKey)
 		if err != nil {
-			status = enums.ExtractionResultStatus_Failed
+			status = enums.JobStatus_Failed
 			return err
 		}
 
 		if len(queryFiles) == 0 {
-			status = enums.ExtractionResultStatus_Failed
+			status = enums.JobStatus_Failed
 			return errors.New("output does not exist")
 		}
 
 		outputFile, err := s.storageAPIClient.DownloadFile(queryFiles[0])
 		if err != nil {
-			status = enums.ExtractionResultStatus_Failed
+			status = enums.JobStatus_Failed
 			return err
 		}
 
-		result.OutputKey = &queryFiles[0]
-		err = s.extractionResultRepository.Update(s.db, result)
+		outputFileKey := queryFiles[0]
+		err = s.fileRepository.Create(tx, &entities.File{
+			ID:                 utils.NewULID(),
+			ExtractionResultID: id,
+			IsOutput:           true,
+			FileKey:            outputFileKey,
+			ContentType:        "application/json",
+			Size:               0,
+		})
 		if err != nil {
-			status = enums.ExtractionResultStatus_Failed
+			status = enums.JobStatus_Failed
 			return err
 		}
-		extractionResult, err = s.extractionResultRepository.GetByID(s.db, id)
+
+		err = s.jobRepository.Update(tx, result)
 		if err != nil {
-			status = enums.ExtractionResultStatus_Failed
+			status = enums.JobStatus_Failed
+			return err
+		}
+		extractionResult, err = s.jobRepository.GetByID(tx, id)
+		if err != nil {
+			status = enums.JobStatus_Failed
 			return err
 		}
 		result = extractionResult
 
 		bytes, err := io.ReadAll(outputFile)
 		if err != nil {
-			status = enums.ExtractionResultStatus_Failed
+			status = enums.JobStatus_Failed
 			return err
 		}
 
 		var detectResponse googleModels.DetectTextResponses
 		if err = json.Unmarshal(bytes, &detectResponse); err != nil {
-			status = enums.ExtractionResultStatus_Failed
+			status = enums.JobStatus_Failed
 			return err
 		}
 
-		err = s.storageAPIClient.UpdateContentType(*result.OutputKey, "application/json")
-		if err != nil {
-			status = enums.ExtractionResultStatus_Failed
-			return err
-		}
-
-		extractedTexts := make([]entities.ExtractedText, 0)
+		extractedTexts := make([]*entities.ExtractedText, 0)
 		for _, response := range detectResponse.Responses {
 			for _, page := range response.FullTextAnnotation.Pages {
 				for _, block := range page.Blocks {
@@ -183,7 +203,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 						bottom := utils.MaxInArray(xArray...)
 						left := utils.MinInArray(yArray...)
 						right := utils.MaxInArray(yArray...)
-						extractedText := entities.ExtractedText{
+						extractedText := &entities.ExtractedText{
 							ID:                 utils.NewULID(),
 							ExtractionResultID: extractionResult.ID,
 							Text:               texts,
@@ -208,28 +228,28 @@ func (s *detectTextService) DeleteResult(id string) error {
 		if err != nil {
 			return err
 		}
-		extractionResult, err := s.extractionResultRepository.GetByID(s.db, id)
+		files, err := s.fileRepository.GetByExtractionResultID(tx, id)
 		if err != nil {
 			return err
 		}
-		if len(extractionResult.ImageKey) != 0 {
-			err = s.storageAPIClient.DeleteFile(extractionResult.ImageKey)
+		for _, file := range files {
+			err = s.storageAPIClient.DeleteFile(file.FileKey)
 			if err != nil {
 				s.logger.Error(err.Error())
 			}
 		}
-		if extractionResult.OutputKey != nil && len(*extractionResult.OutputKey) != 0 {
-			err = s.storageAPIClient.DeleteFile(*extractionResult.OutputKey)
-			if err != nil {
-				s.logger.Error(err.Error())
-			}
+		err = s.fileRepository.DeleteByExtractionResultID(tx, id)
+		if err != nil {
+			return err
 		}
-		return s.extractionResultRepository.Delete(tx, id)
+
+		return s.jobRepository.Delete(tx, id)
 	})
 }
 
-func (s *detectTextService) buildExtractionResultResponse(entity *entities.ExtractionResult) *models.ExtractionResult {
+func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) *models.Job {
 	extractedTexts := make([]models.ExtractedText, 0)
+	files := make([]models.File, 0)
 
 	for _, extractedText := range entity.ExtractedTexts {
 		extractedTexts = append(extractedTexts, models.ExtractedText{
@@ -244,26 +264,34 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Extra
 			UpdatedAt:          extractedText.UpdatedAt.Unix(),
 		})
 	}
-	outputKey := ""
-	if entity.OutputKey != nil {
-		outputKey = *entity.OutputKey
+	for _, file := range entity.Files {
+		files = append(files, models.File{
+			ID:                 file.ID,
+			ExtractionResultID: file.ExtractionResultID,
+			IsOutput:           file.IsOutput,
+			FileKey:            file.FileKey,
+			ContentType:        file.ContentType,
+			Size:               file.Size,
+			CreatedAt:          file.CreatedAt.Unix(),
+			UpdatedAt:          file.UpdatedAt.Unix(),
+		})
 	}
-	return &models.ExtractionResult{
+	return &models.Job{
 		ID:             entity.ID,
 		Status:         entity.Status,
-		ImageKey:       entity.ImageKey,
-		OutputKey:      outputKey,
 		CreatedAt:      entity.CreatedAt.Unix(),
 		UpdatedAt:      entity.UpdatedAt.Unix(),
 		ExtractedTexts: extractedTexts,
+		Files:          files,
 	}
 }
 
 type detectTextService struct {
-	storageAPIClient           clients.StorageAPIClient
-	visionAPIClient            clients.VisionAPIClient
-	extractionResultRepository repositories.ExtractionResultRepository
-	extractedTextRepository    repositories.ExtractedTextRepository
-	db                         *gorm.DB
-	logger                     *zap.Logger
+	storageAPIClient        clients.StorageAPIClient
+	visionAPIClient         clients.VisionAPIClient
+	jobRepository           repositories.JobRepository
+	extractedTextRepository repositories.ExtractedTextRepository
+	fileRepository          repositories.FileRepository
+	db                      *gorm.DB
+	logger                  *zap.Logger
 }

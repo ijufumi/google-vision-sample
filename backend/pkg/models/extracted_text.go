@@ -2,7 +2,7 @@ package models
 
 type ExtractedText struct {
 	ID                 string  `json:"id"`
-	ExtractionResultID string  `json:"extraction_result_id"`
+	ExtractionResultID string  `json:"extractionResultID"`
 	Text               string  `json:"text"`
 	Top                float64 `json:"top"`
 	Bottom             float64 `json:"bottom"`

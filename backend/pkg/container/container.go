@@ -49,8 +49,9 @@ func (c *container) provide() {
 	_ = c.container.Provide(services.NewConfigurationService)
 	// database
 	_ = c.container.Provide(db.NewDB)
-	_ = c.container.Provide(repositories.NewExtractionResultRepository)
+	_ = c.container.Provide(repositories.NewJobRepository)
 	_ = c.container.Provide(repositories.NewExtractedTextRepository)
+	_ = c.container.Provide(repositories.NewFileRepository)
 	// google
 	_ = c.container.Provide(clients.NewStorageAPIClient)
 	_ = c.container.Provide(clients.NewVisionAPIClient)

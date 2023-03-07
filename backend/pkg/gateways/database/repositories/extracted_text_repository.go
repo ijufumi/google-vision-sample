@@ -7,8 +7,8 @@ import (
 )
 
 type ExtractedTextRepository interface {
-	GetByExtractionResultID(db *gorm.DB, extractionResultID string) ([]entities.ExtractedText, error)
-	Create(db *gorm.DB, entity ...entities.ExtractedText) error
+	GetByExtractionResultID(db *gorm.DB, extractionResultID string) ([]*entities.ExtractedText, error)
+	Create(db *gorm.DB, entity ...*entities.ExtractedText) error
 	DeleteByExtractionResultID(db *gorm.DB, extractionResultID string) error
 }
 
@@ -19,8 +19,8 @@ func NewExtractedTextRepository() ExtractedTextRepository {
 type extractedTextRepository struct {
 }
 
-func (r *extractedTextRepository) GetByExtractionResultID(db *gorm.DB, extractionResultID string) ([]entities.ExtractedText, error) {
-	var results []entities.ExtractedText
+func (r *extractedTextRepository) GetByExtractionResultID(db *gorm.DB, extractionResultID string) ([]*entities.ExtractedText, error) {
+	var results []*entities.ExtractedText
 	if err := db.Where(map[string]string{
 		"extractionResultID": extractionResultID,
 	}).Find(&results).Error; err != nil {
@@ -29,7 +29,7 @@ func (r *extractedTextRepository) GetByExtractionResultID(db *gorm.DB, extractio
 	return results, nil
 }
 
-func (r *extractedTextRepository) Create(db *gorm.DB, entity ...entities.ExtractedText) error {
+func (r *extractedTextRepository) Create(db *gorm.DB, entity ...*entities.ExtractedText) error {
 	if err := db.Create(&entity).Error; err != nil {
 		return errors.Wrap(err, "ExtractedTextRepository#Create")
 	}
@@ -38,7 +38,7 @@ func (r *extractedTextRepository) Create(db *gorm.DB, entity ...entities.Extract
 
 func (r *extractedTextRepository) DeleteByExtractionResultID(db *gorm.DB, extractionResultID string) error {
 	if err := db.Where("extraction_result_id", extractionResultID).Delete(&entities.ExtractedText{}).Error; err != nil {
-		return errors.Wrap(err, "ExtractionResultRepository#DeleteByExtractionResultID")
+		return errors.Wrap(err, "ExtractedTextRepository#DeleteByExtractionResultID")
 	}
 	return nil
 }
