@@ -8,6 +8,7 @@ type File struct {
 	ExtractionResultID string
 	IsOutput           bool
 	FileKey            string
+	FileName           string
 	ContentType        string
 	Size               int32
 }

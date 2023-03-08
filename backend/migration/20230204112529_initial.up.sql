@@ -1,11 +1,9 @@
 create table if not exists jobs
 (
-    id         varchar(26)  not null primary key,
-    status     varchar(10)  not null,
-    image_key  varchar(255) not null,
-    output_key varchar(255),
-    created_at timestamp    not null,
-    updated_at timestamp    not null,
+    id         varchar(26) not null primary key,
+    status     varchar(10) not null,
+    created_at timestamp   not null,
+    updated_at timestamp   not null,
     deleted_at timestamp
 );
 
@@ -34,6 +32,7 @@ create table if not exists files
     extracted_text_id varchar(26)  not null references jobs (id),
     is_output         boolean      not null default 1,
     file_key          varchar(255) not null,
+    file_name         varchar(255) not null,
     size              integer      not null default 0,
     content_type      varchar(100) not null default 'application/octet-stream',
     output_key        varchar(255),

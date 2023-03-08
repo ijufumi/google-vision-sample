@@ -10,8 +10,6 @@ entity Jobs {
   * id: ULID
   --
   * status: Status
-  * image_key: string
-    output_key: string
   * created_at: datetime
   * updated_at: datetime
     deleted_at: datetime
@@ -23,6 +21,7 @@ entity Files {
   * job_id: ULID <<FK>>
   * is_output: number
   * file_key: string
+  * file_name: string
   * content_type: string
   * size: number
   * created_at: datetime

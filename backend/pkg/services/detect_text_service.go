@@ -16,6 +16,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type DetectTextService interface {
@@ -109,6 +110,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 			ExtractionResultID: id,
 			IsOutput:           false,
 			FileKey:            key,
+			FileName:           file.Name(),
 			ContentType:        contentType,
 			Size:               0,
 		})
@@ -144,11 +146,13 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 		}
 
 		outputFileKey := queryFiles[0]
+		splitOutputFileKey := strings.Split(outputFileKey, "/")
 		err = s.fileRepository.Create(tx, &entities.File{
 			ID:                 utils.NewULID(),
 			ExtractionResultID: id,
 			IsOutput:           true,
 			FileKey:            outputFileKey,
+			FileName:           splitOutputFileKey[len(splitOutputFileKey)-1],
 			ContentType:        "application/json",
 			Size:               0,
 		})
@@ -270,6 +274,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 			ExtractionResultID: file.ExtractionResultID,
 			IsOutput:           file.IsOutput,
 			FileKey:            file.FileKey,
+			FileName:           file.FileName,
 			ContentType:        file.ContentType,
 			Size:               file.Size,
 			CreatedAt:          file.CreatedAt.Unix(),
