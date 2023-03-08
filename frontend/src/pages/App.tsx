@@ -15,9 +15,9 @@ import {
   EyeOpenIcon,
   DocumentOpenIcon,
 } from "evergreen-ui"
-import ExtractionResult, {
-  ExtractionResultStatus,
-} from "../models/ExtractionResult"
+import Job, {
+  JobStatus,
+} from "../models/Job"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 import FileUploadDialog from "../components/FileUploadDialog"
 import Loader from "../components/Loader"
@@ -30,7 +30,7 @@ const App: FC<Props> = () => {
   const [initialized, setInitialized] = useState<boolean>(false)
   const [showLoader, setShowLoader] = useState<boolean>(false)
   const [extractionResults, setExtractionResults] = useState<
-    ExtractionResult[]
+    Job[]
   >([])
   const [showFileUploadDialog, setShowFileUploadDialog] =
     useState<boolean>(false)
@@ -96,12 +96,12 @@ const App: FC<Props> = () => {
     await loadExtractionResults()
   }
 
-  const renderStatus = (status: ExtractionResultStatus) => {
+  const renderStatus = (status: JobStatus) => {
     let color: "red" | "blue" | "green" = "red"
-    if (status === ExtractionResultStatus.Running) {
+    if (status === JobStatus.Running) {
       color = "blue"
     }
-    if (status === ExtractionResultStatus.Succeeded) {
+    if (status === JobStatus.Succeeded) {
       color = "green"
     }
     return (

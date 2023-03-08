@@ -1,6 +1,6 @@
 import React, { FC, useMemo, useEffect, useState, useCallback } from "react"
 import { Pane, Dialog, Table } from "evergreen-ui"
-import ExtractionResult from "../models/ExtractionResult"
+import Job from "../models/Job"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 import { readAsBlob } from "./files"
 
@@ -12,7 +12,7 @@ export interface Props {
 const ResultViewerDialog: FC<Props> = ({ extractionResultId, onClose }) => {
   const [initialized, setInitialized] = useState<boolean>(false)
   const [extractionResult, setExtractionResult] = useState<
-    ExtractionResult | undefined
+    Job | undefined
   >(undefined)
   const [blobData, setBlobData] = useState<Blob | undefined>(undefined)
 

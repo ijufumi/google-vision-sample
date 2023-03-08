@@ -1,11 +1,11 @@
 import BaseRepository from "./BaseRepository"
-import ExtractionResult, { Props } from "../models/ExtractionResult"
+import Job, { Props } from "../models/Job"
 import Status from "../models/Status"
 
 export interface ExtractionResultRepository {
-  getAll(): Promise<ExtractionResult[]>
+  getAll(): Promise<Job[]>
 
-  getById(args: { id: string }): Promise<ExtractionResult>
+  getById(args: { id: string }): Promise<Job>
 
   create(args: { file: File }): Promise<Status>
 
@@ -25,12 +25,12 @@ export class ExtractionResultRepositoryImpl
 
   getAll = async () => {
     const results = await this._get({ path: "" })
-    return results.map((p: Props) => new ExtractionResult(p))
+    return results.map((p: Props) => new Job(p))
   }
 
   getById = async (args: { id: string }) => {
     const result = await this._get({ path: `/${args.id}` })
-    return new ExtractionResult(result)
+    return new Job(result)
   }
 
   delete = async (args: { id: string }) => {

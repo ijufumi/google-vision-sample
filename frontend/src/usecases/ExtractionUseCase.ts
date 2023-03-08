@@ -2,7 +2,7 @@ import {
   ExtractionResultRepository,
   ExtractionResultRepositoryImpl,
 } from "../repositories/ExtractionResultRepository"
-import ExtractionResult from "../models/ExtractionResult"
+import Job from "../models/Job"
 import { ENDPOINT_URL } from "../configs/config"
 import SignedUrl from "../models/SignedUrl"
 import SignedUrlRepositoryImpl, {
@@ -11,8 +11,8 @@ import SignedUrlRepositoryImpl, {
 
 export interface ExtractionUseCase {
   startExtraction(file: File): Promise<boolean>
-  getExtractionResults(): Promise<ExtractionResult[] | undefined>
-  getExtractionResult(id: string): Promise<ExtractionResult | undefined>
+  getExtractionResults(): Promise<Job[] | undefined>
+  getExtractionResult(id: string): Promise<Job | undefined>
   deleteExtractionResult(id: string): Promise<boolean>
   getSignedUrl(key: string): Promise<SignedUrl | undefined>
 }

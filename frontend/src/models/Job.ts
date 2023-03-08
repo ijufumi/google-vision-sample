@@ -1,7 +1,7 @@
 import ExtractedText, { Props as ExtractedTextProps } from "./ExtractedText"
 import { formatToDate } from "../components/dates"
 
-export enum ExtractionResultStatus {
+export enum JobStatus {
   Running = "running",
   Succeeded = "succeeded",
   Failed = "failed",
@@ -9,7 +9,7 @@ export enum ExtractionResultStatus {
 
 export interface Props {
   id: string
-  status: ExtractionResultStatus
+  status: JobStatus
   imageKey: string
   outputKey: string
   createdAt: number
@@ -17,9 +17,9 @@ export interface Props {
   extractedTexts: ExtractedTextProps[]
 }
 
-export default class ExtractionResult {
+export default class Job {
   readonly id: string
-  readonly status: ExtractionResultStatus
+  readonly status: JobStatus
   readonly imageKey: string
   readonly outputKey: string
   readonly createdAt: number
@@ -33,13 +33,9 @@ export default class ExtractionResult {
     this.outputKey = props.outputKey
     this.createdAt = props.createdAt
     this.updatedAt = props.updatedAt
-    if (props.extractedTexts) {
-      this.extractedTexts = props.extractedTexts.map(
-        (p) => new ExtractedText(p)
-      )
-    } else {
-      this.extractedTexts = []
-    }
+    this.extractedTexts = props.extractedTexts.map(
+      (p) => new ExtractedText(p)
+    )
   }
 
   get readableCreatedAt() {
