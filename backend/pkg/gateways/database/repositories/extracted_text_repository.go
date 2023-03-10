@@ -24,7 +24,7 @@ func (r *extractedTextRepository) GetByExtractionResultID(db *gorm.DB, extractio
 	if err := db.Where(map[string]string{
 		"extractionResultID": extractionResultID,
 	}).Find(&results).Error; err != nil {
-		return nil, errors.Wrap(err, "ExtractedTextRepository#GetByExtractionResultID")
+		return nil, errors.Wrap(err, "ExtractedTextRepository#GetByJobID")
 	}
 	return results, nil
 }
@@ -38,7 +38,7 @@ func (r *extractedTextRepository) Create(db *gorm.DB, entity ...*entities.Extrac
 
 func (r *extractedTextRepository) DeleteByExtractionResultID(db *gorm.DB, extractionResultID string) error {
 	if err := db.Where("extraction_result_id", extractionResultID).Delete(&entities.ExtractedText{}).Error; err != nil {
-		return errors.Wrap(err, "ExtractedTextRepository#DeleteByExtractionResultID")
+		return errors.Wrap(err, "ExtractedTextRepository#DeleteByJobID")
 	}
 	return nil
 }

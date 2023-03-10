@@ -106,13 +106,13 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 			return err
 		}
 		err = s.fileRepository.Create(tx, &entities.JobFile{
-			ID:                 inputFileID,
-			ExtractionResultID: id,
-			IsOutput:           false,
-			FileKey:            key,
-			FileName:           file.Name(),
-			ContentType:        contentType,
-			Size:               0,
+			ID:          inputFileID,
+			JobID:       id,
+			IsOutput:    false,
+			FileKey:     key,
+			FileName:    file.Name(),
+			ContentType: contentType,
+			Size:        0,
 		})
 		if err != nil {
 			return err
@@ -148,13 +148,13 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 		outputFileKey := queryFiles[0]
 		splitOutputFileKey := strings.Split(outputFileKey, "/")
 		err = s.fileRepository.Create(tx, &entities.JobFile{
-			ID:                 utils.NewULID(),
-			ExtractionResultID: id,
-			IsOutput:           true,
-			FileKey:            outputFileKey,
-			FileName:           splitOutputFileKey[len(splitOutputFileKey)-1],
-			ContentType:        "application/json",
-			Size:               0,
+			ID:          utils.NewULID(),
+			JobID:       id,
+			IsOutput:    true,
+			FileKey:     outputFileKey,
+			FileName:    splitOutputFileKey[len(splitOutputFileKey)-1],
+			ContentType: "application/json",
+			Size:        0,
 		})
 		if err != nil {
 			status = enums.JobStatus_Failed
@@ -208,13 +208,13 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 						left := utils.MinInArray(yArray...)
 						right := utils.MaxInArray(yArray...)
 						extractedText := &entities.ExtractedText{
-							ID:                 utils.NewULID(),
-							ExtractionResultID: extractionResult.ID,
-							Text:               texts,
-							Top:                top,
-							Bottom:             bottom,
-							Left:               left,
-							Right:              right,
+							ID:     utils.NewULID(),
+							JobID:  extractionResult.ID,
+							Text:   texts,
+							Top:    top,
+							Bottom: bottom,
+							Left:   left,
+							Right:  right,
 						}
 
 						extractedTexts = append(extractedTexts, extractedText)
@@ -232,7 +232,7 @@ func (s *detectTextService) DeleteResult(id string) error {
 		if err != nil {
 			return err
 		}
-		files, err := s.fileRepository.GetByExtractionResultID(tx, id)
+		files, err := s.fileRepository.GetByJobID(tx, id)
 		if err != nil {
 			return err
 		}
@@ -242,7 +242,7 @@ func (s *detectTextService) DeleteResult(id string) error {
 				s.logger.Error(err.Error())
 			}
 		}
-		err = s.fileRepository.DeleteByExtractionResultID(tx, id)
+		err = s.fileRepository.DeleteByJobID(tx, id)
 		if err != nil {
 			return err
 		}
@@ -257,28 +257,28 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 
 	for _, extractedText := range entity.ExtractedTexts {
 		extractedTexts = append(extractedTexts, models.ExtractedText{
-			ID:                 extractedText.ID,
-			ExtractionResultID: extractedText.ExtractionResultID,
-			Text:               extractedText.Text,
-			Top:                extractedText.Top,
-			Bottom:             extractedText.Bottom,
-			Left:               extractedText.Left,
-			Right:              extractedText.Right,
-			CreatedAt:          extractedText.CreatedAt.Unix(),
-			UpdatedAt:          extractedText.UpdatedAt.Unix(),
+			ID:        extractedText.ID,
+			JobID:     extractedText.JobID,
+			Text:      extractedText.Text,
+			Top:       extractedText.Top,
+			Bottom:    extractedText.Bottom,
+			Left:      extractedText.Left,
+			Right:     extractedText.Right,
+			CreatedAt: extractedText.CreatedAt.Unix(),
+			UpdatedAt: extractedText.UpdatedAt.Unix(),
 		})
 	}
 	for _, file := range entity.Files {
 		files = append(files, models.JobFile{
-			ID:                 file.ID,
-			ExtractionResultID: file.ExtractionResultID,
-			IsOutput:           file.IsOutput,
-			FileKey:            file.FileKey,
-			FileName:           file.FileName,
-			ContentType:        file.ContentType,
-			Size:               file.Size,
-			CreatedAt:          file.CreatedAt.Unix(),
-			UpdatedAt:          file.UpdatedAt.Unix(),
+			ID:          file.ID,
+			JobID:       file.JobID,
+			IsOutput:    file.IsOutput,
+			FileKey:     file.FileKey,
+			FileName:    file.FileName,
+			ContentType: file.ContentType,
+			Size:        file.Size,
+			CreatedAt:   file.CreatedAt.Unix(),
+			UpdatedAt:   file.UpdatedAt.Unix(),
 		})
 	}
 	return &models.Job{

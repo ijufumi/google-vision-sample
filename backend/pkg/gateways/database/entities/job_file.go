@@ -4,11 +4,11 @@ import "gorm.io/gorm"
 
 type JobFile struct {
 	gorm.Model
-	ID                 string
-	ExtractionResultID string
-	IsOutput           bool
-	FileKey            string
-	FileName           string
-	ContentType        string
-	Size               int32
+	ID          string
+	JobID       string
+	IsOutput    bool
+	FileKey     string
+	FileName    string
+	ContentType string
+	Size        int32
 }
