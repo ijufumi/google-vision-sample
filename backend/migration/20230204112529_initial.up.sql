@@ -30,7 +30,7 @@ create table if not exists files
 (
     id                varchar(26)  not null primary key,
     extracted_text_id varchar(26)  not null references jobs (id),
-    is_output         boolean      not null default 1,
+    is_output         boolean      not null default false,
     file_key          varchar(255) not null,
     file_name         varchar(255) not null,
     size              integer      not null default 0,
