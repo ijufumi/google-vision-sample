@@ -26,10 +26,12 @@ const ResultViewerDialog: FC<Props> = ({ extractionResultId, onClose }) => {
     )
     if (_extractionResult) {
       setExtractionResult(_extractionResult)
-      const signedUrl = await useCase.getSignedUrl(_extractionResult.imageKey)
-      if (signedUrl) {
-        const fileData = await readAsBlob(signedUrl.url)
-        setBlobData(fileData)
+      if (_extractionResult.outputFile) {
+        const signedUrl = await useCase.getSignedUrl(_extractionResult.outputFile.fileKey)
+        if (signedUrl) {
+          const fileData = await readAsBlob(signedUrl.url)
+          setBlobData(fileData)
+        }
       }
     }
     setInitialized(true)
@@ -40,7 +42,6 @@ const ResultViewerDialog: FC<Props> = ({ extractionResultId, onClose }) => {
       return
     }
     initialize()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   if (!initialized) {

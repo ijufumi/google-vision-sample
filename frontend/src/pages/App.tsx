@@ -37,7 +37,7 @@ const App: FC<Props> = () => {
     useState<boolean>(false)
   const [deleteTargetId, setDeleteTargetId] = useState<string>("")
   const [showResultTargetId, setShowResultTargetId] = useState<string>("")
-  const [fileKey, setFileKey] = useState<string>("")
+  const [jobFile, setJobFile] = useState<JobFile|undefined>(undefined)
 
   const useCase = useMemo(() => new ExtractionUseCaseImpl(), [])
 
@@ -123,12 +123,6 @@ const App: FC<Props> = () => {
     )
   }
 
-  const handleShowFile = (file: JobFile | undefined) => {
-    if (!file) {
-      return
-    }
-    setFileKey(file.fileKey)
-  }
   const renderResults = () => {
     return (
       <Pane>
@@ -152,7 +146,7 @@ const App: FC<Props> = () => {
                     <IconButton
                       icon={DocumentOpenIcon}
                       appearance="minimal"
-                      onClick={() => handleShowFile(result.inputFile)}
+                      onClick={() => setJobFile(result.inputFile)}
                     />
                   )}
                 </Table.TextCell>
@@ -161,7 +155,7 @@ const App: FC<Props> = () => {
                     <IconButton
                       icon={DocumentOpenIcon}
                       appearance="minimal"
-                      onClick={() => handleShowFile(result.outputFile)}
+                      onClick={() => setJobFile(result.outputFile)}
                     />
                   )}
                 </Table.TextCell>
@@ -231,12 +225,12 @@ const App: FC<Props> = () => {
         </Dialog>
       )}
       <Loader isShown={showLoader} />
-      {!!fileKey && (
+      {jobFile && (
         <FileViewer
-          key={fileKey}
-          fileKey={fileKey}
-          isShown={!!fileKey}
-          onClose={() => setFileKey("")}
+          key={jobFile.fileKey}
+          jobFile={jobFile}
+          isShown={!!jobFile.fileKey}
+          onClose={() => setJobFile(undefined)}
         />
       )}
       {!!showResultTargetId && (

@@ -3,18 +3,18 @@ import { Dialog, Pane, toaster } from "evergreen-ui"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 import { readAsBlob, readAsText, isTextType } from "./files"
 import Loader from "./Loader"
+import JobFile from "../models/JobFile"
 
 export interface Props {
-  fileKey: string
+  jobFile: JobFile
   isShown: boolean
   onClose: () => void
 }
 
-const FileViewer: FC<Props> = ({ fileKey, isShown, onClose }) => {
+const FileViewer: FC<Props> = ({ jobFile, isShown, onClose }) => {
   const [loaded, setLoaded] = useState<boolean>(false)
   const [blobData, setBlobData] = useState<Blob | undefined>(undefined)
   const [textData, setTextData] = useState<string>("")
-  const [contentType, setContentType] = useState<string>("")
   const useCase = useMemo(() => new ExtractionUseCaseImpl(), [])
 
   useEffect(() => {
@@ -22,15 +22,11 @@ const FileViewer: FC<Props> = ({ fileKey, isShown, onClose }) => {
       return
     }
     const loadFile = async () => {
-      if (!fileKey) {
-        return
-      }
-      const signedUrl = await useCase.getSignedUrl(fileKey)
+      const signedUrl = await useCase.getSignedUrl(jobFile.fileKey)
       if (signedUrl) {
         try {
           const fileData = await readAsBlob(signedUrl.url)
-          setContentType(fileData.type)
-          if (isTextType(fileData.type)) {
+          if (isTextType(jobFile.contentType)) {
             setTextData(await readAsText(fileData))
           } else {
             setBlobData(fileData)
@@ -47,7 +43,7 @@ const FileViewer: FC<Props> = ({ fileKey, isShown, onClose }) => {
       setLoaded(true)
     }
     loadFile()
-  }, [fileKey, loaded, onClose, useCase])
+  }, [jobFile, loaded, onClose, useCase])
 
   const showUnsupportedFileAlert = () => {
     toaster.warning("Unsupported file...")
@@ -60,7 +56,7 @@ const FileViewer: FC<Props> = ({ fileKey, isShown, onClose }) => {
       return <div />
     }
     if (textData.length) {
-      if (contentType === "application/json") {
+      if (jobFile.isJSON) {
         return React.createElement(
           "div",
           {
@@ -77,7 +73,7 @@ const FileViewer: FC<Props> = ({ fileKey, isShown, onClose }) => {
       }
     }
     if (blobData) {
-      if (contentType.startsWith("image/")) {
+      if (jobFile.isImage) {
         return React.createElement("img", {
           src: URL.createObjectURL(blobData),
           height: "100%",

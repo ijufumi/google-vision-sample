@@ -36,4 +36,12 @@ export default class JobFile {
   get readableUpdatedAt() {
     return formatToDate(this.updatedAt)
   }
+
+  get isJSON() {
+    return "application/json" === this.contentType
+  }
+
+  get isImage() {
+    return this.contentType.startsWith("image/")
+  }
 }
