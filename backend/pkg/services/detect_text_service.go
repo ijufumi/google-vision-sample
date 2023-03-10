@@ -268,7 +268,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 			UpdatedAt: extractedText.UpdatedAt.Unix(),
 		})
 	}
-	for _, file := range entity.Files {
+	for _, file := range entity.JobFiles {
 		files = append(files, models.JobFile{
 			ID:          file.ID,
 			JobID:       file.JobID,
@@ -287,7 +287,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 		CreatedAt:      entity.CreatedAt.Unix(),
 		UpdatedAt:      entity.UpdatedAt.Unix(),
 		ExtractedTexts: extractedTexts,
-		Files:          files,
+		JobFiles:       files,
 	}
 }
 
