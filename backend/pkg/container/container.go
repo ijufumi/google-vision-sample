@@ -51,7 +51,7 @@ func (c *container) provide() {
 	_ = c.container.Provide(db.NewDB)
 	_ = c.container.Provide(repositories.NewJobRepository)
 	_ = c.container.Provide(repositories.NewExtractedTextRepository)
-	_ = c.container.Provide(repositories.NewFileRepository)
+	_ = c.container.Provide(repositories.NewJobFileRepository)
 	// google
 	_ = c.container.Provide(clients.NewStorageAPIClient)
 	_ = c.container.Provide(clients.NewVisionAPIClient)

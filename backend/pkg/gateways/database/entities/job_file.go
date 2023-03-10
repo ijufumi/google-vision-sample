@@ -2,7 +2,7 @@ package entities
 
 import "gorm.io/gorm"
 
-type File struct {
+type JobFile struct {
 	gorm.Model
 	ID                 string
 	ExtractionResultID string

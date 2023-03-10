@@ -26,7 +26,7 @@ create table if not exists extracted_texts
 create index if not exists idx_extracted_texts_deleted_at on extracted_texts (deleted_at);
 create index if not exists idx_extracted_texts_extraction_result_id on extracted_texts (extracted_text_id);
 
-create table if not exists files
+create table if not exists job_files
 (
     id                varchar(26)  not null primary key,
     extracted_text_id varchar(26)  not null references jobs (id),
@@ -41,5 +41,5 @@ create table if not exists files
     deleted_at        timestamp
 );
 
-create index if not exists idx_files_deleted_at on files (deleted_at);
-create index if not exists idx_files_extraction_result_id on files (extracted_text_id);
+create index if not exists idx_job_files_deleted_at on job_files (deleted_at);
+create index if not exists idx_job_files_extraction_result_id on job_files (extracted_text_id);

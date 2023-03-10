@@ -10,5 +10,5 @@ type Job struct {
 	CreatedAt      int64           `json:"createdAt"`
 	UpdatedAt      int64           `json:"updatedAt"`
 	ExtractedTexts []ExtractedText `json:"extractedTexts"`
-	Files          []File          `json:"files"`
+	Files          []JobFile       `json:"files"`
 }

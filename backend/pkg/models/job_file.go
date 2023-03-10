@@ -1,6 +1,6 @@
 package models
 
-type File struct {
+type JobFile struct {
 	ID                 string `json:"id"`
 	ExtractionResultID string `json:"extractionResultID"`
 	IsOutput           bool   `json:"isOutput"`

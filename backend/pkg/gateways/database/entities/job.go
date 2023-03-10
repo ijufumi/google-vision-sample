@@ -10,5 +10,5 @@ type Job struct {
 	ID             string
 	Status         enums.JobStatus
 	ExtractedTexts []ExtractedText
-	Files          []File
+	Files          []JobFile
 }

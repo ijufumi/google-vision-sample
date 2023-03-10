@@ -32,7 +32,7 @@ func NewDetectTextService(
 	visionAPIClient clients.VisionAPIClient,
 	jobRepository repositories.JobRepository,
 	extractedTextRepository repositories.ExtractedTextRepository,
-	fileRepository repositories.FileRepository,
+	fileRepository repositories.JobFileRepository,
 	logger *zap.Logger,
 	db *gorm.DB,
 ) DetectTextService {
@@ -105,7 +105,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 		if err != nil {
 			return err
 		}
-		err = s.fileRepository.Create(tx, &entities.File{
+		err = s.fileRepository.Create(tx, &entities.JobFile{
 			ID:                 inputFileID,
 			ExtractionResultID: id,
 			IsOutput:           false,
@@ -147,7 +147,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 
 		outputFileKey := queryFiles[0]
 		splitOutputFileKey := strings.Split(outputFileKey, "/")
-		err = s.fileRepository.Create(tx, &entities.File{
+		err = s.fileRepository.Create(tx, &entities.JobFile{
 			ID:                 utils.NewULID(),
 			ExtractionResultID: id,
 			IsOutput:           true,
@@ -253,7 +253,7 @@ func (s *detectTextService) DeleteResult(id string) error {
 
 func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) *models.Job {
 	extractedTexts := make([]models.ExtractedText, 0)
-	files := make([]models.File, 0)
+	files := make([]models.JobFile, 0)
 
 	for _, extractedText := range entity.ExtractedTexts {
 		extractedTexts = append(extractedTexts, models.ExtractedText{
@@ -269,7 +269,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 		})
 	}
 	for _, file := range entity.Files {
-		files = append(files, models.File{
+		files = append(files, models.JobFile{
 			ID:                 file.ID,
 			ExtractionResultID: file.ExtractionResultID,
 			IsOutput:           file.IsOutput,
@@ -296,7 +296,7 @@ type detectTextService struct {
 	visionAPIClient         clients.VisionAPIClient
 	jobRepository           repositories.JobRepository
 	extractedTextRepository repositories.ExtractedTextRepository
-	fileRepository          repositories.FileRepository
+	fileRepository          repositories.JobFileRepository
 	db                      *gorm.DB
 	logger                  *zap.Logger
 }
