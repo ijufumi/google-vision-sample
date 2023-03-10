@@ -10,7 +10,7 @@ export interface Props {
   updatedAt: number
 }
 
-export default class File {
+export default class JobFile {
   readonly id: string
   readonly isOutput: boolean
   readonly fileKey: string

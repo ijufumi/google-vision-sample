@@ -1,5 +1,5 @@
 import ExtractedText, { Props as ExtractedTextProps } from "./ExtractedText"
-import File, { Props as FilProps } from "./File"
+import JobFile, { Props as JobFileProps } from "./JobFile"
 import { formatToDate } from "../components/dates"
 
 export enum JobStatus {
@@ -14,7 +14,7 @@ export interface Props {
   createdAt: number
   updatedAt: number
   extractedTexts: ExtractedTextProps[]
-  files: FilProps[]
+  jobFiles: JobFileProps[]
 }
 
 export default class Job {
@@ -23,7 +23,7 @@ export default class Job {
   readonly createdAt: number
   readonly updatedAt: number
   readonly extractedTexts: ExtractedText[]
-  readonly files: File[]
+  readonly jobFiles: JobFile[]
 
   constructor(props: Props) {
     this.id = props.id
@@ -33,7 +33,7 @@ export default class Job {
     this.extractedTexts = props.extractedTexts.map(
       (p) => new ExtractedText(p)
     )
-    this.files = props.files.map(f => new File(f))
+    this.jobFiles = props.jobFiles.map(f => new JobFile(f))
   }
 
   get readableCreatedAt() {
@@ -42,5 +42,13 @@ export default class Job {
 
   get readableUpdatedAt() {
     return formatToDate(this.updatedAt)
+  }
+
+  get inputFile() {
+    return this.jobFiles.find(f => !f.isOutput)
+  }
+
+  get outputFile() {
+    return this.jobFiles.find(f => f.isOutput)
   }
 }

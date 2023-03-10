@@ -23,6 +23,7 @@ import FileUploadDialog from "../components/FileUploadDialog"
 import Loader from "../components/Loader"
 import FileViewer from "../components/FileViewer"
 import ResultViewerDialog from "../components/ResultViewerDialog"
+import JobFile from "../models/JobFile"
 
 interface Props {}
 
@@ -122,6 +123,12 @@ const App: FC<Props> = () => {
     )
   }
 
+  const handleShowFile = (file: JobFile | undefined) => {
+    if (!file) {
+      return
+    }
+    setFileKey(file.fileKey)
+  }
   const renderResults = () => {
     return (
       <Pane>
@@ -141,20 +148,20 @@ const App: FC<Props> = () => {
                 <Table.TextCell>{result.id}</Table.TextCell>
                 <Table.TextCell>{renderStatus(result.status)}</Table.TextCell>
                 <Table.TextCell>
-                  {result.imageKey && (
+                  {result.inputFile && (
                     <IconButton
                       icon={DocumentOpenIcon}
                       appearance="minimal"
-                      onClick={() => setFileKey(result.imageKey)}
+                      onClick={() => handleShowFile(result.inputFile)}
                     />
                   )}
                 </Table.TextCell>
                 <Table.TextCell>
-                  {result.outputKey && (
+                  {result.outputFile && (
                     <IconButton
                       icon={DocumentOpenIcon}
                       appearance="minimal"
-                      onClick={() => setFileKey(result.outputKey)}
+                      onClick={() => handleShowFile(result.outputFile)}
                     />
                   )}
                 </Table.TextCell>
