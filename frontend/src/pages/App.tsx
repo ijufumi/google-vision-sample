@@ -225,14 +225,11 @@ const App: FC<Props> = () => {
         </Dialog>
       )}
       <Loader isShown={showLoader} />
-      {jobFile && (
-        <FileViewer
-          key={jobFile.fileKey}
-          jobFile={jobFile}
-          isShown={!!jobFile.fileKey}
-          onClose={() => setJobFile(undefined)}
-        />
-      )}
+      <FileViewer
+        key={jobFile?.fileKey}
+        jobFile={jobFile}
+        onClose={() => setJobFile(undefined)}
+      />
       {!!showResultTargetId && (
         <ResultViewerDialog
           key={showResultTargetId}

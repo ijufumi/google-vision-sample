@@ -1,35 +1,38 @@
-import React, { FC, useEffect, useMemo, useState } from "react"
+import React, { FC, useEffect, useMemo, useState, useRef } from "react"
 import { Dialog, Pane, toaster } from "evergreen-ui"
+import { Stage, Layer, Text } from "react-konva"
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 import { readAsBlob, readAsText, isTextType } from "./files"
 import Loader from "./Loader"
+import Image from "./Image"
 import JobFile from "../models/JobFile"
+import Konva from "konva"
 
 export interface Props {
-  jobFile: JobFile
-  isShown: boolean
+  jobFile: JobFile | undefined
   onClose: () => void
 }
 
-const FileViewer: FC<Props> = ({ jobFile, isShown, onClose }) => {
+const FileViewer: FC<Props> = ({ jobFile, onClose }) => {
   const [loaded, setLoaded] = useState<boolean>(false)
-  const [blobData, setBlobData] = useState<Blob | undefined>(undefined)
+  const [fileUrl, setFileUrl] = useState<string>('')
   const [textData, setTextData] = useState<string>("")
   const useCase = useMemo(() => new ExtractionUseCaseImpl(), [])
 
+  const stageRef = useRef<Konva.Stage>(null)
+
   useEffect(() => {
-    if (loaded) {
+    if (loaded || !jobFile) {
       return
     }
     const loadFile = async () => {
       const signedUrl = await useCase.getSignedUrl(jobFile.fileKey)
       if (signedUrl) {
+        setFileUrl(signedUrl.url)
         try {
-          const fileData = await readAsBlob(signedUrl.url)
           if (isTextType(jobFile.contentType)) {
+            const fileData = await readAsBlob(signedUrl.url)
             setTextData(await readAsText(fileData))
-          } else {
-            setBlobData(fileData)
           }
         } catch (e) {
           console.error(e)
@@ -45,68 +48,47 @@ const FileViewer: FC<Props> = ({ jobFile, isShown, onClose }) => {
     loadFile()
   }, [jobFile, loaded, onClose, useCase])
 
+  useEffect(() => {
+    console.info(stageRef.current)
+  }, [loaded])
+
   const showUnsupportedFileAlert = () => {
     toaster.warning("Unsupported file...")
     onClose()
   }
 
   const renderFile = () => {
-    if (!blobData && !textData) {
-      showUnsupportedFileAlert()
-      return <div />
+    if (!stageRef.current || !jobFile) {
+      return null
     }
     if (textData.length) {
       if (jobFile.isJSON) {
-        return React.createElement(
-          "div",
-          {
-            height: "100%",
-            width: "100%",
-            style: {
-              border: "1px solid #000000",
-              borderRadius: "10px",
-              whiteSpace: "break-spaces",
-            },
-          },
-          JSON.stringify(JSON.parse(textData), undefined, 2)
-        )
+        const text = JSON.stringify(JSON.parse(textData), undefined, 2)
+        return <Text text={text} />
       }
     }
-    if (blobData) {
-      if (jobFile.isImage) {
-        return React.createElement("img", {
-          src: URL.createObjectURL(blobData),
-          height: "100%",
-          width: "100%",
-          style: {
-            objectFit: "contain",
-          },
-        })
-      }
+    if (jobFile.isImage) {
+      return <Image url={fileUrl} outerHeight={1} outerWidth={1}/>
     }
     showUnsupportedFileAlert()
-    return <div />
+    return null
   }
 
-  if (isShown && !loaded) {
+  if (!jobFile) {
+    return null
+  }
+
+  if (!loaded || !!stageRef.current) {
     return <Loader isShown={!loaded} />
   }
 
   return (
-    <Pane>
-      <Dialog
-        isShown={isShown}
-        onConfirm={onClose}
-        hasCancel={false}
-        confirmLabel={"OK"}
-        shouldCloseOnOverlayClick={false}
-        shouldCloseOnEscapePress={false}
-        width={"1000px"}
-      >
-        <Pane height="700px" width="100%">
+    <Pane height={"100%"}>
+      <Stage width={window.innerWidth} height={window.innerHeight} ref={stageRef}>
+        <Layer>
           {renderFile()}
-        </Pane>
-      </Dialog>
+        </Layer>
+      </Stage>
     </Pane>
   )
 }
