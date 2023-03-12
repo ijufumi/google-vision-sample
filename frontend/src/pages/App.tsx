@@ -21,9 +21,7 @@ import Job, {
 import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
 import FileUploadDialog from "../components/FileUploadDialog"
 import Loader from "../components/Loader"
-import FileViewer from "../components/FileViewer"
 import ResultViewerDialog from "../components/ResultViewerDialog"
-import JobFile from "../models/JobFile"
 
 interface Props {}
 
@@ -37,7 +35,6 @@ const App: FC<Props> = () => {
     useState<boolean>(false)
   const [deleteTargetId, setDeleteTargetId] = useState<string>("")
   const [showResultTargetId, setShowResultTargetId] = useState<string>("")
-  const [jobFile, setJobFile] = useState<JobFile|undefined>(undefined)
 
   const useCase = useMemo(() => new ExtractionUseCaseImpl(), [])
 
@@ -142,22 +139,10 @@ const App: FC<Props> = () => {
                 <Table.TextCell>{result.id}</Table.TextCell>
                 <Table.TextCell>{renderStatus(result.status)}</Table.TextCell>
                 <Table.TextCell>
-                  {result.inputFile && (
-                    <IconButton
-                      icon={DocumentOpenIcon}
-                      appearance="minimal"
-                      onClick={() => setJobFile(result.inputFile)}
-                    />
-                  )}
+                  { result.inputFile && <DocumentOpenIcon /> }
                 </Table.TextCell>
                 <Table.TextCell>
-                  {result.outputFile && (
-                    <IconButton
-                      icon={DocumentOpenIcon}
-                      appearance="minimal"
-                      onClick={() => setJobFile(result.outputFile)}
-                    />
-                  )}
+                  { result.outputFile && <DocumentOpenIcon /> }
                 </Table.TextCell>
                 <Table.TextCell>{result.readableCreatedAt}</Table.TextCell>
                 <Table.TextCell>{result.readableUpdatedAt}</Table.TextCell>
@@ -187,6 +172,7 @@ const App: FC<Props> = () => {
       flexDirection="column"
       backgroundColor="#FFFFFF"
       margin="20px"
+      position="relative"
       height="calc(100vh - 40px)"
     >
       <Pane padding="20px">
@@ -225,11 +211,6 @@ const App: FC<Props> = () => {
         </Dialog>
       )}
       <Loader isShown={showLoader} />
-      <FileViewer
-        key={jobFile?.fileKey}
-        jobFile={jobFile}
-        onClose={() => setJobFile(undefined)}
-      />
       {!!showResultTargetId && (
         <ResultViewerDialog
           key={showResultTargetId}
