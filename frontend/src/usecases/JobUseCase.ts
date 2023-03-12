@@ -17,7 +17,7 @@ export interface JobUseCase {
   getSignedUrl(key: string): Promise<SignedUrl | undefined>
 }
 
-export default class ExtractionUseCaseImpl implements JobUseCase {
+export default class JobUseCaseImpl implements JobUseCase {
   private jobRepository: JobRepository
   private signedUrlRepository: SignedUrlRepository
 
