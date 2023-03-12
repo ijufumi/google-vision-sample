@@ -2,7 +2,7 @@ import BaseRepository from "./BaseRepository"
 import Job, { Props } from "../models/Job"
 import Status from "../models/Status"
 
-export interface ExtractionResultRepository {
+export interface JobRepository {
   getAll(): Promise<Job[]>
 
   getById(args: { id: string }): Promise<Job>
@@ -12,9 +12,9 @@ export interface ExtractionResultRepository {
   delete(args: { id: string }): Promise<Status>
 }
 
-export class ExtractionResultRepositoryImpl
+export class JobRepositoryImpl
   extends BaseRepository
-  implements ExtractionResultRepository
+  implements JobRepository
 {
   create = async (args: { file: File }) => {
     const formData = new FormData()

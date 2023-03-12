@@ -1,7 +1,7 @@
 import {
-  ExtractionResultRepository,
-  ExtractionResultRepositoryImpl,
-} from "../repositories/ExtractionResultRepository"
+  JobRepository,
+  JobRepositoryImpl,
+} from "../repositories/JobRepository"
 import Job from "../models/Job"
 import { ENDPOINT_URL } from "../configs/config"
 import SignedUrl from "../models/SignedUrl"
@@ -9,20 +9,20 @@ import SignedUrlRepositoryImpl, {
   SignedUrlRepository,
 } from "../repositories/SignedUrlRepository"
 
-export interface ExtractionUseCase {
-  startExtraction(file: File): Promise<boolean>
-  getExtractionResults(): Promise<Job[] | undefined>
-  getExtractionResult(id: string): Promise<Job | undefined>
-  deleteExtractionResult(id: string): Promise<boolean>
+export interface JobUseCase {
+  startJob(file: File): Promise<boolean>
+  getJobs(): Promise<Job[] | undefined>
+  getJob(id: string): Promise<Job | undefined>
+  deleteJob(id: string): Promise<boolean>
   getSignedUrl(key: string): Promise<SignedUrl | undefined>
 }
 
-export default class ExtractionUseCaseImpl implements ExtractionUseCase {
-  private extractionRepository: ExtractionResultRepository
+export default class ExtractionUseCaseImpl implements JobUseCase {
+  private jobRepository: JobRepository
   private signedUrlRepository: SignedUrlRepository
 
   constructor() {
-    this.extractionRepository = new ExtractionResultRepositoryImpl(
+    this.jobRepository = new JobRepositoryImpl(
       `${ENDPOINT_URL}/detect_texts`
     )
     this.signedUrlRepository = new SignedUrlRepositoryImpl(
@@ -30,27 +30,27 @@ export default class ExtractionUseCaseImpl implements ExtractionUseCase {
     )
   }
 
-  getExtractionResult = async (id: string) => {
+  getJob = async (id: string) => {
     try {
-      return await this.extractionRepository.getById({ id })
+      return await this.jobRepository.getById({ id })
     } catch (e) {
       console.error(e)
     }
     return undefined
   }
 
-  getExtractionResults = async () => {
+  getJobs = async () => {
     try {
-      return await this.extractionRepository.getAll()
+      return await this.jobRepository.getAll()
     } catch (e) {
       console.error(e)
     }
     return undefined
   }
 
-  startExtraction = async (file: File) => {
+  startJob = async (file: File) => {
     try {
-      const result = await this.extractionRepository.create({ file })
+      const result = await this.jobRepository.create({ file })
       return result.status
     } catch (e) {
       console.error(e)
@@ -58,9 +58,9 @@ export default class ExtractionUseCaseImpl implements ExtractionUseCase {
     return false
   }
 
-  deleteExtractionResult = async (id: string) => {
+  deleteJob = async (id: string) => {
     try {
-      const result = await this.extractionRepository.delete({ id })
+      const result = await this.jobRepository.delete({ id })
       return result.status
     } catch (e) {
       console.error(e)
