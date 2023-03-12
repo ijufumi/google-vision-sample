@@ -18,7 +18,7 @@ import {
 import Job, {
   JobStatus,
 } from "../models/Job"
-import ExtractionUseCaseImpl from "../usecases/ExtractionUseCase"
+import JobUseCaseImpl from "../usecases/JobUseCase"
 import FileUploadDialog from "../components/FileUploadDialog"
 import Loader from "../components/Loader"
 import ResultViewerDialog from "../components/ResultViewerDialog"
@@ -36,10 +36,10 @@ const App: FC<Props> = () => {
   const [deleteTargetId, setDeleteTargetId] = useState<string>("")
   const [showResultTargetId, setShowResultTargetId] = useState<string>("")
 
-  const useCase = useMemo(() => new ExtractionUseCaseImpl(), [])
+  const useCase = useMemo(() => new JobUseCaseImpl(), [])
 
   const loadExtractionResults = useCallback(async () => {
-    const _extractionResults = await useCase.getExtractionResults()
+    const _extractionResults = await useCase.getJobs()
     console.info("initialize...")
     if (_extractionResults) {
       setExtractionResults(_extractionResults)
@@ -63,7 +63,7 @@ const App: FC<Props> = () => {
   const handleFileUpload = async (file: File) => {
     setShowFileUploadDialog(false)
     setShowLoader(true)
-    const result = await useCase.startExtraction(file)
+    const result = await useCase.startJob(file)
     setShowLoader(false)
     if (result) {
       toaster.success("Uploading succeeded")
@@ -83,7 +83,7 @@ const App: FC<Props> = () => {
     }
     setShowLoader(true)
     setDeleteTargetId("")
-    const result = await useCase.deleteExtractionResult(deleteTargetId)
+    const result = await useCase.deleteJob(deleteTargetId)
     setShowLoader(false)
     if (result) {
       setDeleteTargetId("")
