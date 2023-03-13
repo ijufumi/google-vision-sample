@@ -21,7 +21,6 @@ import Job, {
 import JobUseCaseImpl from "../usecases/JobUseCase"
 import FileUploadDialog from "../components/FileUploadDialog"
 import Loader from "../components/Loader"
-import ResultViewerDialog from "../components/ResultViewerDialog"
 
 interface Props {}
 
@@ -34,7 +33,6 @@ const App: FC<Props> = () => {
   const [showFileUploadDialog, setShowFileUploadDialog] =
     useState<boolean>(false)
   const [deleteTargetId, setDeleteTargetId] = useState<string>("")
-  const [showResultTargetId, setShowResultTargetId] = useState<string>("")
 
   const useCase = useMemo(() => new JobUseCaseImpl(), [])
 
@@ -150,7 +148,6 @@ const App: FC<Props> = () => {
                   <IconButton
                     icon={EyeOpenIcon}
                     marginRight={majorScale(2)}
-                    onClick={() => setShowResultTargetId(result.id)}
                   />
                   <IconButton
                     icon={TrashIcon}
@@ -211,13 +208,6 @@ const App: FC<Props> = () => {
         </Dialog>
       )}
       <Loader isShown={showLoader} />
-      {!!showResultTargetId && (
-        <ResultViewerDialog
-          key={showResultTargetId}
-          extractionResultId={showResultTargetId}
-          onClose={() => setShowResultTargetId("")}
-        />
-      )}
     </Pane>
   )
 }
