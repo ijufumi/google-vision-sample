@@ -27,20 +27,18 @@ interface Props {}
 const App: FC<Props> = () => {
   const [initialized, setInitialized] = useState<boolean>(false)
   const [showLoader, setShowLoader] = useState<boolean>(false)
-  const [extractionResults, setExtractionResults] = useState<
-    Job[]
-  >([])
+  const [jobs, setJobs] = useState<Job[]>([])
   const [showFileUploadDialog, setShowFileUploadDialog] =
     useState<boolean>(false)
   const [deleteTargetId, setDeleteTargetId] = useState<string>("")
 
   const useCase = useMemo(() => new JobUseCaseImpl(), [])
 
-  const loadExtractionResults = useCallback(async () => {
-    const _extractionResults = await useCase.getJobs()
+  const loadJobs = useCallback(async () => {
+    const _jobs = await useCase.getJobs()
     console.info("initialize...")
-    if (_extractionResults) {
-      setExtractionResults(_extractionResults)
+    if (_jobs) {
+      setJobs(_jobs)
     } else {
       toaster.danger("Something wrong...")
     }
@@ -52,11 +50,11 @@ const App: FC<Props> = () => {
     }
     const initialize = async () => {
       console.info("initialize2...")
-      await loadExtractionResults()
+      await loadJobs()
       setInitialized(true)
     }
     initialize()
-  }, [initialized, loadExtractionResults])
+  }, [initialized, loadJobs])
 
   const handleFileUpload = async (file: File) => {
     setShowFileUploadDialog(false)
@@ -68,7 +66,7 @@ const App: FC<Props> = () => {
     } else {
       toaster.danger("Uploading failed")
     }
-    await loadExtractionResults()
+    await loadJobs()
   }
 
   const confirmDelete = (id: string) => {
@@ -89,7 +87,7 @@ const App: FC<Props> = () => {
     } else {
       toaster.danger("Deleting failed")
     }
-    await loadExtractionResults()
+    await loadJobs()
   }
 
   const renderStatus = (status: JobStatus) => {
@@ -132,7 +130,7 @@ const App: FC<Props> = () => {
             <Table.TextHeaderCell>Operations</Table.TextHeaderCell>
           </Table.Head>
           <Table.Body>
-            {extractionResults.map((result) => (
+            {jobs.map((result) => (
               <Table.Row key={result.id}>
                 <Table.TextCell>{result.id}</Table.TextCell>
                 <Table.TextCell>{renderStatus(result.status)}</Table.TextCell>
