@@ -126,7 +126,7 @@ abstract class BaseRepository {
   ) => {
     let bodyData = undefined
     if (body) {
-      bodyData = requestAsForm ? (body as FormData) : JSON.stringify(body)
+      bodyData = (requestAsForm === true) ? (body as FormData) : JSON.stringify(body)
     }
     const response = await fetch(`${apiEndpoint}${path}`, {
       mode: "cors",
@@ -139,7 +139,7 @@ abstract class BaseRepository {
     })
 
     if (response.ok) {
-      if (responseAsBlob) {
+      if (responseAsBlob === true) {
         return response.blob()
       }
       return response.json()
