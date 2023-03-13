@@ -1,4 +1,5 @@
 import React, { FC, useState, useEffect, useMemo, useCallback } from "react"
+import { useNavigate } from "react-router"
 import {
   Pane,
   Button,
@@ -32,6 +33,7 @@ const App: FC<Props> = () => {
     useState<boolean>(false)
   const [deleteTargetId, setDeleteTargetId] = useState<string>("")
 
+  const navigate = useNavigate()
   const useCase = useMemo(() => new JobUseCaseImpl(), [])
 
   const loadJobs = useCallback(async () => {
@@ -90,6 +92,10 @@ const App: FC<Props> = () => {
     await loadJobs()
   }
 
+  const showResultPage = (id: string) => {
+    navigate(`/${id}`)
+  }
+
   const renderStatus = (status: JobStatus) => {
     let color: "red" | "blue" | "green" = "red"
     if (status === JobStatus.Running) {
@@ -146,6 +152,7 @@ const App: FC<Props> = () => {
                   <IconButton
                     icon={EyeOpenIcon}
                     marginRight={majorScale(2)}
+                    onClick={() => showResultPage(result.id)}
                   />
                   <IconButton
                     icon={TrashIcon}

@@ -1,8 +1,9 @@
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useParams } from "react-router"
+import { useNavigate } from "react-router"
 import { Stage, Layer } from "react-konva"
 import Konva from "konva"
-import { Pane, Table } from "evergreen-ui"
+import { Pane, Table, Button } from "evergreen-ui"
 import Job from "../models/Job"
 import JobUseCaseImpl from "../usecases/JobUseCase"
 import Image from "../components/Image"
@@ -15,6 +16,7 @@ const ResultPage : FC<Props> = () => {
   const [inputFileUrl, setInputFileUrl] = useState<string>("")
 
   const stageRef = useRef<Konva.Stage>(null)
+  const navigate = useNavigate()
   const { jobId } = useParams()
 
   const stageWidth = useMemo(() => {
@@ -57,12 +59,21 @@ const ResultPage : FC<Props> = () => {
     initialize()
   }, [])
 
+  const handleBackToTop = () => {
+    navigate("/")
+  }
+
   if (!initialized) {
     return null
   }
 
   return (
-    <Pane width="100%" height="700px" display="flex">
+    <Pane width="100%" height="100%" display="flex">
+      <Pane>
+        <Button onClick={handleBackToTop}>
+          Return to top
+        </Button>
+      </Pane>
       <Pane width="47%" marginRight={"5px"}>
         <Stage ref={stageRef}>
           <Layer>
@@ -78,7 +89,7 @@ const ResultPage : FC<Props> = () => {
           <Table.Body>
             {job?.extractedTexts.map((result) => {
               return (
-                <Table.Row>
+                <Table.Row key={result.id}>
                   <Table.TextCell>{result.text}</Table.TextCell>
                 </Table.Row>
               )
