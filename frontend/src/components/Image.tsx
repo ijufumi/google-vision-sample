@@ -16,10 +16,10 @@ const Image: FC<Props> = ({ url , outerWidth, outerHeight}) => {
     if (!loaded || !image) {
       return
     }
-    const imageWidth = image.width
-    const imageHeight = image.height
-    const scaleWidth = imageWidth / outerWidth
-    const scaleHeight = imageHeight /outerHeight
+    const imageWidth = image.naturalWidth
+    const imageHeight = image.naturalHeight
+    const scaleWidth = outerWidth / imageWidth
+    const scaleHeight = outerHeight / imageHeight
     const _scale = Math.min(scaleHeight, scaleWidth)
     setScale(_scale)
   }, [image, loaded])

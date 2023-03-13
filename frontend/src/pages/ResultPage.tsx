@@ -68,34 +68,36 @@ const ResultPage : FC<Props> = () => {
   }
 
   return (
-    <Pane width="100%" height="100%" display="flex">
+    <Pane width="100%" height="100%" display="flex" flexDirection="column">
       <Pane>
         <Button onClick={handleBackToTop}>
           Return to top
         </Button>
       </Pane>
-      <Pane width="47%" marginRight={"5px"}>
-        <Stage ref={stageRef}>
-          <Layer>
-            <Image outerWidth={stageWidth} outerHeight={stageHeight} url={inputFileUrl} />
-          </Layer>
-        </Stage>
-      </Pane>
-      <Pane width="47%" height="100%" overflow="scroll">
-        <Table>
-          <Table.Head>
-            <Table.TextHeaderCell>Texts</Table.TextHeaderCell>
-          </Table.Head>
-          <Table.Body>
-            {job?.extractedTexts.map((result) => {
-              return (
-                <Table.Row key={result.id}>
-                  <Table.TextCell>{result.text}</Table.TextCell>
-                </Table.Row>
-              )
-            })}
-          </Table.Body>
-        </Table>
+      <Pane display="flex" width="100%">
+        <Pane width="55%" marginRight={"5px"} height="100%">
+          <Stage ref={stageRef} width={window.innerWidth/2 - 10} height={window.innerHeight}>
+            <Layer>
+              <Image outerWidth={stageWidth} outerHeight={stageHeight} url={inputFileUrl} />
+            </Layer>
+          </Stage>
+        </Pane>
+        <Pane width="40%" height="100%" overflow="scroll">
+          <Table>
+            <Table.Head>
+              <Table.TextHeaderCell>Texts</Table.TextHeaderCell>
+            </Table.Head>
+            <Table.Body>
+              {job?.extractedTexts.map((result) => {
+                return (
+                  <Table.Row key={result.id}>
+                    <Table.TextCell>{result.text}</Table.TextCell>
+                  </Table.Row>
+                )
+              })}
+            </Table.Body>
+          </Table>
+        </Pane>
       </Pane>
     </Pane>
   )
