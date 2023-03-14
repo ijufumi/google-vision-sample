@@ -14,22 +14,19 @@ const ResultPage : FC<Props> = () => {
   const [initialized, setInitialized] = useState<boolean>(false)
   const [job, setJob] = useState<Job | undefined>(undefined)
   const [inputFileUrl, setInputFileUrl] = useState<string>("")
+  const [stageWidth, setStageWidth] = useState<number>(1)
+  const [stageHeight, setStageHeight] = useState<number>(1)
 
   const stageRef = useRef<Konva.Stage>(null)
   const navigate = useNavigate()
   const { jobId } = useParams()
 
-  const stageWidth = useMemo(() => {
-    if (!stageRef.current) {
-      return 1
+  useEffect(() => {
+    console.warn(stageRef.current)
+    if (stageRef.current) {
+      setStageWidth(stageRef.current.width())
+      setStageHeight(stageRef.current.height())
     }
-    return stageRef.current.width()
-  }, [stageRef])
-  const stageHeight = useMemo(() => {
-    if (!stageRef.current) {
-      return 1
-    }
-    return stageRef.current.height()
   }, [stageRef])
 
   const useCase = useMemo(() => new JobUseCaseImpl(), [])
@@ -63,12 +60,15 @@ const ResultPage : FC<Props> = () => {
     navigate("/")
   }
 
-  if (!initialized) {
-    return null
-  }
-
   return (
-    <Pane width="100%" height="100%" display="flex" flexDirection="column">
+    <Pane
+      display="flex"
+      flexDirection="column"
+      backgroundColor="#FFFFFF"
+      margin="20px"
+      position="relative"
+      height="calc(100vh - 40px)"
+    >
       <Pane>
         <Button onClick={handleBackToTop}>
           Return to top
@@ -76,9 +76,13 @@ const ResultPage : FC<Props> = () => {
       </Pane>
       <Pane display="flex" width="100%">
         <Pane width="55%" marginRight={"5px"} height="100%">
-          <Stage ref={stageRef} width={window.innerWidth/2 - 10} height={window.innerHeight}>
+          <Stage ref={stageRef} width={window.innerWidth/2 - 10} height={window.innerHeight - 10}>
             <Layer>
-              <Image outerWidth={stageWidth} outerHeight={stageHeight} url={inputFileUrl} />
+              <Image
+                outerWidth={stageWidth}
+                outerHeight={stageHeight}
+                url={inputFileUrl}
+              />
             </Layer>
           </Stage>
         </Pane>
@@ -87,7 +91,7 @@ const ResultPage : FC<Props> = () => {
             <Table.Head>
               <Table.TextHeaderCell>Texts</Table.TextHeaderCell>
             </Table.Head>
-            <Table.Body>
+            <Table.Body overflow="scroll" height="100%">
               {job?.extractedTexts.map((result) => {
                 return (
                   <Table.Row key={result.id}>

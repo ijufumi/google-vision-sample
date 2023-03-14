@@ -9,24 +9,22 @@ export interface Props {
 }
 
 const Image: FC<Props> = ({ url , outerWidth, outerHeight}) => {
-  const [image, loaded] = useImage(url)
+  const [image, status] = useImage(url)
   const [scale, setScale] = useState<number>(1)
 
   useEffect(() => {
-    if (!loaded || !image) {
+    if (status !== 'loaded' || !image) {
       return
     }
     const imageWidth = image.naturalWidth
     const imageHeight = image.naturalHeight
     const scaleWidth = outerWidth / imageWidth
     const scaleHeight = outerHeight / imageHeight
-    const _scale = Math.min(scaleHeight, scaleWidth)
-    setScale(_scale)
-  }, [image, loaded])
+    const _scale = Math.max(scaleHeight, scaleWidth)
 
-  if (!loaded || !image) {
-    return null
-  }
+    setScale(_scale)
+  }, [image, status])
+
   return <KonvaImage image={image} scaleY={scale} scaleX={scale} />
 }
 
