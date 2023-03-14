@@ -22,7 +22,6 @@ const ResultPage : FC<Props> = () => {
   const { jobId } = useParams()
 
   useEffect(() => {
-    console.warn(stageRef.current)
     if (stageRef.current) {
       setStageWidth(stageRef.current.width())
       setStageHeight(stageRef.current.height())
