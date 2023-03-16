@@ -79,10 +79,10 @@ const ResultPage : FC<Props> = () => {
           Return to top
         </Button>
       </Pane>
-      <Pane display="flex" width="100%">
-        <Pane width="55%" marginRight={"5px"} height="100%">
+      <Pane display="flex" width="100%" height="100%">
+        <Pane width="55%" marginRight={"5px"} height="100%" overflow="scroll">
           { !imageLoaded && <Loader /> }
-          <Stage ref={stageRef} width={window.innerWidth/2 - 10} height={window.innerHeight - 10}>
+          <Stage ref={stageRef} width={window.innerWidth/2 - 10} height={window.innerHeight - 100}>
             <Layer>
               <Image
                 outerWidth={stageWidth}
@@ -93,8 +93,8 @@ const ResultPage : FC<Props> = () => {
             </Layer>
           </Stage>
         </Pane>
-        <Pane width="40%" height="100%" overflow="scroll">
-          <Table>
+        <Pane width="40%" height="100%">
+          <Table height="100%">
             <Table.Head>
               <Table.TextHeaderCell>Texts</Table.TextHeaderCell>
             </Table.Head>

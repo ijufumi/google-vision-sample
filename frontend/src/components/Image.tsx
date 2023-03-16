@@ -21,7 +21,7 @@ const Image: FC<Props> = ({ url , outerWidth, outerHeight, onLoaded}) => {
     const imageHeight = image.naturalHeight
     const scaleWidth = outerWidth / imageWidth
     const scaleHeight = outerHeight / imageHeight
-    const _scale = Math.max(scaleHeight, scaleWidth)
+    const _scale = Math.min(scaleHeight, scaleWidth)
 
     setScale(_scale)
     onLoaded()
