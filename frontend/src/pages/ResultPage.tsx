@@ -79,7 +79,7 @@ const ResultPage : FC<Props> = () => {
           Return to top
         </Button>
       </Pane>
-      <Pane display="flex" width="100%" height="100%">
+      <Pane display="flex" width="100%" height="99%">
         <Pane width="55%" marginRight={"5px"} height="100%" overflow="scroll">
           { !imageLoaded && <Loader /> }
           <Stage ref={stageRef} width={window.innerWidth/2 - 10} height={window.innerHeight - 100}>
@@ -93,12 +93,12 @@ const ResultPage : FC<Props> = () => {
             </Layer>
           </Stage>
         </Pane>
-        <Pane width="40%" height="100%">
-          <Table height="100%">
+        <Pane width="40%" height="calc(100% - 30px)">
+          <Table height="calc(100% - 30px)">
             <Table.Head>
               <Table.TextHeaderCell>Texts</Table.TextHeaderCell>
             </Table.Head>
-            <Table.Body overflow="scroll" height="100%">
+            <Table.Body overflow="scroll" height="calc(100% - 40px)">
               {job?.extractedTexts.map((result) => {
                 return (
                   <Table.Row key={result.id}>
