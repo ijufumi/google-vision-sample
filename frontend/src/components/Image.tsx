@@ -6,9 +6,10 @@ export interface Props {
   outerWidth: number
   outerHeight: number
   url: string
+  onLoaded: () => void
 }
 
-const Image: FC<Props> = ({ url , outerWidth, outerHeight}) => {
+const Image: FC<Props> = ({ url , outerWidth, outerHeight, onLoaded}) => {
   const [image, status] = useImage(url)
   const [scale, setScale] = useState<number>(1)
 
@@ -23,6 +24,7 @@ const Image: FC<Props> = ({ url , outerWidth, outerHeight}) => {
     const _scale = Math.max(scaleHeight, scaleWidth)
 
     setScale(_scale)
+    onLoaded()
   }, [image, status])
 
   return <KonvaImage image={image} scaleY={scale} scaleX={scale} />

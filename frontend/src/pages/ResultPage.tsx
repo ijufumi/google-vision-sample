@@ -7,6 +7,7 @@ import { Pane, Table, Button } from "evergreen-ui"
 import Job from "../models/Job"
 import JobUseCaseImpl from "../usecases/JobUseCase"
 import Image from "../components/Image"
+import Loader from "../components/Loader"
 
 export interface Props {}
 
@@ -16,6 +17,7 @@ const ResultPage : FC<Props> = () => {
   const [inputFileUrl, setInputFileUrl] = useState<string>("")
   const [stageWidth, setStageWidth] = useState<number>(1)
   const [stageHeight, setStageHeight] = useState<number>(1)
+  const [imageLoaded, setImageLoaded] = useState<boolean>(false)
 
   const stageRef = useRef<Konva.Stage>(null)
   const navigate = useNavigate()
@@ -59,6 +61,10 @@ const ResultPage : FC<Props> = () => {
     navigate("/")
   }
 
+  const handleImageLoaded = () => {
+    setImageLoaded(true)
+  }
+
   return (
     <Pane
       display="flex"
@@ -75,12 +81,14 @@ const ResultPage : FC<Props> = () => {
       </Pane>
       <Pane display="flex" width="100%">
         <Pane width="55%" marginRight={"5px"} height="100%">
+          { !imageLoaded && <Loader /> }
           <Stage ref={stageRef} width={window.innerWidth/2 - 10} height={window.innerHeight - 10}>
             <Layer>
               <Image
                 outerWidth={stageWidth}
                 outerHeight={stageHeight}
                 url={inputFileUrl}
+                onLoaded={handleImageLoaded}
               />
             </Layer>
           </Stage>

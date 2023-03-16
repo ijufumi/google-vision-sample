@@ -21,7 +21,7 @@ import Job, {
 } from "../models/Job"
 import JobUseCaseImpl from "../usecases/JobUseCase"
 import FileUploadDialog from "../components/FileUploadDialog"
-import Loader from "../components/Loader"
+import LoaderOverlay from "../components/LoaderOverlay"
 
 interface Props {}
 
@@ -212,7 +212,7 @@ const App: FC<Props> = () => {
           <Text size={600}>Would you like to delete it?</Text>
         </Dialog>
       )}
-      <Loader isShown={showLoader} />
+      <LoaderOverlay isShown={showLoader} />
     </Pane>
   )
 }
