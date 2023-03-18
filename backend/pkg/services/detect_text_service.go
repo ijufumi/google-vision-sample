@@ -32,7 +32,7 @@ func NewDetectTextService(
 	visionAPIClient clients.VisionAPIClient,
 	jobRepository repositories.JobRepository,
 	extractedTextRepository repositories.ExtractedTextRepository,
-	fileRepository repositories.JobFileRepository,
+	jobFileRepository repositories.JobFileRepository,
 	logger *zap.Logger,
 	db *gorm.DB,
 ) DetectTextService {
@@ -41,7 +41,7 @@ func NewDetectTextService(
 		visionAPIClient:         visionAPIClient,
 		jobRepository:           jobRepository,
 		extractedTextRepository: extractedTextRepository,
-		fileRepository:          fileRepository,
+		jobFileRepository:       jobFileRepository,
 		logger:                  logger,
 		db:                      db,
 	}
@@ -86,26 +86,16 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 		return err
 	}
 
-	var result *entities.Job
-
-	status := enums.JobStatus_Succeeded
-	defer func() {
-		if result != nil {
-			result.Status = status
-			_ = s.jobRepository.Update(s.db, result)
-		}
-	}()
-
-	return s.db.Transaction(func(tx *gorm.DB) error {
-		extractionResult := &entities.Job{
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		job := &entities.Job{
 			ID:     id,
 			Status: enums.JobStatus_Runing,
 		}
-		err = s.jobRepository.Create(tx, extractionResult)
+		err = s.jobRepository.Create(tx, job)
 		if err != nil {
 			return err
 		}
-		err = s.fileRepository.Create(tx, &entities.JobFile{
+		err = s.jobFileRepository.Create(tx, &entities.JobFile{
 			ID:          inputFileID,
 			JobID:       id,
 			IsOutput:    false,
@@ -114,40 +104,51 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 			ContentType: contentType,
 			Size:        0,
 		})
+		return err
+	})
+
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		err := s.processDetectText(id, key)
 		if err != nil {
-			return err
+			s.logger.Error(fmt.Sprintf("%v was occurred.", err))
 		}
-		extractionResult, err = s.jobRepository.GetByID(tx, id)
-		if err != nil {
-			return err
-		}
-		result = extractionResult
+	}()
+	return nil
+}
+
+func (s *detectTextService) processDetectText(id, key string) error {
+	job, err := s.jobRepository.GetByID(s.db, id)
+	if err != nil {
+		return err
+	}
+
+	err = s.db.Transaction(func(tx *gorm.DB) error {
 		outputKey, err := s.visionAPIClient.DetectText(key)
 		if err != nil {
-			status = enums.JobStatus_Failed
 			return err
 		}
 
 		queryFiles, err := s.storageAPIClient.QueryFiles(outputKey)
 		if err != nil {
-			status = enums.JobStatus_Failed
 			return err
 		}
 
 		if len(queryFiles) == 0 {
-			status = enums.JobStatus_Failed
 			return errors.New("output does not exist")
 		}
 
 		outputFile, err := s.storageAPIClient.DownloadFile(queryFiles[0])
 		if err != nil {
-			status = enums.JobStatus_Failed
 			return err
 		}
 
 		outputFileKey := queryFiles[0]
 		splitOutputFileKey := strings.Split(outputFileKey, "/")
-		err = s.fileRepository.Create(tx, &entities.JobFile{
+		err = s.jobFileRepository.Create(tx, &entities.JobFile{
 			ID:          utils.NewULID(),
 			JobID:       id,
 			IsOutput:    true,
@@ -157,73 +158,27 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 			Size:        0,
 		})
 		if err != nil {
-			status = enums.JobStatus_Failed
 			return err
 		}
-
-		err = s.jobRepository.Update(tx, result)
-		if err != nil {
-			status = enums.JobStatus_Failed
-			return err
-		}
-		extractionResult, err = s.jobRepository.GetByID(tx, id)
-		if err != nil {
-			status = enums.JobStatus_Failed
-			return err
-		}
-		result = extractionResult
 
 		bytes, err := io.ReadAll(outputFile)
 		if err != nil {
-			status = enums.JobStatus_Failed
 			return err
 		}
 
 		var detectResponse googleModels.DetectTextResponses
 		if err = json.Unmarshal(bytes, &detectResponse); err != nil {
-			status = enums.JobStatus_Failed
 			return err
 		}
-
-		extractedTexts := make([]*entities.ExtractedText, 0)
-		for _, response := range detectResponse.Responses {
-			for _, page := range response.FullTextAnnotation.Pages {
-				for _, block := range page.Blocks {
-					for _, paragraph := range block.Paragraphs {
-						texts := ""
-						for _, word := range paragraph.Words {
-							for _, symbol := range word.Symbols {
-								texts += symbol.Text
-							}
-						}
-						vertices := paragraph.BoundingBox.Vertices
-						xArray := make([]float64, 0)
-						yArray := make([]float64, 0)
-						for _, _vertices := range vertices {
-							xArray = append(xArray, _vertices.X)
-							yArray = append(yArray, _vertices.Y)
-						}
-						top := utils.MinInArray(xArray...)
-						bottom := utils.MaxInArray(xArray...)
-						left := utils.MinInArray(yArray...)
-						right := utils.MaxInArray(yArray...)
-						extractedText := &entities.ExtractedText{
-							ID:     utils.NewULID(),
-							JobID:  extractionResult.ID,
-							Text:   texts,
-							Top:    top,
-							Bottom: bottom,
-							Left:   left,
-							Right:  right,
-						}
-
-						extractedTexts = append(extractedTexts, extractedText)
-					}
-				}
-			}
-		}
-		return s.extractedTextRepository.Create(tx, extractedTexts...)
+		return nil
 	})
+	status := enums.JobStatus_Succeeded
+	if err != nil {
+		status = enums.JobStatus_Failed
+	}
+	job.Status = status
+
+	return s.jobRepository.Update(s.db, job)
 }
 
 func (s *detectTextService) DeleteResult(id string) error {
@@ -232,7 +187,7 @@ func (s *detectTextService) DeleteResult(id string) error {
 		if err != nil {
 			return err
 		}
-		files, err := s.fileRepository.GetByJobID(tx, id)
+		files, err := s.jobFileRepository.GetByJobID(tx, id)
 		if err != nil {
 			return err
 		}
@@ -242,7 +197,7 @@ func (s *detectTextService) DeleteResult(id string) error {
 				s.logger.Error(err.Error())
 			}
 		}
-		err = s.fileRepository.DeleteByJobID(tx, id)
+		err = s.jobFileRepository.DeleteByJobID(tx, id)
 		if err != nil {
 			return err
 		}
@@ -296,7 +251,7 @@ type detectTextService struct {
 	visionAPIClient         clients.VisionAPIClient
 	jobRepository           repositories.JobRepository
 	extractedTextRepository repositories.ExtractedTextRepository
-	fileRepository          repositories.JobFileRepository
+	jobFileRepository       repositories.JobFileRepository
 	db                      *gorm.DB
 	logger                  *zap.Logger
 }
