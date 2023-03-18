@@ -170,7 +170,44 @@ func (s *detectTextService) processDetectText(id, key string) error {
 		if err = json.Unmarshal(bytes, &detectResponse); err != nil {
 			return err
 		}
-		return nil
+		extractedTexts := make([]*entities.ExtractedText, 0)
+		for _, response := range detectResponse.Responses {
+			for _, page := range response.FullTextAnnotation.Pages {
+				for _, block := range page.Blocks {
+					for _, paragraph := range block.Paragraphs {
+						texts := ""
+						for _, word := range paragraph.Words {
+							for _, symbol := range word.Symbols {
+								texts += symbol.Text
+							}
+						}
+						vertices := paragraph.BoundingBox.Vertices
+						xArray := make([]float64, 0)
+						yArray := make([]float64, 0)
+						for _, _vertices := range vertices {
+							xArray = append(xArray, _vertices.X)
+							yArray = append(yArray, _vertices.Y)
+						}
+						top := utils.MinInArray(xArray...)
+						bottom := utils.MaxInArray(xArray...)
+						left := utils.MinInArray(yArray...)
+						right := utils.MaxInArray(yArray...)
+						extractedText := &entities.ExtractedText{
+							ID:     utils.NewULID(),
+							JobID:  id,
+							Text:   texts,
+							Top:    top,
+							Bottom: bottom,
+							Left:   left,
+							Right:  right,
+						}
+
+						extractedTexts = append(extractedTexts, extractedText)
+					}
+				}
+			}
+		}
+		return s.extractedTextRepository.Create(tx, extractedTexts...)
 	})
 	status := enums.JobStatus_Succeeded
 	if err != nil {
