@@ -35,7 +35,6 @@ create table if not exists job_files
     file_name    varchar(255) not null,
     size         integer      not null default 0,
     content_type varchar(100) not null default 'application/octet-stream',
-    output_key   varchar(255),
     created_at   timestamp    not null,
     updated_at   timestamp    not null,
     deleted_at   timestamp
