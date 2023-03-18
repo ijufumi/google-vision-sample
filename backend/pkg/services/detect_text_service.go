@@ -87,6 +87,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 	}
 
 	fileInfo, _ := file.Stat()
+	splitFileName := strings.Split(file.Name(), "/")
 	err = s.db.Transaction(func(tx *gorm.DB) error {
 		job := &entities.Job{
 			ID:     id,
@@ -101,7 +102,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 			JobID:       id,
 			IsOutput:    false,
 			FileKey:     key,
-			FileName:    file.Name(),
+			FileName:    splitFileName[len(splitFileName)-1],
 			ContentType: contentType,
 			Size:        fileInfo.Size(),
 		})
