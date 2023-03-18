@@ -1,24 +1,22 @@
-import React, { FC, useState, useEffect, useMemo, useCallback } from "react"
+import React, { FC, useCallback, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router"
 import {
-  Pane,
+  Badge,
   Button,
   Dialog,
-  Text,
-  Heading,
-  Table,
-  IconButton,
-  Badge,
-  majorScale,
-  toaster,
-  UploadIcon,
-  TrashIcon,
-  EyeOpenIcon,
   DocumentOpenIcon,
+  EyeOpenIcon,
+  Heading,
+  IconButton,
+  majorScale,
+  Pane,
+  Table,
+  Text,
+  toaster,
+  TrashIcon,
+  UploadIcon,
 } from "evergreen-ui"
-import Job, {
-  JobStatus,
-} from "../models/Job"
+import Job, { JobStatus } from "../models/Job"
 import JobUseCaseImpl from "../usecases/JobUseCase"
 import FileUploadDialog from "../components/FileUploadDialog"
 import LoaderOverlay from "../components/LoaderOverlay"
@@ -57,6 +55,17 @@ const App: FC<Props> = () => {
     }
     initialize()
   }, [initialized, loadJobs])
+
+  useEffect(() => {
+    const runningJob = jobs.find(j => j.status === JobStatus.Running)
+    if (!runningJob) {
+      return
+    }
+    const intervalId = window.setInterval(loadJobs, 1000)
+    return function() {
+      window.clearInterval(intervalId)
+    }
+  }, [jobs])
 
   const handleFileUpload = async (file: File) => {
     setShowFileUploadDialog(false)
