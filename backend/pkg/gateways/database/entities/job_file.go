@@ -10,5 +10,5 @@ type JobFile struct {
 	FileKey     string
 	FileName    string
 	ContentType string
-	Size        int32
+	Size        int64
 }

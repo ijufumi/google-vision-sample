@@ -86,6 +86,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 		return err
 	}
 
+	fileInfo, _ := file.Stat()
 	err = s.db.Transaction(func(tx *gorm.DB) error {
 		job := &entities.Job{
 			ID:     id,
@@ -102,7 +103,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 			FileKey:     key,
 			FileName:    file.Name(),
 			ContentType: contentType,
-			Size:        0,
+			Size:        fileInfo.Size(),
 		})
 		return err
 	})
@@ -146,6 +147,7 @@ func (s *detectTextService) processDetectText(id, key string) error {
 			return err
 		}
 
+		fileStat, _ := outputFile.Stat()
 		outputFileKey := queryFiles[0]
 		splitOutputFileKey := strings.Split(outputFileKey, "/")
 		err = s.jobFileRepository.Create(tx, &entities.JobFile{
@@ -155,7 +157,7 @@ func (s *detectTextService) processDetectText(id, key string) error {
 			FileKey:     outputFileKey,
 			FileName:    splitOutputFileKey[len(splitOutputFileKey)-1],
 			ContentType: "application/json",
-			Size:        0,
+			Size:        fileStat.Size(),
 		})
 		if err != nil {
 			return err
