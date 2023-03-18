@@ -139,8 +139,8 @@ const App: FC<Props> = () => {
             <Table.TextHeaderCell>ID</Table.TextHeaderCell>
             <Table.TextHeaderCell>Status</Table.TextHeaderCell>
             <Table.TextHeaderCell>Input file name</Table.TextHeaderCell>
-            <Table.TextHeaderCell>CreatedAt</Table.TextHeaderCell>
-            <Table.TextHeaderCell>UpdatedAt</Table.TextHeaderCell>
+            <Table.TextHeaderCell>Created At</Table.TextHeaderCell>
+            <Table.TextHeaderCell>Updated At</Table.TextHeaderCell>
             <Table.TextHeaderCell>Operations</Table.TextHeaderCell>
           </Table.Head>
           <Table.Body>
