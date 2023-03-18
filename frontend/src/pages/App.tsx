@@ -138,8 +138,7 @@ const App: FC<Props> = () => {
           <Table.Head>
             <Table.TextHeaderCell>ID</Table.TextHeaderCell>
             <Table.TextHeaderCell>Status</Table.TextHeaderCell>
-            <Table.TextHeaderCell>Input</Table.TextHeaderCell>
-            <Table.TextHeaderCell>Output</Table.TextHeaderCell>
+            <Table.TextHeaderCell>Input file name</Table.TextHeaderCell>
             <Table.TextHeaderCell>CreatedAt</Table.TextHeaderCell>
             <Table.TextHeaderCell>UpdatedAt</Table.TextHeaderCell>
             <Table.TextHeaderCell>Operations</Table.TextHeaderCell>
@@ -150,10 +149,7 @@ const App: FC<Props> = () => {
                 <Table.TextCell>{result.id}</Table.TextCell>
                 <Table.TextCell>{renderStatus(result.status)}</Table.TextCell>
                 <Table.TextCell>
-                  { result.inputFile && <DocumentOpenIcon /> }
-                </Table.TextCell>
-                <Table.TextCell>
-                  { result.outputFile && <DocumentOpenIcon /> }
+                  { result.inputFile && result.inputFile.fileName }
                 </Table.TextCell>
                 <Table.TextCell>{result.readableCreatedAt}</Table.TextCell>
                 <Table.TextCell>{result.readableUpdatedAt}</Table.TextCell>

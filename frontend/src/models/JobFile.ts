@@ -4,6 +4,7 @@ export interface Props {
   id: string
   isOutput: boolean
   fileKey: string
+  fileName: string
   size: number
   contentType: string
   createdAt: number
@@ -14,6 +15,7 @@ export default class JobFile {
   readonly id: string
   readonly isOutput: boolean
   readonly fileKey: string
+  readonly fileName: string
   readonly size: number
   readonly contentType: string
   readonly createdAt: number
@@ -23,6 +25,7 @@ export default class JobFile {
     this.id = props.id
     this.isOutput = props.isOutput
     this.fileKey = props.fileKey
+    this.fileName = props.fileName
     this.size = props.size
     this.contentType = props.contentType
     this.createdAt = props.createdAt
