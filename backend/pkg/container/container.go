@@ -47,6 +47,7 @@ func (c *container) provide() {
 	// services
 	_ = c.container.Provide(services.NewDetectTextService)
 	_ = c.container.Provide(services.NewConfigurationService)
+	_ = c.container.Provide(services.NewImageConversionService)
 	// database
 	_ = c.container.Provide(db.NewDB)
 	_ = c.container.Provide(repositories.NewJobRepository)
