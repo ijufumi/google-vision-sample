@@ -86,9 +86,6 @@ const ResultPage : FC<Props> = () => {
     setScale(scale)
   }
 
-  console.info(job?.extractedTexts)
-  console.warn(scale)
-
   return (
     <Pane
       display="flex"
