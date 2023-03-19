@@ -18,10 +18,20 @@ const ResultPage : FC<Props> = () => {
   const [stageWidth, setStageWidth] = useState<number>(1)
   const [stageHeight, setStageHeight] = useState<number>(1)
   const [imageLoaded, setImageLoaded] = useState<boolean>(false)
+  const [selectedTextId, setSelectedTextId] = useState<string>('')
 
   const stageRef = useRef<Konva.Stage>(null)
   const navigate = useNavigate()
   const { jobId } = useParams()
+
+  const basicStyle = {
+    cursor: "pointer",
+  }
+
+  const selectedStyle = {
+    border: "2px solid #52BD95",
+    cursor: "pointer",
+  }
 
   useEffect(() => {
     if (stageRef.current) {
@@ -59,6 +69,14 @@ const ResultPage : FC<Props> = () => {
 
   const handleBackToTop = () => {
     navigate("/")
+  }
+
+  const handleSelectText = (id: string) => {
+    if (selectedTextId === id) {
+      setSelectedTextId('')
+    } else {
+      setSelectedTextId(id)
+    }
   }
 
   const handleImageLoaded = () => {
@@ -101,8 +119,8 @@ const ResultPage : FC<Props> = () => {
             <Table.Body overflow="scroll" height="calc(100% - 40px)">
               {job?.extractedTexts.map((result) => {
                 return (
-                  <Table.Row key={result.id}>
-                    <Table.TextCell>{result.text}</Table.TextCell>
+                  <Table.Row key={result.id} style={selectedTextId === result.id ? selectedStyle : basicStyle}>
+                    <Table.TextCell onClick={() => handleSelectText(result.id)}>{result.text}</Table.TextCell>
                   </Table.Row>
                 )
               })}
