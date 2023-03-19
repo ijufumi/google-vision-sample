@@ -13,8 +13,8 @@ FROM debian:bullseye-slim as deploy
 
 WORKDIR /app
 
-RUN apt-get update \
-&& apt-get install -y ca-certificates \
+RUN apt update \
+&& apt install -y ca-certificates imagemagick \
 && rm -rf /var/cache/apt
 
 COPY --from=build /app/app /app/app
