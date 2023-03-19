@@ -1,13 +1,14 @@
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useParams } from "react-router"
 import { useNavigate } from "react-router"
-import { Stage, Layer } from "react-konva"
+import { Stage, Layer, Rect } from "react-konva"
 import Konva from "konva"
 import { Pane, Table, Button } from "evergreen-ui"
 import Job from "../models/Job"
 import JobUseCaseImpl from "../usecases/JobUseCase"
 import Image from "../components/Image"
 import Loader from "../components/Loader"
+import ExtractedText from "../models/ExtractedText"
 
 export interface Props {}
 
@@ -19,6 +20,7 @@ const ResultPage : FC<Props> = () => {
   const [stageHeight, setStageHeight] = useState<number>(1)
   const [imageLoaded, setImageLoaded] = useState<boolean>(false)
   const [selectedTextId, setSelectedTextId] = useState<string>('')
+  const [scale, setScale] = useState<number>(1)
 
   const stageRef = useRef<Konva.Stage>(null)
   const navigate = useNavigate()
@@ -71,17 +73,21 @@ const ResultPage : FC<Props> = () => {
     navigate("/")
   }
 
-  const handleSelectText = (id: string) => {
-    if (selectedTextId === id) {
+  const handleSelectText = (text: ExtractedText) => {
+    if (selectedTextId === text.id) {
       setSelectedTextId('')
     } else {
-      setSelectedTextId(id)
+      setSelectedTextId(text.id)
     }
   }
 
-  const handleImageLoaded = () => {
+  const handleImageLoaded = (scale: number) => {
     setImageLoaded(true)
+    setScale(scale)
   }
+
+  console.info(job?.extractedTexts)
+  console.warn(scale)
 
   return (
     <Pane
@@ -109,6 +115,22 @@ const ResultPage : FC<Props> = () => {
                 onLoaded={handleImageLoaded}
               />
             </Layer>
+            <Layer>
+              {job?.extractedTexts.map(result => {
+                return <Rect
+                  key={result.id}
+                  x={result.left * scale}
+                  y={result.top * scale}
+                  width={(result.right - result.left) * scale}
+                  height={(result.bottom - result.top) * scale}
+                  stroke={"#D14343"}
+                  fill={"#F9DADA"}
+                  opacity={0.3}
+                  strokeWidth={2}
+                  visible={result.id === selectedTextId}
+                />
+              })}
+            </Layer>
           </Stage>
         </Pane>
         <Pane width="40%" height="calc(100% - 30px)">
@@ -120,7 +142,7 @@ const ResultPage : FC<Props> = () => {
               {job?.extractedTexts.map((result) => {
                 return (
                   <Table.Row key={result.id} style={selectedTextId === result.id ? selectedStyle : basicStyle}>
-                    <Table.TextCell onClick={() => handleSelectText(result.id)}>{result.text}</Table.TextCell>
+                    <Table.TextCell onClick={() => handleSelectText(result)}>{result.text}</Table.TextCell>
                   </Table.Row>
                 )
               })}
