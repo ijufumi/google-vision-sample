@@ -2,7 +2,7 @@ import { formatToDate } from "../components/dates"
 
 export interface Props {
   id: string
-  extractionResultID: string
+  jobID: string
   text: string
   top: number
   bottom: number
@@ -14,7 +14,7 @@ export interface Props {
 
 export default class ExtractedText {
   readonly id: string
-  readonly extractionResultID: string
+  readonly jobID: string
   readonly text: string
   readonly top: number
   readonly bottom: number
@@ -25,7 +25,7 @@ export default class ExtractedText {
 
   constructor(props: Props) {
     this.id = props.id
-    this.extractionResultID = props.extractionResultID
+    this.jobID = props.jobID
     this.text = props.text
     this.top = props.top
     this.bottom = props.bottom
