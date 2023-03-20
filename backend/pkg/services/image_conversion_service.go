@@ -5,7 +5,7 @@ import "os/exec"
 type Orientation string
 
 const (
-	Orientation_Normal      = Orientation("0")
+	Orientation_None        = Orientation("0")
 	Orientation_TopLeft     = Orientation("1")
 	Orientation_TopRight    = Orientation("2")
 	Orientation_BottomRight = Orientation("3")
@@ -19,7 +19,6 @@ const (
 var identifyCommand = []string{"identify", "-format", "'%[orientation]'"}
 
 var orientationMap = map[string]Orientation{
-	"0": Orientation_Normal,
 	"1": Orientation_TopLeft,
 	"2": Orientation_TopRight,
 	"3": Orientation_BottomRight,
@@ -44,12 +43,12 @@ func NewImageConversionService() ImageConversionService {
 func (s *imageConversionService) DetectOrientation(filePath string) (Orientation, error) {
 	result, err := exec.Command(identifyCommand[0], identifyCommand[1:]...).Output()
 	if err != nil {
-		return Orientation_Normal, err
+		return Orientation_None, err
 	}
 
 	if orientation, ok := orientationMap[string(result)]; ok {
 		return orientation, nil
 	}
 
-	return Orientation_Normal, nil
+	return Orientation_None, nil
 }
