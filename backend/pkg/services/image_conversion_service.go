@@ -31,6 +31,7 @@ var orientationMap = map[string]Orientation{
 
 type ImageConversionService interface {
 	DetectOrientation(filePath string) (Orientation, error)
+	ConvertPoints(points []float64, orientation Orientation) []float64
 }
 
 type imageConversionService struct {
@@ -51,4 +52,21 @@ func (s *imageConversionService) DetectOrientation(filePath string) (Orientation
 	}
 
 	return Orientation_None, nil
+}
+
+func (s *imageConversionService) ConvertPoints(points []float64, orientation Orientation) []float64 {
+	if len(points) != 4 {
+		return points
+	}
+	x := points[0]
+	y := points[1]
+	left := points[2]
+	bottom := points[3]
+
+	switch orientation {
+
+	case Orientation_None, Orientation_TopLeft, Orientation_TopRight, Orientation_BottomRight, Orientation_BottomLeft:
+		// nothing
+	}
+	return []float64{x, y, left, bottom}
 }
