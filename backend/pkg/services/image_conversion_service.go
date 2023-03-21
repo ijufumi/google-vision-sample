@@ -6,6 +6,7 @@ import (
 	"go.uber.org/zap"
 	"math"
 	"os/exec"
+	"strings"
 )
 
 type Orientation string
@@ -51,12 +52,14 @@ func NewImageConversionService(logger *zap.Logger) ImageConversionService {
 }
 
 func (s *imageConversionService) DetectOrientation(filePath string) (Orientation, error) {
-	args := identifyCommand[1:]
-	args = append(args, filePath)
-	result, err := exec.Command(identifyCommand[0], args...).Output()
+	commands := identifyCommand
+	commands = append(commands, filePath)
+	s.logger.Info(fmt.Sprintf("command: %s", strings.Join(commands, " ")))
+	result, err := exec.Command(commands[0], commands[1:]...).Output()
 
 	s.logger.Info(fmt.Sprintf("result: %s", string(result)))
 	if err != nil {
+		s.logger.Error(fmt.Sprintf("error: %v", err))
 		return Orientation_None, err
 	}
 
