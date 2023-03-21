@@ -64,8 +64,14 @@ func (s *imageConversionService) ConvertPoints(points []float64, orientation Ori
 	bottom := points[3]
 
 	switch orientation {
-
-	case Orientation_None, Orientation_TopLeft, Orientation_TopRight, Orientation_BottomRight, Orientation_BottomLeft:
+	case Orientation_TopRight:
+	case Orientation_BottomRight:
+	case Orientation_BottomLeft:
+	case Orientation_LeftTop:
+	case Orientation_RightTop:
+	case Orientation_RightBottom:
+	case Orientation_LeftBottom:
+	case Orientation_None, Orientation_TopLeft:
 		// nothing
 	}
 	return []float64{x, y, left, bottom}
