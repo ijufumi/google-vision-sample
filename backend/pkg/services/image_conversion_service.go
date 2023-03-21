@@ -108,7 +108,7 @@ func (s *imageConversionService) convertPoint(point []float64, angle float64, mi
 
 	adjustPoint := []float64{point[0] - middlePoint[0], point[1] - middlePoint[1]}
 	adjustPoint[0] = adjustPoint[0]*cos - adjustPoint[1]*sin
-	adjustPoint[1] = adjustPoint[0]*sin - adjustPoint[1]*cos
+	adjustPoint[1] = adjustPoint[1]*cos + adjustPoint[0]*sin
 
 	return []float64{adjustPoint[0] + middlePoint[0], adjustPoint[1] + middlePoint[1]}
 }
