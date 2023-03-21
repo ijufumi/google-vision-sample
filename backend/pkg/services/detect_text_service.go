@@ -33,6 +33,7 @@ func NewDetectTextService(
 	jobRepository repositories.JobRepository,
 	extractedTextRepository repositories.ExtractedTextRepository,
 	jobFileRepository repositories.JobFileRepository,
+	imageConversionService ImageConversionService,
 	logger *zap.Logger,
 	db *gorm.DB,
 ) DetectTextService {
@@ -42,6 +43,7 @@ func NewDetectTextService(
 		jobRepository:           jobRepository,
 		extractedTextRepository: extractedTextRepository,
 		jobFileRepository:       jobFileRepository,
+		imageConversionService:  imageConversionService,
 		logger:                  logger,
 		db:                      db,
 	}
@@ -114,7 +116,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 	}
 
 	go func() {
-		err := s.processDetectText(id, key)
+		err := s.processDetectText(id, key, file.Name())
 		if err != nil {
 			s.logger.Error(fmt.Sprintf("%v was occurred.", err))
 		}
@@ -122,7 +124,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 	return nil
 }
 
-func (s *detectTextService) processDetectText(id, key string) error {
+func (s *detectTextService) processDetectText(id, key, imageFilePath string) error {
 	job, err := s.jobRepository.GetByID(s.db, id)
 	if err != nil {
 		return err
@@ -174,6 +176,10 @@ func (s *detectTextService) processDetectText(id, key string) error {
 			return err
 		}
 		extractedTexts := make([]*entities.ExtractedText, 0)
+		orientation, err := s.imageConversionService.DetectOrientation(imageFilePath)
+		if err != nil {
+			return err
+		}
 		for _, response := range detectResponse.Responses {
 			for _, page := range response.FullTextAnnotation.Pages {
 				for _, block := range page.Blocks {
@@ -185,16 +191,17 @@ func (s *detectTextService) processDetectText(id, key string) error {
 							}
 						}
 						vertices := paragraph.BoundingBox.Vertices
+						points := s.imageConversionService.ConvertPoints(vertices, orientation)
 						xArray := make([]float64, 0)
 						yArray := make([]float64, 0)
-						for _, _vertices := range vertices {
-							xArray = append(xArray, _vertices.X)
-							yArray = append(yArray, _vertices.Y)
+						for _, point := range points {
+							xArray = append(xArray, point[0])
+							yArray = append(yArray, point[1])
 						}
-						top := utils.MinInArray(xArray...)
-						bottom := utils.MaxInArray(xArray...)
-						left := utils.MinInArray(yArray...)
-						right := utils.MaxInArray(yArray...)
+						top := utils.MinInArray(yArray...)
+						bottom := utils.MaxInArray(yArray...)
+						left := utils.MinInArray(xArray...)
+						right := utils.MaxInArray(xArray...)
 						extractedText := &entities.ExtractedText{
 							ID:     utils.NewULID(),
 							JobID:  id,
@@ -292,6 +299,7 @@ type detectTextService struct {
 	jobRepository           repositories.JobRepository
 	extractedTextRepository repositories.ExtractedTextRepository
 	jobFileRepository       repositories.JobFileRepository
+	imageConversionService  ImageConversionService
 	db                      *gorm.DB
 	logger                  *zap.Logger
 }
