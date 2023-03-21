@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/models"
+	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"go.uber.org/zap"
 	"math"
 	"os/exec"
@@ -75,13 +76,18 @@ func (s *imageConversionService) DetectOrientation(filePath string) (Orientation
 
 func (s *imageConversionService) ConvertPoints(points []models.Vertices, orientation Orientation) [][]float64 {
 	if len(points) != 4 {
+		s.logger.Warn("point is invalid")
 		return [][]float64{}
 	}
 	p1 := []float64{points[0].X, points[0].Y}
 	p2 := []float64{points[1].X, points[1].Y}
 	p3 := []float64{points[2].X, points[2].Y}
 	p4 := []float64{points[3].X, points[3].Y}
-	m := []float64{(p3[0] - p1[0]) / 2, (p3[1] - p1[1]) / 2}
+	x1 := utils.MinInArray(points[0].X, points[1].X, points[2].X, points[3].X)
+	x2 := utils.MaxInArray(points[0].X, points[1].X, points[2].X, points[3].X)
+	y1 := utils.MinInArray(points[0].Y, points[1].Y, points[2].Y, points[3].Y)
+	y2 := utils.MaxInArray(points[0].Y, points[1].Y, points[2].Y, points[3].Y)
+	m := []float64{(x2 - x1) / 2, (y2 - y1) / 2}
 
 	angle := float64(0)
 	switch orientation {
