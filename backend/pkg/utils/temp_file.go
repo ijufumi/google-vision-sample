@@ -12,7 +12,13 @@ func NewTempFile() (*os.File, error) {
 
 func NewTempFileWithName(fileName string) (*os.File, error) {
 	tempDir := os.TempDir()
-	file, err := os.Create(fmt.Sprintf("%s/%s", tempDir, fileName))
+	subDir := NewRandomString(10)
+	dir := fmt.Sprintf("%s/%s", tempDir, subDir)
+	err := os.MkdirAll(dir, os.ModeDir)
+	if err != nil {
+		return nil, err
+	}
+	file, err := os.Create(fmt.Sprintf("%s/%s", dir, fileName))
 	if err != nil {
 		return nil, err
 	}
