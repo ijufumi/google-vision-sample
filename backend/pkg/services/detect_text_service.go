@@ -90,6 +90,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 
 	fileInfo, _ := file.Stat()
 	splitFileName := strings.Split(file.Name(), "/")
+	fileName := splitFileName[len(splitFileName)-1]
 	err = s.db.Transaction(func(tx *gorm.DB) error {
 		job := &entities.Job{
 			ID:     id,
@@ -104,7 +105,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 			JobID:       id,
 			IsOutput:    false,
 			FileKey:     key,
-			FileName:    splitFileName[len(splitFileName)-1],
+			FileName:    fileName,
 			ContentType: contentType,
 			Size:        fileInfo.Size(),
 		})
@@ -115,11 +116,21 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 		return err
 	}
 
+	tempFileForWork, err := utils.NewTempFileWithName(fileName)
+	if err != nil {
+		return err
+	}
+	err = utils.Copy(file, tempFileForWork)
+	if err != nil {
+		return err
+	}
+
 	go func() {
-		err := s.processDetectText(id, key, file.Name())
+		err := s.processDetectText(id, key, tempFileForWork.Name())
 		if err != nil {
 			s.logger.Error(fmt.Sprintf("%v was occurred.", err))
 		}
+		_ = os.Remove(tempFileForWork.Name())
 	}()
 	return nil
 }

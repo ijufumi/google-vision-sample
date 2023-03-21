@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -16,4 +17,13 @@ func NewTempFileWithName(fileName string) (*os.File, error) {
 		return nil, err
 	}
 	return file, nil
+}
+
+func Copy(src *os.File, dst *os.File) error {
+	_, err := src.Seek(0, 0)
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(dst, src)
+	return err
 }
