@@ -12,28 +12,28 @@ import (
 type Orientation string
 
 const (
-	Orientation_None        = Orientation("0")
-	Orientation_TopLeft     = Orientation("1")
-	Orientation_TopRight    = Orientation("2")
-	Orientation_BottomRight = Orientation("3")
-	Orientation_BottomLeft  = Orientation("4")
-	Orientation_LeftTop     = Orientation("5")
-	Orientation_RightTop    = Orientation("6")
-	Orientation_RightBottom = Orientation("7")
-	Orientation_LeftBottom  = Orientation("8")
+	Orientation_None        = Orientation("None")
+	Orientation_TopLeft     = Orientation("TopLeft")
+	Orientation_TopRight    = Orientation("TopRight")
+	Orientation_BottomRight = Orientation("BottomRight")
+	Orientation_BottomLeft  = Orientation("BottomLeft")
+	Orientation_LeftTop     = Orientation("LeftTop")
+	Orientation_RightTop    = Orientation("RightTop")
+	Orientation_RightBottom = Orientation("RightBottom")
+	Orientation_LeftBottom  = Orientation("LeftBottom")
 )
 
 var identifyCommand = []string{"identify", "-format", "'%[orientation]'"}
 
 var orientationMap = map[string]Orientation{
-	"1": Orientation_TopLeft,
-	"2": Orientation_TopRight,
-	"3": Orientation_BottomRight,
-	"4": Orientation_BottomLeft,
-	"5": Orientation_LeftTop,
-	"6": Orientation_RightTop,
-	"7": Orientation_RightBottom,
-	"8": Orientation_LeftBottom,
+	"TopLeft":     Orientation_TopLeft,
+	"TopRight":    Orientation_TopRight,
+	"BottomRight": Orientation_BottomRight,
+	"BottomLeft":  Orientation_BottomLeft,
+	"LeftTop":     Orientation_LeftTop,
+	"RightTop":    Orientation_RightTop,
+	"RightBottom": Orientation_RightBottom,
+	"LeftBottom":  Orientation_LeftBottom,
 }
 
 type ImageConversionService interface {
@@ -57,17 +57,20 @@ func (s *imageConversionService) DetectOrientation(filePath string) (Orientation
 	s.logger.Info(fmt.Sprintf("command: %s", strings.Join(commands, " ")))
 	result, err := exec.Command(commands[0], commands[1:]...).Output()
 
-	s.logger.Info(fmt.Sprintf("result: %s", string(result)))
+	resultStr := strings.ReplaceAll(string(result), "'", "")
+	s.logger.Info(fmt.Sprintf("result: %s", resultStr))
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("error: %v", err))
 		return Orientation_None, err
 	}
 
-	if orientation, ok := orientationMap[string(result)]; ok {
-		return orientation, nil
+	orientation := Orientation_None
+	if _orientation, ok := orientationMap[resultStr]; ok {
+		orientation = _orientation
 	}
 
-	return Orientation_None, nil
+	s.logger.Info(fmt.Sprintf("orientation is %v", orientation))
+	return orientation, nil
 }
 
 func (s *imageConversionService) ConvertPoints(points []models.Vertices, orientation Orientation) [][]float64 {
