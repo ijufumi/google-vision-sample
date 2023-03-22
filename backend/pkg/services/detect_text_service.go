@@ -209,10 +209,8 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string) err
 							xArray = append(xArray, point[0])
 							yArray = append(yArray, point[1])
 						}
-						top := utils.MinInArray(yArray...)
-						bottom := utils.MaxInArray(yArray...)
-						left := utils.MinInArray(xArray...)
-						right := utils.MaxInArray(xArray...)
+						bottom, top := utils.MaxMinInArray(yArray...)
+						right, left := utils.MaxMinInArray(xArray...)
 						extractedText := &entities.ExtractedText{
 							ID:     utils.NewULID(),
 							JobID:  id,
