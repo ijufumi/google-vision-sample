@@ -110,9 +110,11 @@ func (s *imageConversionService) ConvertPoints(points []models.Vertices, orienta
 func (s *imageConversionService) convertPoint(point []float64, angle float64, middlePoint []float64) []float64 {
 	sin, cos := math.Sincos(angle * math.Pi / 180)
 
-	adjustPoint := []float64{point[0] - middlePoint[0], point[1] - middlePoint[1]}
-	adjustPoint[0] = adjustPoint[0]*cos - adjustPoint[1]*sin
-	adjustPoint[1] = adjustPoint[1]*cos + adjustPoint[0]*sin
+	x := point[0] - middlePoint[0]
+	y := point[1] - middlePoint[1]
+	adjustPoint := make([]float64, 2)
+	adjustPoint[0] = x*cos - y*sin
+	adjustPoint[1] = y*cos + x*sin
 
 	return []float64{adjustPoint[0] + middlePoint[0], adjustPoint[1] + middlePoint[1]}
 }
