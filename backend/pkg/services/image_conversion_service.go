@@ -87,11 +87,6 @@ func (s *imageConversionService) ConvertPoints(points []models.Vertices, orienta
 	y2, y1 := utils.MaxMinInArray(points[0].Y, points[1].Y, points[2].Y, points[3].Y)
 	m := []float64{(x1 + x2) / 2, (y1 + y2) / 2}
 
-	s.logger.Info(fmt.Sprintf("p1: %+v", p1))
-	s.logger.Info(fmt.Sprintf("p2: %+v", p2))
-	s.logger.Info(fmt.Sprintf("p3: %+v", p3))
-	s.logger.Info(fmt.Sprintf("p4: %+v", p4))
-	s.logger.Info(fmt.Sprintf("m: %+v", m))
 	angle := float64(0)
 	switch orientation {
 	case Orientation_BottomLeft:
@@ -118,17 +113,14 @@ func (s *imageConversionService) convertPoint(point []float64, sin, cos float64,
 	y := point[1] - middlePoint[1]
 	adjustPoint := make([]float64, 2)
 	adjustPoint[0] = x*cos - y*sin
-	adjustPoint[1] = y*cos + x*sin
+	adjustPoint[1] = x*sin + y*cos
 
 	return []float64{adjustPoint[0] + middlePoint[0], adjustPoint[1] + middlePoint[1]}
 }
 
 func (s *imageConversionService) convertToSinCos(angle float64) (sin float64, cos float64) {
-	s.logger.Info(fmt.Sprintf("angle is %v,", angle))
+	s.logger.Debug(fmt.Sprintf("angle is %v,", angle))
 	sin, cos = math.Sincos(angle * math.Pi / 180)
-	s.logger.Info(fmt.Sprintf("[before ]sin is %v, cos is %v", sin, cos))
-	sin = math.Round(sin)
-	cos = math.Round(cos)
-	s.logger.Info(fmt.Sprintf("[after ]sin is %v, cos is %v", sin, cos))
+	s.logger.Debug(fmt.Sprintf("sin is %v, cos is %v", sin, cos))
 	return
 }
