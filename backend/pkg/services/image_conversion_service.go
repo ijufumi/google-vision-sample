@@ -57,13 +57,13 @@ func (s *imageConversionService) DetectOrientation(filePath string) (Orientation
 	commands = append(commands, filePath)
 	s.logger.Info(fmt.Sprintf("command: %s", strings.Join(commands, " ")))
 	result, err := exec.Command(commands[0], commands[1:]...).Output()
-
-	resultStr := strings.ReplaceAll(string(result), "'", "")
-	s.logger.Info(fmt.Sprintf("result: %s", resultStr))
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("error: %v", err))
 		return Orientation_None, err
 	}
+
+	resultStr := strings.ReplaceAll(string(result), "'", "")
+	s.logger.Info(fmt.Sprintf("result: %s", resultStr))
 
 	orientation := Orientation_None
 	if _orientation, ok := orientationMap[resultStr]; ok {
