@@ -24,6 +24,8 @@ entity Files {
   * file_name: string
   * content_type: string
   * size: number
+  * width: number
+  * height: number
   * created_at: datetime
   * updated_at: datetime
     deleted_at: datetime
