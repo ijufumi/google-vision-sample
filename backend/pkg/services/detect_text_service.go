@@ -181,6 +181,8 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string, wid
 			FileName:    splitOutputFileKey[len(splitOutputFileKey)-1],
 			ContentType: "application/json",
 			Size:        fileStat.Size(),
+			Width:       0,
+			Height:      0,
 		})
 		if err != nil {
 			return err
