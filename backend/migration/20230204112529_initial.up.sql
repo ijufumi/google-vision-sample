@@ -34,6 +34,8 @@ create table if not exists job_files
     file_key     varchar(255) not null,
     file_name    varchar(255) not null,
     size         bigint       not null default 0,
+    width        bigint       not null default 0,
+    height       bigint       not null default 0,
     content_type varchar(100) not null default 'application/octet-stream',
     created_at   timestamp    not null,
     updated_at   timestamp    not null,
