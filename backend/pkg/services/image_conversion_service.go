@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap"
 	"math"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -25,6 +26,7 @@ const (
 )
 
 var identifyOrientationCommand = []string{"identify", "-format", "'%[orientation]'"}
+var identifyWidthHeightCommand = []string{"identify", "-format", "'%[width],%[height]'"}
 
 var orientationMap = map[string]Orientation{
 	"TopLeft":     Orientation_TopLeft,
@@ -54,8 +56,7 @@ func NewImageConversionService(logger *zap.Logger) ImageConversionService {
 }
 
 func (s *imageConversionService) DetectOrientation(filePath string) (Orientation, error) {
-	commands := identifyOrientationCommand
-	commands = append(commands, filePath)
+	commands := append(identifyOrientationCommand, filePath)
 	s.logger.Info(fmt.Sprintf("command: %s", strings.Join(commands, " ")))
 	result, err := exec.Command(commands[0], commands[1:]...).Output()
 	if err != nil {
@@ -76,7 +77,34 @@ func (s *imageConversionService) DetectOrientation(filePath string) (Orientation
 }
 
 func (s *imageConversionService) DetectSize(filePath string) (width float64, height float64, err error) {
-	return 0, 0, nil
+	commands := append(identifyWidthHeightCommand, filePath)
+	s.logger.Info(fmt.Sprintf("command: %s", strings.Join(commands, " ")))
+	result, err := exec.Command(commands[0], commands[1:]...).Output()
+	if err != nil {
+		s.logger.Error(fmt.Sprintf("error: %v", err))
+		return 0, 0, err
+	}
+
+	resultStr := strings.ReplaceAll(string(result), "'", "")
+	s.logger.Info(fmt.Sprintf("result: %s", resultStr))
+
+	splitValue := strings.Split(resultStr, ",")
+	if len(splitValue) != 2 {
+		return 0, 0, err
+	}
+
+	width, err = strconv.ParseFloat(splitValue[0], 64)
+	if err != nil {
+		s.logger.Error(fmt.Sprintf("error: %v", err))
+		return 0, 0, err
+	}
+	height, err = strconv.ParseFloat(splitValue[1], 64)
+	if err != nil {
+		s.logger.Error(fmt.Sprintf("error: %v", err))
+		return 0, 0, err
+	}
+
+	return
 }
 
 func (s *imageConversionService) ConvertPoints(points []models.Vertices, orientation Orientation) [][]float64 {
