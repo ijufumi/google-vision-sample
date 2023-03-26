@@ -3,7 +3,6 @@ package services
 import (
 	"fmt"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/models"
-	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"go.uber.org/zap"
 	"math"
 	"os/exec"
@@ -41,8 +40,8 @@ var orientationMap = map[string]Orientation{
 
 type ImageConversionService interface {
 	DetectOrientation(filePath string) (Orientation, error)
-	DetectSize(filePath string) (width float64, height float64, err error)
-	ConvertPoints(points []models.Vertices, orientation Orientation) [][]float64
+	DetectSize(filePath string) (width int64, height int64, err error)
+	ConvertPoints(points []models.Vertices, orientation Orientation, width, height int64) [][]float64
 }
 
 type imageConversionService struct {
@@ -76,7 +75,7 @@ func (s *imageConversionService) DetectOrientation(filePath string) (Orientation
 	return orientation, nil
 }
 
-func (s *imageConversionService) DetectSize(filePath string) (width float64, height float64, err error) {
+func (s *imageConversionService) DetectSize(filePath string) (width int64, height int64, err error) {
 	commands := append(identifyWidthHeightCommand, filePath)
 	s.logger.Info(fmt.Sprintf("command: %s", strings.Join(commands, " ")))
 	result, err := exec.Command(commands[0], commands[1:]...).Output()
@@ -93,12 +92,12 @@ func (s *imageConversionService) DetectSize(filePath string) (width float64, hei
 		return 0, 0, err
 	}
 
-	width, err = strconv.ParseFloat(splitValue[0], 64)
+	width, err = strconv.ParseInt(splitValue[0], 10, 64)
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("error: %v", err))
 		return 0, 0, err
 	}
-	height, err = strconv.ParseFloat(splitValue[1], 64)
+	height, err = strconv.ParseInt(splitValue[1], 10, 64)
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("error: %v", err))
 		return 0, 0, err
@@ -107,7 +106,7 @@ func (s *imageConversionService) DetectSize(filePath string) (width float64, hei
 	return
 }
 
-func (s *imageConversionService) ConvertPoints(points []models.Vertices, orientation Orientation) [][]float64 {
+func (s *imageConversionService) ConvertPoints(points []models.Vertices, orientation Orientation, width, height int64) [][]float64 {
 	if len(points) != 4 {
 		s.logger.Warn("point is invalid")
 		return [][]float64{}
@@ -116,9 +115,7 @@ func (s *imageConversionService) ConvertPoints(points []models.Vertices, orienta
 	p2 := []float64{points[1].X, points[1].Y}
 	p3 := []float64{points[2].X, points[2].Y}
 	p4 := []float64{points[3].X, points[3].Y}
-	x2, x1 := utils.MaxMinInArray(points[0].X, points[1].X, points[2].X, points[3].X)
-	y2, y1 := utils.MaxMinInArray(points[0].Y, points[1].Y, points[2].Y, points[3].Y)
-	m := []float64{(x1 + x2) / 2, (y1 + y2) / 2}
+	m := []float64{float64(width / 2), float64(height / 2)}
 
 	angle := float64(0)
 	switch orientation {

@@ -91,6 +91,8 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 	fileInfo, _ := file.Stat()
 	splitFileName := strings.Split(file.Name(), "/")
 	fileName := splitFileName[len(splitFileName)-1]
+	width, height := int64(0), int64(0)
+
 	err = s.db.Transaction(func(tx *gorm.DB) error {
 		job := &entities.Job{
 			ID:     id,
@@ -100,6 +102,11 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 		if err != nil {
 			return err
 		}
+		width, height, err = s.imageConversionService.DetectSize(file.Name())
+		if err != nil {
+			return err
+		}
+
 		err = s.jobFileRepository.Create(tx, &entities.JobFile{
 			ID:          inputFileID,
 			JobID:       id,
@@ -108,6 +115,8 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 			FileName:    fileName,
 			ContentType: contentType,
 			Size:        fileInfo.Size(),
+			Width:       width,
+			Height:      height,
 		})
 		return err
 	})
@@ -126,7 +135,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 	}
 
 	go func() {
-		err := s.processDetectText(id, key, tempFileForWork.Name())
+		err := s.processDetectText(id, key, tempFileForWork.Name(), width, height)
 		if err != nil {
 			s.logger.Error(fmt.Sprintf("%v was occurred.", err))
 		}
@@ -135,7 +144,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 	return nil
 }
 
-func (s *detectTextService) processDetectText(id, key, imageFilePath string) error {
+func (s *detectTextService) processDetectText(id, key, imageFilePath string, width, height int64) error {
 	job, err := s.jobRepository.GetByID(s.db, id)
 	if err != nil {
 		return err
@@ -202,7 +211,7 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string) err
 							}
 						}
 						vertices := paragraph.BoundingBox.Vertices
-						points := s.imageConversionService.ConvertPoints(vertices, orientation)
+						points := s.imageConversionService.ConvertPoints(vertices, orientation, width, height)
 						xArray := make([]float64, 0)
 						yArray := make([]float64, 0)
 						for _, point := range points {
