@@ -24,7 +24,7 @@ const (
 	Orientation_LeftBottom  = Orientation("LeftBottom")
 )
 
-var identifyCommand = []string{"identify", "-format", "'%[orientation]'"}
+var identifyOrientationCommand = []string{"identify", "-format", "'%[orientation]'"}
 
 var orientationMap = map[string]Orientation{
 	"TopLeft":     Orientation_TopLeft,
@@ -39,6 +39,7 @@ var orientationMap = map[string]Orientation{
 
 type ImageConversionService interface {
 	DetectOrientation(filePath string) (Orientation, error)
+	DetectSize(filePath string) (width float64, height float64, err error)
 	ConvertPoints(points []models.Vertices, orientation Orientation) [][]float64
 }
 
@@ -53,7 +54,7 @@ func NewImageConversionService(logger *zap.Logger) ImageConversionService {
 }
 
 func (s *imageConversionService) DetectOrientation(filePath string) (Orientation, error) {
-	commands := identifyCommand
+	commands := identifyOrientationCommand
 	commands = append(commands, filePath)
 	s.logger.Info(fmt.Sprintf("command: %s", strings.Join(commands, " ")))
 	result, err := exec.Command(commands[0], commands[1:]...).Output()
@@ -72,6 +73,10 @@ func (s *imageConversionService) DetectOrientation(filePath string) (Orientation
 
 	s.logger.Info(fmt.Sprintf("orientation is %v", orientation))
 	return orientation, nil
+}
+
+func (s *imageConversionService) DetectSize(filePath string) (width float64, height float64, err error) {
+	return 0, 0, nil
 }
 
 func (s *imageConversionService) ConvertPoints(points []models.Vertices, orientation Orientation) [][]float64 {
