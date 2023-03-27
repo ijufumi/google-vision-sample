@@ -15,14 +15,14 @@ type Orientation string
 
 const (
 	Orientation_None        = Orientation("None")
-	Orientation_TopLeft     = Orientation("TopLeft")
-	Orientation_TopRight    = Orientation("TopRight")
-	Orientation_BottomRight = Orientation("BottomRight")
-	Orientation_BottomLeft  = Orientation("BottomLeft")
-	Orientation_LeftTop     = Orientation("LeftTop")
-	Orientation_RightTop    = Orientation("RightTop")
-	Orientation_RightBottom = Orientation("RightBottom")
-	Orientation_LeftBottom  = Orientation("LeftBottom")
+	Orientation_TopLeft     = Orientation("TopLeft")     // 1
+	Orientation_TopRight    = Orientation("TopRight")    // 2
+	Orientation_BottomRight = Orientation("BottomRight") // 3
+	Orientation_BottomLeft  = Orientation("BottomLeft")  // 4
+	Orientation_LeftTop     = Orientation("LeftTop")     // 5
+	Orientation_RightTop    = Orientation("RightTop")    // 6
+	Orientation_RightBottom = Orientation("RightBottom") // 7
+	Orientation_LeftBottom  = Orientation("LeftBottom")  // 8
 )
 
 var identifyOrientationCommand = []string{"identify", "-format", "'%[orientation]'"}
