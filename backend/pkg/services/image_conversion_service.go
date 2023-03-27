@@ -121,11 +121,11 @@ func (s *imageConversionService) ConvertPoints(points []models.Vertices, orienta
 	angle := float64(0)
 	switch orientation {
 	case Orientation_BottomLeft:
-		angle = 180
+		angle = 90
 	case Orientation_RightTop:
 		angle = 270
 	case Orientation_LeftBottom:
-		angle = 90
+		angle = 180
 	default:
 		// nothing
 	}
