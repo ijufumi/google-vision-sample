@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/models"
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"math"
 	"os/exec"
@@ -89,7 +90,7 @@ func (s *imageConversionService) DetectSize(filePath string) (width int64, heigh
 
 	splitValue := strings.Split(resultStr, ",")
 	if len(splitValue) != 2 {
-		return 0, 0, err
+		return 0, 0, errors.New(fmt.Sprintf("result was invalid value: %v", resultStr))
 	}
 
 	width, err = strconv.ParseInt(splitValue[0], 10, 64)
