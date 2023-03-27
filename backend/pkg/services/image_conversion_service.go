@@ -112,18 +112,22 @@ func (s *imageConversionService) ConvertPoints(points []models.Vertices, orienta
 		s.logger.Warn("point is invalid")
 		return [][]float64{}
 	}
-	p1 := []float64{points[0].X, points[0].Y}
-	p2 := []float64{points[1].X, points[1].Y}
-	p3 := []float64{points[2].X, points[2].Y}
-	p4 := []float64{points[3].X, points[3].Y}
-	m := []float64{float64(width / 2), float64(height / 2)}
-
+	floatWidth := float64(width)
+	floatHeight := float64(height)
+	p1 := []float64{floatWidth - points[0].X, floatHeight - points[0].Y}
+	p2 := []float64{floatWidth - points[1].X, floatHeight - points[1].Y}
+	p3 := []float64{floatWidth - points[2].X, floatHeight - points[2].Y}
+	p4 := []float64{floatWidth - points[3].X, floatHeight - points[3].Y}
+	m := []float64{floatWidth / 2, floatHeight / 2}
+	afterM := m
 	angle := float64(0)
 	switch orientation {
 	case Orientation_BottomLeft:
 		angle = 90
+		afterM = []float64{afterM[1], afterM[0]}
 	case Orientation_RightTop:
 		angle = 270
+		afterM = []float64{afterM[1], afterM[0]}
 	case Orientation_LeftBottom:
 		angle = 180
 	default:
@@ -131,22 +135,22 @@ func (s *imageConversionService) ConvertPoints(points []models.Vertices, orienta
 	}
 
 	sin, cos := s.convertToSinCos(angle)
-	p1 = s.convertPoint(p1, sin, cos, m)
-	p2 = s.convertPoint(p2, sin, cos, m)
-	p3 = s.convertPoint(p3, sin, cos, m)
-	p4 = s.convertPoint(p4, sin, cos, m)
+	p1 = s.convertPoint(p1, sin, cos, m, afterM)
+	p2 = s.convertPoint(p2, sin, cos, m, afterM)
+	p3 = s.convertPoint(p3, sin, cos, m, afterM)
+	p4 = s.convertPoint(p4, sin, cos, m, afterM)
 
 	return [][]float64{p1, p2, p3, p4}
 }
 
-func (s *imageConversionService) convertPoint(point []float64, sin, cos float64, middlePoint []float64) []float64 {
-	x := point[0] - middlePoint[0]
-	y := point[1] - middlePoint[1]
+func (s *imageConversionService) convertPoint(point []float64, sin, cos float64, beforeMiddlePoint, afterMiddlePoint []float64) []float64 {
+	x := point[0] - beforeMiddlePoint[0]
+	y := point[1] - beforeMiddlePoint[1]
 	adjustPoint := make([]float64, 2)
 	adjustPoint[0] = x*cos - y*sin
 	adjustPoint[1] = x*sin + y*cos
 
-	return []float64{adjustPoint[0] + middlePoint[0], adjustPoint[1] + middlePoint[1]}
+	return []float64{adjustPoint[0] + afterMiddlePoint[0], adjustPoint[1] + afterMiddlePoint[1]}
 }
 
 func (s *imageConversionService) convertToSinCos(angle float64) (sin float64, cos float64) {
