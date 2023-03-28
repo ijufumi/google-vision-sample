@@ -16,10 +16,21 @@ type TextAnnotation struct {
 }
 
 type BoundingPoly struct {
-	Vertices []Vertices `json:"vertices"`
+	Vertices Vertices `json:"vertices"`
 }
 
-type Vertices struct {
+type Vertices []Vertex
+
+func (v *Vertices) ToFloat() [][]float64 {
+	value := make([][]float64, 0)
+
+	for _, vertex := range *v {
+		value = append(value, []float64{vertex.X, vertex.Y})
+	}
+	return value
+}
+
+type Vertex struct {
 	X float64 `json:"x"`
 	Y float64 `json:"y"`
 }
@@ -40,7 +51,7 @@ type Block struct {
 }
 
 type BoundingBox struct {
-	Vertices []Vertices `json:"vertices"`
+	Vertices Vertices `json:"vertices"`
 }
 
 type Paragraph struct {

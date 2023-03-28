@@ -212,8 +212,11 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string, wid
 								texts += symbol.Text
 							}
 						}
-						vertices := paragraph.BoundingBox.Vertices
-						points := s.imageConversionService.ConvertPoints(vertices, orientation, width, height)
+						points := paragraph.BoundingBox.Vertices.ToFloat()
+						if orientation.RequiresRotation() {
+							points = s.imageConversionService.ConvertPoints(points, orientation, width, height)
+						}
+
 						xArray := make([]float64, 0)
 						yArray := make([]float64, 0)
 						for _, point := range points {

@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/models"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"math"
@@ -25,6 +24,14 @@ const (
 	Orientation_LeftBottom  = Orientation("LeftBottom")  // 8
 )
 
+func (o Orientation) RequiresRotation() bool {
+	switch o {
+	case Orientation_BottomLeft, Orientation_RightTop, Orientation_LeftBottom:
+		return true
+	}
+	return false
+}
+
 var identifyOrientationCommand = []string{"identify", "-format", "'%[orientation]'"}
 var identifyWidthHeightCommand = []string{"identify", "-format", "'%[width],%[height]'"}
 
@@ -42,7 +49,7 @@ var orientationMap = map[string]Orientation{
 type ImageConversionService interface {
 	DetectOrientation(filePath string) (Orientation, error)
 	DetectSize(filePath string) (width int64, height int64, err error)
-	ConvertPoints(points []models.Vertices, orientation Orientation, width, height int64) [][]float64
+	ConvertPoints(points [][]float64, orientation Orientation, width, height int64) [][]float64
 }
 
 type imageConversionService struct {
@@ -107,17 +114,17 @@ func (s *imageConversionService) DetectSize(filePath string) (width int64, heigh
 	return
 }
 
-func (s *imageConversionService) ConvertPoints(points []models.Vertices, orientation Orientation, width, height int64) [][]float64 {
+func (s *imageConversionService) ConvertPoints(points [][]float64, orientation Orientation, width, height int64) [][]float64 {
 	if len(points) != 4 {
 		s.logger.Warn("point is invalid")
-		return [][]float64{}
+		return points
 	}
 	floatWidth := float64(width)
 	floatHeight := float64(height)
-	p1 := []float64{floatWidth - points[0].X, floatHeight - points[0].Y}
-	p2 := []float64{floatWidth - points[1].X, floatHeight - points[1].Y}
-	p3 := []float64{floatWidth - points[2].X, floatHeight - points[2].Y}
-	p4 := []float64{floatWidth - points[3].X, floatHeight - points[3].Y}
+	p1 := []float64{floatWidth - points[0][0], floatHeight - points[0][1]}
+	p2 := []float64{floatWidth - points[1][0], floatHeight - points[1][1]}
+	p3 := []float64{floatWidth - points[2][0], floatHeight - points[2][1]}
+	p4 := []float64{floatWidth - points[3][0], floatHeight - points[3][1]}
 	m := []float64{floatWidth / 2, floatHeight / 2}
 	afterM := m
 	angle := float64(0)
