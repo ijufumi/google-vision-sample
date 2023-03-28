@@ -69,5 +69,6 @@ require (
 	google.golang.org/genproto v0.0.0-20230216225411-c8e22ba71e44 // indirect
 	google.golang.org/grpc v1.53.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
+	gopkg.in/gographics/imagick.v3 v3.4.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
