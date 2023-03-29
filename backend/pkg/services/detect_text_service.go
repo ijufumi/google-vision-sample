@@ -275,42 +275,42 @@ func (s *detectTextService) DeleteResult(id string) error {
 }
 
 func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) *models.Job {
-	extractedTexts := make([]models.ExtractedText, 0)
 	files := make([]models.JobFile, 0)
 
-	for _, extractedText := range entity.ExtractedTexts {
-		extractedTexts = append(extractedTexts, models.ExtractedText{
-			ID:        extractedText.ID,
-			JobID:     extractedText.JobID,
-			Text:      extractedText.Text,
-			Top:       extractedText.Top,
-			Bottom:    extractedText.Bottom,
-			Left:      extractedText.Left,
-			Right:     extractedText.Right,
-			CreatedAt: extractedText.CreatedAt.Unix(),
-			UpdatedAt: extractedText.UpdatedAt.Unix(),
-		})
-	}
 	for _, file := range entity.JobFiles {
+		extractedTexts := make([]*models.ExtractedText, 0)
+		for _, extractedText := range file.ExtractedTexts {
+			extractedTexts = append(extractedTexts, &models.ExtractedText{
+				ID:        extractedText.ID,
+				JobID:     extractedText.JobID,
+				Text:      extractedText.Text,
+				Top:       extractedText.Top,
+				Bottom:    extractedText.Bottom,
+				Left:      extractedText.Left,
+				Right:     extractedText.Right,
+				CreatedAt: extractedText.CreatedAt.Unix(),
+				UpdatedAt: extractedText.UpdatedAt.Unix(),
+			})
+		}
 		files = append(files, models.JobFile{
-			ID:          file.ID,
-			JobID:       file.JobID,
-			IsOutput:    file.IsOutput,
-			FileKey:     file.FileKey,
-			FileName:    file.FileName,
-			ContentType: file.ContentType,
-			Size:        file.Size,
-			CreatedAt:   file.CreatedAt.Unix(),
-			UpdatedAt:   file.UpdatedAt.Unix(),
+			ID:             file.ID,
+			JobID:          file.JobID,
+			IsOutput:       file.IsOutput,
+			FileKey:        file.FileKey,
+			FileName:       file.FileName,
+			ContentType:    file.ContentType,
+			Size:           file.Size,
+			CreatedAt:      file.CreatedAt.Unix(),
+			UpdatedAt:      file.UpdatedAt.Unix(),
+			ExtractedTexts: extractedTexts,
 		})
 	}
 	return &models.Job{
-		ID:             entity.ID,
-		Status:         entity.Status,
-		CreatedAt:      entity.CreatedAt.Unix(),
-		UpdatedAt:      entity.UpdatedAt.Unix(),
-		ExtractedTexts: extractedTexts,
-		JobFiles:       files,
+		ID:        entity.ID,
+		Status:    entity.Status,
+		CreatedAt: entity.CreatedAt.Unix(),
+		UpdatedAt: entity.UpdatedAt.Unix(),
+		JobFiles:  files,
 	}
 }
 
