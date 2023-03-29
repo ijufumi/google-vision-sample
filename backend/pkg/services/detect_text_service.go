@@ -91,7 +91,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 	fileInfo, _ := file.Stat()
 	splitFileName := strings.Split(file.Name(), "/")
 	fileName := splitFileName[len(splitFileName)-1]
-	width, height := int64(0), int64(0)
+	width, height := uint(0), uint(0)
 
 	err = s.db.Transaction(func(tx *gorm.DB) error {
 		job := &entities.Job{
@@ -114,7 +114,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 			FileKey:     key,
 			FileName:    fileName,
 			ContentType: contentType,
-			Size:        fileInfo.Size(),
+			Size:        uint(fileInfo.Size()),
 			Width:       width,
 			Height:      height,
 		})
@@ -144,7 +144,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 	return nil
 }
 
-func (s *detectTextService) processDetectText(id, key, imageFilePath string, width, height int64) error {
+func (s *detectTextService) processDetectText(id, key, imageFilePath string, width, height uint) error {
 	job, err := s.jobRepository.GetByID(s.db, id)
 	if err != nil {
 		return err
@@ -180,7 +180,7 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string, wid
 			FileKey:     outputFileKey,
 			FileName:    splitOutputFileKey[len(splitOutputFileKey)-1],
 			ContentType: "application/json",
-			Size:        fileStat.Size(),
+			Size:        uint(fileStat.Size()),
 			Width:       0,
 			Height:      0,
 		})
@@ -213,9 +213,7 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string, wid
 							}
 						}
 						points := paragraph.BoundingBox.Vertices.ToFloat()
-						if orientation.RequiresRotation() {
-							points = s.imageConversionService.ConvertPoints(points, orientation, width, height)
-						}
+						points = s.imageConversionService.ConvertPoints(points, orientation, width, height)
 
 						xArray := make([]float64, 0)
 						yArray := make([]float64, 0)

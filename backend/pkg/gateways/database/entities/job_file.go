@@ -10,7 +10,7 @@ type JobFile struct {
 	FileKey     string
 	FileName    string
 	ContentType string
-	Size        int64
-	Width       int64
-	Height      int64
+	Size        uint
+	Width       uint
+	Height      uint
 }

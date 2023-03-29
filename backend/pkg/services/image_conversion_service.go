@@ -2,54 +2,15 @@ package services
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
+	"gopkg.in/gographics/imagick.v3/imagick"
 	"math"
-	"os/exec"
-	"strconv"
-	"strings"
 )
-
-type Orientation string
-
-const (
-	Orientation_None        = Orientation("None")
-	Orientation_TopLeft     = Orientation("TopLeft")     // 1
-	Orientation_TopRight    = Orientation("TopRight")    // 2
-	Orientation_BottomRight = Orientation("BottomRight") // 3
-	Orientation_BottomLeft  = Orientation("BottomLeft")  // 4
-	Orientation_LeftTop     = Orientation("LeftTop")     // 5
-	Orientation_RightTop    = Orientation("RightTop")    // 6
-	Orientation_RightBottom = Orientation("RightBottom") // 7
-	Orientation_LeftBottom  = Orientation("LeftBottom")  // 8
-)
-
-func (o Orientation) RequiresRotation() bool {
-	switch o {
-	case Orientation_BottomLeft, Orientation_RightTop, Orientation_LeftBottom:
-		return true
-	}
-	return false
-}
-
-var identifyOrientationCommand = []string{"identify", "-format", "'%[orientation]'"}
-var identifyWidthHeightCommand = []string{"identify", "-format", "'%[width],%[height]'"}
-
-var orientationMap = map[string]Orientation{
-	"TopLeft":     Orientation_TopLeft,
-	"TopRight":    Orientation_TopRight,
-	"BottomRight": Orientation_BottomRight,
-	"BottomLeft":  Orientation_BottomLeft,
-	"LeftTop":     Orientation_LeftTop,
-	"RightTop":    Orientation_RightTop,
-	"RightBottom": Orientation_RightBottom,
-	"LeftBottom":  Orientation_LeftBottom,
-}
 
 type ImageConversionService interface {
-	DetectOrientation(filePath string) (Orientation, error)
-	DetectSize(filePath string) (width int64, height int64, err error)
-	ConvertPoints(points [][]float64, orientation Orientation, width, height int64) [][]float64
+	DetectOrientation(filePath string) (imagick.OrientationType, error)
+	DetectSize(filePath string) (width, height uint, err error)
+	ConvertPoints(points [][]float64, orientation imagick.OrientationType, width, height uint) [][]float64
 }
 
 type imageConversionService struct {
@@ -62,59 +23,42 @@ func NewImageConversionService(logger *zap.Logger) ImageConversionService {
 	}
 }
 
-func (s *imageConversionService) DetectOrientation(filePath string) (Orientation, error) {
-	commands := append(identifyOrientationCommand, filePath)
-	s.logger.Info(fmt.Sprintf("command: %s", strings.Join(commands, " ")))
-	result, err := exec.Command(commands[0], commands[1:]...).Output()
+func (s *imageConversionService) DetectOrientation(filePath string) (imagick.OrientationType, error) {
+	imagick.Initialize()
+	defer imagick.Terminate()
+
+	magickWand := imagick.NewMagickWand()
+	defer magickWand.Destroy()
+
+	err := magickWand.ReadImage(filePath)
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("error: %v", err))
-		return Orientation_None, err
+		return imagick.ORIENTATION_UNDEFINED, err
 	}
-
-	resultStr := strings.ReplaceAll(string(result), "'", "")
-	s.logger.Info(fmt.Sprintf("result: %s", resultStr))
-
-	orientation := Orientation_None
-	if _orientation, ok := orientationMap[resultStr]; ok {
-		orientation = _orientation
-	}
-
+	orientation := magickWand.GetOrientation()
 	s.logger.Info(fmt.Sprintf("orientation is %v", orientation))
 	return orientation, nil
 }
 
-func (s *imageConversionService) DetectSize(filePath string) (width int64, height int64, err error) {
-	commands := append(identifyWidthHeightCommand, filePath)
-	s.logger.Info(fmt.Sprintf("command: %s", strings.Join(commands, " ")))
-	result, err := exec.Command(commands[0], commands[1:]...).Output()
+func (s *imageConversionService) DetectSize(filePath string) (width, height uint, err error) {
+	imagick.Initialize()
+	defer imagick.Terminate()
+
+	magickWand := imagick.NewMagickWand()
+	defer magickWand.Destroy()
+
+	err = magickWand.ReadImage(filePath)
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("error: %v", err))
-		return 0, 0, err
+		return
 	}
-
-	resultStr := strings.ReplaceAll(string(result), "'", "")
-	s.logger.Info(fmt.Sprintf("result: %s", resultStr))
-
-	splitValue := strings.Split(resultStr, ",")
-	if len(splitValue) != 2 {
-		return 0, 0, errors.New(fmt.Sprintf("result was invalid value: %v", resultStr))
-	}
-
-	width, err = strconv.ParseInt(splitValue[0], 10, 64)
-	if err != nil {
-		s.logger.Error(fmt.Sprintf("error: %v", err))
-		return 0, 0, err
-	}
-	height, err = strconv.ParseInt(splitValue[1], 10, 64)
-	if err != nil {
-		s.logger.Error(fmt.Sprintf("error: %v", err))
-		return 0, 0, err
-	}
+	height = magickWand.GetImageHeight()
+	width = magickWand.GetImageWidth()
 
 	return
 }
 
-func (s *imageConversionService) ConvertPoints(points [][]float64, orientation Orientation, width, height int64) [][]float64 {
+func (s *imageConversionService) ConvertPoints(points [][]float64, orientation imagick.OrientationType, width, height uint) [][]float64 {
 	if len(points) != 4 {
 		s.logger.Warn("point is invalid")
 		return points
@@ -129,16 +73,17 @@ func (s *imageConversionService) ConvertPoints(points [][]float64, orientation O
 	afterM := m
 	angle := float64(0)
 	switch orientation {
-	case Orientation_BottomLeft:
+	case imagick.ORIENTATION_BOTTOM_LEFT:
 		angle = 90
 		afterM = []float64{afterM[1], afterM[0]}
-	case Orientation_RightTop:
+	case imagick.ORIENTATION_RIGHT_TOP:
 		angle = 270
 		afterM = []float64{afterM[1], afterM[0]}
-	case Orientation_LeftBottom:
+	case imagick.ORIENTATION_LEFT_BOTTOM:
 		angle = 180
 	default:
 		// nothing
+		return points
 	}
 
 	sin, cos := s.convertToSinCos(angle)

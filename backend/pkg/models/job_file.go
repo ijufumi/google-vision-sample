@@ -7,7 +7,7 @@ type JobFile struct {
 	FileKey     string `json:"fileKey"`
 	FileName    string `json:"fileName"`
 	ContentType string `json:"contentType"`
-	Size        int64  `json:"size"`
+	Size        uint   `json:"size"`
 	CreatedAt   int64  `json:"createdAt"`
 	UpdatedAt   int64  `json:"updatedAt"`
 }
