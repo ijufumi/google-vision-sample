@@ -14,7 +14,7 @@ FROM debian:bullseye-slim as deploy
 WORKDIR /app
 
 RUN apt update \
-&& apt install -y ca-certificates imagemagick \
+&& apt install -y ca-certificates imagemagick libmagickwand-dev \
 && rm -rf /var/cache/apt
 
 COPY --from=build /app/app /app/app
