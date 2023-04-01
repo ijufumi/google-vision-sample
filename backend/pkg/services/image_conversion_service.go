@@ -3,7 +3,7 @@ package services
 import (
 	"fmt"
 	"go.uber.org/zap"
-	"gopkg.in/gographics/imagick.v3/imagick"
+	"gopkg.in/gographics/imagick.v2/imagick"
 	"math"
 )
 
