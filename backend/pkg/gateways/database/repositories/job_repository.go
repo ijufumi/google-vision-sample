@@ -34,8 +34,8 @@ func (r *jobRepository) GetAll(db *gorm.DB) ([]*entities.Job, error) {
 func (r *jobRepository) GetByID(db *gorm.DB, id string) (*entities.Job, error) {
 	var result entities.Job
 	if err := db.
-		Preload("ExtractedTexts").
 		Preload("JobFiles").
+		Preload("JobFiles.ExtractedTexts").
 		Where("id = ?", id).First(&result).Error; err != nil {
 		return nil, errors.Wrap(err, "JobRepository#GetByID")
 	}

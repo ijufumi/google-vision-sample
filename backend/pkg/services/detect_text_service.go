@@ -173,8 +173,9 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string, wid
 		fileStat, _ := outputFile.Stat()
 		outputFileKey := queryFiles[0]
 		splitOutputFileKey := strings.Split(outputFileKey, "/")
+		outputFileID := utils.NewULID()
 		err = s.jobFileRepository.Create(tx, &entities.JobFile{
-			ID:          utils.NewULID(),
+			ID:          outputFileID,
 			JobID:       id,
 			IsOutput:    true,
 			FileKey:     outputFileKey,
@@ -224,13 +225,13 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string, wid
 						bottom, top := utils.MaxMinInArray(yArray...)
 						right, left := utils.MaxMinInArray(xArray...)
 						extractedText := &entities.ExtractedText{
-							ID:     utils.NewULID(),
-							JobID:  id,
-							Text:   texts,
-							Top:    top,
-							Bottom: bottom,
-							Left:   left,
-							Right:  right,
+							ID:        utils.NewULID(),
+							JobFileID: outputFileID,
+							Text:      texts,
+							Top:       top,
+							Bottom:    bottom,
+							Left:      left,
+							Right:     right,
 						}
 
 						extractedTexts = append(extractedTexts, extractedText)
@@ -251,10 +252,6 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string, wid
 
 func (s *detectTextService) DeleteResult(id string) error {
 	return s.db.Transaction(func(tx *gorm.DB) error {
-		err := s.extractedTextRepository.DeleteByExtractionResultID(tx, id)
-		if err != nil {
-			return err
-		}
 		files, err := s.jobFileRepository.GetByJobID(tx, id)
 		if err != nil {
 			return err
@@ -263,6 +260,10 @@ func (s *detectTextService) DeleteResult(id string) error {
 			err = s.storageAPIClient.DeleteFile(file.FileKey)
 			if err != nil {
 				s.logger.Error(err.Error())
+			}
+			err := s.extractedTextRepository.DeleteByJobFileID(tx, file.ID)
+			if err != nil {
+				return err
 			}
 		}
 		err = s.jobFileRepository.DeleteByJobID(tx, id)
@@ -282,7 +283,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 		for _, extractedText := range file.ExtractedTexts {
 			extractedTexts = append(extractedTexts, &models.ExtractedText{
 				ID:        extractedText.ID,
-				JobID:     extractedText.JobID,
+				JobFileID: extractedText.JobFileID,
 				Text:      extractedText.Text,
 				Top:       extractedText.Top,
 				Bottom:    extractedText.Bottom,
