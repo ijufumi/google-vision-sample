@@ -113,7 +113,7 @@ const ResultPage : FC<Props> = () => {
               />
             </Layer>
             <Layer>
-              {job?.extractedTexts.map(result => {
+              {job?.outputFile?.extractedTexts.map(result => {
                 return <Rect
                   key={result.id}
                   x={result.left * scale}
@@ -136,7 +136,7 @@ const ResultPage : FC<Props> = () => {
               <Table.TextHeaderCell>Texts</Table.TextHeaderCell>
             </Table.Head>
             <Table.Body overflow="scroll" height="calc(100% - 40px)">
-              {job?.extractedTexts.map((result) => {
+              {job?.outputFile?.extractedTexts.map((result) => {
                 return (
                   <Table.Row key={result.id} style={selectedTextId === result.id ? selectedStyle : basicStyle}>
                     <Table.TextCell onClick={() => handleSelectText(result)}>{result.text}</Table.TextCell>
