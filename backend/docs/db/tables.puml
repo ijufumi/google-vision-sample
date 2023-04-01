@@ -46,6 +46,6 @@ entity ExtractedTexts {
 }
 
 Jobs ||..o{ JobFiles
-JobFiles ||..o{ ExtractedTexts
+JobFiles ||..ro{ ExtractedTexts
 
 @enduml
