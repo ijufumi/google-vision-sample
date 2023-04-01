@@ -35,7 +35,7 @@ func (s *imageConversionService) DetectOrientation(filePath string) (imagick.Ori
 		s.logger.Error(fmt.Sprintf("error: %v", err))
 		return imagick.ORIENTATION_UNDEFINED, err
 	}
-	orientation := magickWand.GetOrientation()
+	orientation := magickWand.GetImageOrientation()
 	s.logger.Info(fmt.Sprintf("orientation is %v", orientation))
 	return orientation, nil
 }
