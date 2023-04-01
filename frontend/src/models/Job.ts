@@ -1,4 +1,3 @@
-import ExtractedText, { Props as ExtractedTextProps } from "./ExtractedText"
 import JobFile, { Props as JobFileProps } from "./JobFile"
 import { formatToDate } from "../components/dates"
 
@@ -13,7 +12,6 @@ export interface Props {
   status: JobStatus
   createdAt: number
   updatedAt: number
-  extractedTexts: ExtractedTextProps[]
   jobFiles: JobFileProps[]
 }
 
@@ -22,7 +20,6 @@ export default class Job {
   readonly status: JobStatus
   readonly createdAt: number
   readonly updatedAt: number
-  readonly extractedTexts: ExtractedText[]
   readonly jobFiles: JobFile[]
 
   constructor(props: Props) {
@@ -30,9 +27,6 @@ export default class Job {
     this.status = props.status
     this.createdAt = props.createdAt
     this.updatedAt = props.updatedAt
-    this.extractedTexts = props.extractedTexts.map(
-      (p) => new ExtractedText(p)
-    )
     this.jobFiles = props.jobFiles.map(f => new JobFile(f))
   }
 

@@ -1,4 +1,5 @@
 import { formatToDate } from "../components/dates"
+import ExtractedText, { Props as ExtractedTextProps } from "./ExtractedText"
 
 export interface Props {
   id: string
@@ -9,6 +10,7 @@ export interface Props {
   contentType: string
   createdAt: number
   updatedAt: number
+  extractedTexts: ExtractedTextProps[]
 }
 
 export default class JobFile {
@@ -20,6 +22,7 @@ export default class JobFile {
   readonly contentType: string
   readonly createdAt: number
   readonly updatedAt: number
+  readonly extractedTexts: ExtractedText[]
 
   constructor(props: Props) {
     this.id = props.id
@@ -30,6 +33,9 @@ export default class JobFile {
     this.contentType = props.contentType
     this.createdAt = props.createdAt
     this.updatedAt = props.updatedAt
+    this.extractedTexts = props.extractedTexts.map(
+      (p) => new ExtractedText(p)
+    )
   }
 
   get readableCreatedAt() {

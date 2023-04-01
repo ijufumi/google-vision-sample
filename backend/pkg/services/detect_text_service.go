@@ -91,7 +91,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 	fileInfo, _ := file.Stat()
 	splitFileName := strings.Split(file.Name(), "/")
 	fileName := splitFileName[len(splitFileName)-1]
-	width, height := int64(0), int64(0)
+	width, height := uint(0), uint(0)
 
 	err = s.db.Transaction(func(tx *gorm.DB) error {
 		job := &entities.Job{
@@ -114,7 +114,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 			FileKey:     key,
 			FileName:    fileName,
 			ContentType: contentType,
-			Size:        fileInfo.Size(),
+			Size:        uint(fileInfo.Size()),
 			Width:       width,
 			Height:      height,
 		})
@@ -144,7 +144,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 	return nil
 }
 
-func (s *detectTextService) processDetectText(id, key, imageFilePath string, width, height int64) error {
+func (s *detectTextService) processDetectText(id, key, imageFilePath string, width, height uint) error {
 	job, err := s.jobRepository.GetByID(s.db, id)
 	if err != nil {
 		return err
@@ -173,14 +173,15 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string, wid
 		fileStat, _ := outputFile.Stat()
 		outputFileKey := queryFiles[0]
 		splitOutputFileKey := strings.Split(outputFileKey, "/")
+		outputFileID := utils.NewULID()
 		err = s.jobFileRepository.Create(tx, &entities.JobFile{
-			ID:          utils.NewULID(),
+			ID:          outputFileID,
 			JobID:       id,
 			IsOutput:    true,
 			FileKey:     outputFileKey,
 			FileName:    splitOutputFileKey[len(splitOutputFileKey)-1],
 			ContentType: "application/json",
-			Size:        fileStat.Size(),
+			Size:        uint(fileStat.Size()),
 			Width:       0,
 			Height:      0,
 		})
@@ -213,9 +214,7 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string, wid
 							}
 						}
 						points := paragraph.BoundingBox.Vertices.ToFloat()
-						if orientation.RequiresRotation() {
-							points = s.imageConversionService.ConvertPoints(points, orientation, width, height)
-						}
+						points = s.imageConversionService.ConvertPoints(points, orientation, width, height)
 
 						xArray := make([]float64, 0)
 						yArray := make([]float64, 0)
@@ -226,13 +225,13 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string, wid
 						bottom, top := utils.MaxMinInArray(yArray...)
 						right, left := utils.MaxMinInArray(xArray...)
 						extractedText := &entities.ExtractedText{
-							ID:     utils.NewULID(),
-							JobID:  id,
-							Text:   texts,
-							Top:    top,
-							Bottom: bottom,
-							Left:   left,
-							Right:  right,
+							ID:        utils.NewULID(),
+							JobFileID: outputFileID,
+							Text:      texts,
+							Top:       top,
+							Bottom:    bottom,
+							Left:      left,
+							Right:     right,
 						}
 
 						extractedTexts = append(extractedTexts, extractedText)
@@ -253,10 +252,6 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string, wid
 
 func (s *detectTextService) DeleteResult(id string) error {
 	return s.db.Transaction(func(tx *gorm.DB) error {
-		err := s.extractedTextRepository.DeleteByExtractionResultID(tx, id)
-		if err != nil {
-			return err
-		}
 		files, err := s.jobFileRepository.GetByJobID(tx, id)
 		if err != nil {
 			return err
@@ -265,6 +260,10 @@ func (s *detectTextService) DeleteResult(id string) error {
 			err = s.storageAPIClient.DeleteFile(file.FileKey)
 			if err != nil {
 				s.logger.Error(err.Error())
+			}
+			err := s.extractedTextRepository.DeleteByJobFileID(tx, file.ID)
+			if err != nil {
+				return err
 			}
 		}
 		err = s.jobFileRepository.DeleteByJobID(tx, id)
@@ -277,42 +276,42 @@ func (s *detectTextService) DeleteResult(id string) error {
 }
 
 func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) *models.Job {
-	extractedTexts := make([]models.ExtractedText, 0)
 	files := make([]models.JobFile, 0)
 
-	for _, extractedText := range entity.ExtractedTexts {
-		extractedTexts = append(extractedTexts, models.ExtractedText{
-			ID:        extractedText.ID,
-			JobID:     extractedText.JobID,
-			Text:      extractedText.Text,
-			Top:       extractedText.Top,
-			Bottom:    extractedText.Bottom,
-			Left:      extractedText.Left,
-			Right:     extractedText.Right,
-			CreatedAt: extractedText.CreatedAt.Unix(),
-			UpdatedAt: extractedText.UpdatedAt.Unix(),
-		})
-	}
 	for _, file := range entity.JobFiles {
+		extractedTexts := make([]*models.ExtractedText, 0)
+		for _, extractedText := range file.ExtractedTexts {
+			extractedTexts = append(extractedTexts, &models.ExtractedText{
+				ID:        extractedText.ID,
+				JobFileID: extractedText.JobFileID,
+				Text:      extractedText.Text,
+				Top:       extractedText.Top,
+				Bottom:    extractedText.Bottom,
+				Left:      extractedText.Left,
+				Right:     extractedText.Right,
+				CreatedAt: extractedText.CreatedAt.Unix(),
+				UpdatedAt: extractedText.UpdatedAt.Unix(),
+			})
+		}
 		files = append(files, models.JobFile{
-			ID:          file.ID,
-			JobID:       file.JobID,
-			IsOutput:    file.IsOutput,
-			FileKey:     file.FileKey,
-			FileName:    file.FileName,
-			ContentType: file.ContentType,
-			Size:        file.Size,
-			CreatedAt:   file.CreatedAt.Unix(),
-			UpdatedAt:   file.UpdatedAt.Unix(),
+			ID:             file.ID,
+			JobID:          file.JobID,
+			IsOutput:       file.IsOutput,
+			FileKey:        file.FileKey,
+			FileName:       file.FileName,
+			ContentType:    file.ContentType,
+			Size:           file.Size,
+			CreatedAt:      file.CreatedAt.Unix(),
+			UpdatedAt:      file.UpdatedAt.Unix(),
+			ExtractedTexts: extractedTexts,
 		})
 	}
 	return &models.Job{
-		ID:             entity.ID,
-		Status:         entity.Status,
-		CreatedAt:      entity.CreatedAt.Unix(),
-		UpdatedAt:      entity.UpdatedAt.Unix(),
-		ExtractedTexts: extractedTexts,
-		JobFiles:       files,
+		ID:        entity.ID,
+		Status:    entity.Status,
+		CreatedAt: entity.CreatedAt.Unix(),
+		UpdatedAt: entity.UpdatedAt.Unix(),
+		JobFiles:  files,
 	}
 }
 

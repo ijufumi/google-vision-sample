@@ -7,8 +7,7 @@ import (
 
 type Job struct {
 	gorm.Model
-	ID             string
-	Status         enums.JobStatus
-	ExtractedTexts []ExtractedText
-	JobFiles       []JobFile
+	ID       string
+	Status   enums.JobStatus
+	JobFiles []JobFile
 }

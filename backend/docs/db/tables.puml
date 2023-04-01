@@ -15,7 +15,7 @@ entity Jobs {
     deleted_at: datetime
 }
 
-entity Files {
+entity JobFiles {
   * id: ULID
   --
   * job_id: ULID <<FK>>
@@ -34,7 +34,7 @@ entity Files {
 entity ExtractedTexts {
   * id: ULID
   --
-  * job_id: ULID <<FK>>
+  * job_file_id: ULID <<FK>>
   * text: string
   * top: number
   * bottom: number
@@ -45,7 +45,7 @@ entity ExtractedTexts {
     deleted_at: datetime
 }
 
-Jobs ||..o{ ExtractedTexts
-Jobs ||..o{ Files
+Jobs ||..o{ JobFiles
+JobFiles ||..o{ ExtractedTexts
 
 @enduml

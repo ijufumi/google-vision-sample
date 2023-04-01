@@ -1,5 +1,9 @@
 FROM golang:1.20-bullseye as build
 
+RUN apt update \
+&& apt install -y ca-certificates libmagickwand-dev graphicsmagick-libmagick-dev-compat \
+&& rm -rf /var/cache/apt
+
 WORKDIR /app
 
 COPY . .
@@ -14,7 +18,7 @@ FROM debian:bullseye-slim as deploy
 WORKDIR /app
 
 RUN apt update \
-&& apt install -y ca-certificates imagemagick \
+&& apt install -y ca-certificates libmagickwand-dev graphicsmagick-libmagick-dev-compat \
 && rm -rf /var/cache/apt
 
 COPY --from=build /app/app /app/app

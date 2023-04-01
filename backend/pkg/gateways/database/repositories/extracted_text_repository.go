@@ -9,7 +9,7 @@ import (
 type ExtractedTextRepository interface {
 	GetByExtractionResultID(db *gorm.DB, extractionResultID string) ([]*entities.ExtractedText, error)
 	Create(db *gorm.DB, entity ...*entities.ExtractedText) error
-	DeleteByExtractionResultID(db *gorm.DB, extractionResultID string) error
+	DeleteByJobFileID(db *gorm.DB, extractionResultID string) error
 }
 
 func NewExtractedTextRepository() ExtractedTextRepository {
@@ -36,9 +36,9 @@ func (r *extractedTextRepository) Create(db *gorm.DB, entity ...*entities.Extrac
 	return nil
 }
 
-func (r *extractedTextRepository) DeleteByExtractionResultID(db *gorm.DB, extractionResultID string) error {
-	if err := db.Where("job_id", extractionResultID).Delete(&entities.ExtractedText{}).Error; err != nil {
-		return errors.Wrap(err, "ExtractedTextRepository#DeleteByJobID")
+func (r *extractedTextRepository) DeleteByJobFileID(db *gorm.DB, jobFileID string) error {
+	if err := db.Where("job_file_id", jobFileID).Delete(&entities.ExtractedText{}).Error; err != nil {
+		return errors.Wrap(err, "ExtractedTextRepository#DeleteByJobFileID")
 	}
 	return nil
 }
