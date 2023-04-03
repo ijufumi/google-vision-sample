@@ -32,7 +32,8 @@ func NewDetectTextService(
 	visionAPIClient clients.VisionAPIClient,
 	jobRepository repositories.JobRepository,
 	extractedTextRepository repositories.ExtractedTextRepository,
-	jobFileRepository repositories.JobFileRepository,
+	inputFileRepository repositories.InputFileRepository,
+	outputFileRepository repositories.OutputFileRepository,
 	imageConversionService ImageConversionService,
 	logger *zap.Logger,
 	db *gorm.DB,
@@ -42,7 +43,8 @@ func NewDetectTextService(
 		visionAPIClient:         visionAPIClient,
 		jobRepository:           jobRepository,
 		extractedTextRepository: extractedTextRepository,
-		jobFileRepository:       jobFileRepository,
+		inputFileRepository:     inputFileRepository,
+		outputFileRepository:    outputFileRepository,
 		imageConversionService:  imageConversionService,
 		logger:                  logger,
 		db:                      db,
@@ -320,7 +322,8 @@ type detectTextService struct {
 	visionAPIClient         clients.VisionAPIClient
 	jobRepository           repositories.JobRepository
 	extractedTextRepository repositories.ExtractedTextRepository
-	jobFileRepository       repositories.JobFileRepository
+	inputFileRepository     repositories.InputFileRepository
+	outputFileRepository    repositories.OutputFileRepository
 	imageConversionService  ImageConversionService
 	db                      *gorm.DB
 	logger                  *zap.Logger

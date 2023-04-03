@@ -2,11 +2,11 @@ package entities
 
 import "gorm.io/gorm"
 
-type JobFile struct {
+type OutputFile struct {
 	gorm.Model
 	ID             string
 	JobID          string
-	IsOutput       bool
+	InputFileID    string
 	FileKey        string
 	FileName       string
 	ContentType    string

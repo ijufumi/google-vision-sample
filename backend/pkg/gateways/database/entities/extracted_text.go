@@ -4,11 +4,13 @@ import "gorm.io/gorm"
 
 type ExtractedText struct {
 	gorm.Model
-	ID        string
-	JobFileID string
-	Text      string
-	Top       float64
-	Bottom    float64
-	Left      float64
-	Right     float64
+	ID           string
+	JobID        string
+	InputFileID  string
+	OutputFileID string
+	Text         string
+	Top          float64
+	Bottom       float64
+	Left         float64
+	Right        float64
 }
