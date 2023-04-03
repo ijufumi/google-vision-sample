@@ -15,11 +15,26 @@ entity Jobs {
     deleted_at: datetime
 }
 
-entity JobFiles {
+entity InputFiles {
   * id: ULID
   --
   * job_id: ULID <<FK>>
-  * is_output: number
+  * file_key: string
+  * file_name: string
+  * content_type: string
+  * size: number
+  * width: number
+  * height: number
+  * created_at: datetime
+  * updated_at: datetime
+    deleted_at: datetime
+}
+
+entity OutputFiles {
+  * id: ULID
+  --
+  * job_id: ULID <<FK>>
+  * input_file_id: ULID <<FK>>
   * file_key: string
   * file_name: string
   * content_type: string
@@ -34,7 +49,9 @@ entity JobFiles {
 entity ExtractedTexts {
   * id: ULID
   --
-  * job_file_id: ULID <<FK>>
+  * job_id: ULID <<FK>>
+  * input_file_id: ULID <<FK>>
+  * output_file_id: ULID <<FK>>
   * text: string
   * top: number
   * bottom: number
@@ -45,7 +62,8 @@ entity ExtractedTexts {
     deleted_at: datetime
 }
 
-Jobs ||..o{ JobFiles
-JobFiles ||..ro{ ExtractedTexts
+Jobs ||..o{ InputFiles
+Jobs ||..o{ OutputFiles
+OutputFiles ||..do{ ExtractedTexts
 
 @enduml
