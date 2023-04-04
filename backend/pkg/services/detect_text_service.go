@@ -264,7 +264,7 @@ func (s *detectTextService) DeleteResult(id string) error {
 			if err != nil {
 				s.logger.Error(err.Error())
 			}
-			err := s.extractedTextRepository.DeleteByJobFileID(tx, file.ID)
+			err := s.extractedTextRepository.DeleteByOutputFileID(tx, file.ID)
 			if err != nil {
 				return err
 			}

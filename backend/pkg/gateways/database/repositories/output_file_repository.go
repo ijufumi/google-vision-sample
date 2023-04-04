@@ -10,6 +10,7 @@ type OutputFileRepository interface {
 	GetByJobID(db *gorm.DB, jobID string) ([]*entities.OutputFile, error)
 	Create(db *gorm.DB, entity ...*entities.OutputFile) error
 	DeleteByJobID(db *gorm.DB, jobID string) error
+	DeleteByInputFileID(db *gorm.DB, inputFileID string) error
 }
 
 func NewOutputFileRepository() OutputFileRepository {
@@ -38,6 +39,13 @@ func (r *outputFileRepository) Create(db *gorm.DB, entity ...*entities.OutputFil
 
 func (r *outputFileRepository) DeleteByJobID(db *gorm.DB, jobID string) error {
 	if err := db.Where("job_id", jobID).Delete(&entities.OutputFile{}).Error; err != nil {
+		return errors.Wrap(err, "OutputFileRepository#DeleteByJobID")
+	}
+	return nil
+}
+
+func (r *outputFileRepository) DeleteByInputFileID(db *gorm.DB, inputFileID string) error {
+	if err := db.Where("input_file_id", inputFileID).Delete(&entities.OutputFile{}).Error; err != nil {
 		return errors.Wrap(err, "OutputFileRepository#DeleteByJobID")
 	}
 	return nil
