@@ -109,10 +109,9 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 			return err
 		}
 
-		err = s.jobFileRepository.Create(tx, &entities.JobFile{
+		err = s.inputFileRepository.Create(tx, &entities.InputFile{
 			ID:          inputFileID,
 			JobID:       id,
-			IsOutput:    false,
 			FileKey:     key,
 			FileName:    fileName,
 			ContentType: contentType,
@@ -137,7 +136,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 	}
 
 	go func() {
-		err := s.processDetectText(id, key, tempFileForWork.Name(), width, height)
+		err := s.processDetectText(id, inputFileID, key, tempFileForWork.Name(), width, height)
 		if err != nil {
 			s.logger.Error(fmt.Sprintf("%v was occurred.", err))
 		}
@@ -146,7 +145,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 	return nil
 }
 
-func (s *detectTextService) processDetectText(id, key, imageFilePath string, width, height uint) error {
+func (s *detectTextService) processDetectText(id, inputFileID, key, imageFilePath string, width, height uint) error {
 	job, err := s.jobRepository.GetByID(s.db, id)
 	if err != nil {
 		return err
@@ -176,10 +175,10 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string, wid
 		outputFileKey := queryFiles[0]
 		splitOutputFileKey := strings.Split(outputFileKey, "/")
 		outputFileID := utils.NewULID()
-		err = s.jobFileRepository.Create(tx, &entities.JobFile{
+		err = s.outputFileRepository.Create(tx, &entities.OutputFile{
 			ID:          outputFileID,
 			JobID:       id,
-			IsOutput:    true,
+			InputFileID: inputFileID,
 			FileKey:     outputFileKey,
 			FileName:    splitOutputFileKey[len(splitOutputFileKey)-1],
 			ContentType: "application/json",
@@ -227,13 +226,15 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string, wid
 						bottom, top := utils.MaxMinInArray(yArray...)
 						right, left := utils.MaxMinInArray(xArray...)
 						extractedText := &entities.ExtractedText{
-							ID:        utils.NewULID(),
-							JobFileID: outputFileID,
-							Text:      texts,
-							Top:       top,
-							Bottom:    bottom,
-							Left:      left,
-							Right:     right,
+							ID:           utils.NewULID(),
+							JobID:        id,
+							InputFileID:  inputFileID,
+							OutputFileID: outputFileID,
+							Text:         texts,
+							Top:          top,
+							Bottom:       bottom,
+							Left:         left,
+							Right:        right,
 						}
 
 						extractedTexts = append(extractedTexts, extractedText)
@@ -254,11 +255,11 @@ func (s *detectTextService) processDetectText(id, key, imageFilePath string, wid
 
 func (s *detectTextService) DeleteResult(id string) error {
 	return s.db.Transaction(func(tx *gorm.DB) error {
-		files, err := s.jobFileRepository.GetByJobID(tx, id)
+		outputFiles, err := s.outputFileRepository.GetByJobID(tx, id)
 		if err != nil {
 			return err
 		}
-		for _, file := range files {
+		for _, file := range outputFiles {
 			err = s.storageAPIClient.DeleteFile(file.FileKey)
 			if err != nil {
 				s.logger.Error(err.Error())
@@ -268,7 +269,21 @@ func (s *detectTextService) DeleteResult(id string) error {
 				return err
 			}
 		}
-		err = s.jobFileRepository.DeleteByJobID(tx, id)
+		err = s.outputFileRepository.DeleteByJobID(tx, id)
+		if err != nil {
+			return err
+		}
+		inputFiles, err := s.inputFileRepository.GetByJobID(tx, id)
+		if err != nil {
+			return err
+		}
+		for _, file := range inputFiles {
+			err = s.storageAPIClient.DeleteFile(file.FileKey)
+			if err != nil {
+				s.logger.Error(err.Error())
+			}
+		}
+		err = s.inputFileRepository.DeleteByJobID(tx, id)
 		if err != nil {
 			return err
 		}
@@ -278,42 +293,56 @@ func (s *detectTextService) DeleteResult(id string) error {
 }
 
 func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) *models.Job {
-	files := make([]models.JobFile, 0)
+	inputFiles := make([]models.InputFile, 0)
 
-	for _, file := range entity.JobFiles {
-		extractedTexts := make([]*models.ExtractedText, 0)
-		for _, extractedText := range file.ExtractedTexts {
-			extractedTexts = append(extractedTexts, &models.ExtractedText{
-				ID:        extractedText.ID,
-				JobFileID: extractedText.JobFileID,
-				Text:      extractedText.Text,
-				Top:       extractedText.Top,
-				Bottom:    extractedText.Bottom,
-				Left:      extractedText.Left,
-				Right:     extractedText.Right,
-				CreatedAt: extractedText.CreatedAt.Unix(),
-				UpdatedAt: extractedText.UpdatedAt.Unix(),
+	for _, inputFile := range entity.InputFiles {
+		outputFiles := make([]models.OutputFile, 0)
+		for _, outputFile := range inputFile.OutputFiles {
+			extractedTexts := make([]*models.ExtractedText, 0)
+			for _, extractedText := range outputFile.ExtractedTexts {
+				extractedTexts = append(extractedTexts, &models.ExtractedText{
+					ID:           extractedText.ID,
+					InputFileID:  extractedText.ID,
+					OutputFileID: extractedText.ID,
+					Text:         extractedText.Text,
+					Top:          extractedText.Top,
+					Bottom:       extractedText.Bottom,
+					Left:         extractedText.Left,
+					Right:        extractedText.Right,
+					CreatedAt:    extractedText.CreatedAt.Unix(),
+					UpdatedAt:    extractedText.UpdatedAt.Unix(),
+				})
+			}
+			outputFiles = append(outputFiles, models.OutputFile{
+				ID:             outputFile.ID,
+				JobID:          outputFile.JobID,
+				InputFileID:    outputFile.InputFileID,
+				FileKey:        outputFile.FileKey,
+				FileName:       outputFile.FileName,
+				ContentType:    outputFile.ContentType,
+				Size:           outputFile.Size,
+				CreatedAt:      outputFile.CreatedAt.Unix(),
+				UpdatedAt:      outputFile.UpdatedAt.Unix(),
+				ExtractedTexts: extractedTexts,
 			})
 		}
-		files = append(files, models.JobFile{
-			ID:             file.ID,
-			JobID:          file.JobID,
-			IsOutput:       file.IsOutput,
-			FileKey:        file.FileKey,
-			FileName:       file.FileName,
-			ContentType:    file.ContentType,
-			Size:           file.Size,
-			CreatedAt:      file.CreatedAt.Unix(),
-			UpdatedAt:      file.UpdatedAt.Unix(),
-			ExtractedTexts: extractedTexts,
+		inputFiles = append(inputFiles, models.InputFile{
+			ID:          inputFile.ID,
+			JobID:       inputFile.JobID,
+			FileKey:     inputFile.FileKey,
+			FileName:    inputFile.FileName,
+			ContentType: inputFile.ContentType,
+			Size:        inputFile.Size,
+			CreatedAt:   inputFile.CreatedAt.Unix(),
+			UpdatedAt:   inputFile.UpdatedAt.Unix(),
 		})
 	}
 	return &models.Job{
-		ID:        entity.ID,
-		Status:    entity.Status,
-		CreatedAt: entity.CreatedAt.Unix(),
-		UpdatedAt: entity.UpdatedAt.Unix(),
-		JobFiles:  files,
+		ID:         entity.ID,
+		Status:     entity.Status,
+		CreatedAt:  entity.CreatedAt.Unix(),
+		UpdatedAt:  entity.UpdatedAt.Unix(),
+		InputFiles: inputFiles,
 	}
 }
 
