@@ -6,6 +6,7 @@ import (
 
 type Job struct {
 	ID         string          `json:"id"`
+	Name       string          `json:"name"`
 	Status     enums.JobStatus `json:"status"`
 	CreatedAt  int64           `json:"createdAt"`
 	UpdatedAt  int64           `json:"updatedAt"`

@@ -98,6 +98,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 	err = s.db.Transaction(func(tx *gorm.DB) error {
 		job := &entities.Job{
 			ID:     id,
+			Name:   fileName,
 			Status: enums.JobStatus_Runing,
 		}
 		err = s.jobRepository.Create(tx, job)
@@ -339,6 +340,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 	}
 	return &models.Job{
 		ID:         entity.ID,
+		Name:       entity.Name,
 		Status:     entity.Status,
 		CreatedAt:  entity.CreatedAt.Unix(),
 		UpdatedAt:  entity.UpdatedAt.Unix(),

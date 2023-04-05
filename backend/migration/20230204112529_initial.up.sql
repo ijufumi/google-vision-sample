@@ -1,9 +1,10 @@
 create table if not exists jobs
 (
-    id         varchar(26) not null primary key,
-    status     varchar(10) not null,
-    created_at timestamp   not null,
-    updated_at timestamp   not null,
+    id         varchar(26)  not null primary key,
+    name       varchar(255) not null,
+    status     varchar(10)  not null,
+    created_at timestamp    not null,
+    updated_at timestamp    not null,
     deleted_at timestamp
 );
 
