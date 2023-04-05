@@ -9,6 +9,7 @@ export enum JobStatus {
 
 export interface Props {
   id: string
+  name: string
   status: JobStatus
   createdAt: number
   updatedAt: number
@@ -17,6 +18,7 @@ export interface Props {
 
 export default class Job {
   readonly id: string
+  readonly name: string
   readonly status: JobStatus
   readonly createdAt: number
   readonly updatedAt: number
@@ -24,6 +26,7 @@ export default class Job {
 
   constructor(props: Props) {
     this.id = props.id
+    this.name = props.name
     this.status = props.status
     this.createdAt = props.createdAt
     this.updatedAt = props.updatedAt
