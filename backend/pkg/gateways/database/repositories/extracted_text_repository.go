@@ -7,7 +7,7 @@ import (
 )
 
 type ExtractedTextRepository interface {
-	GetByExtractionResultID(db *gorm.DB, extractionResultID string) ([]*entities.ExtractedText, error)
+	GetByID(db *gorm.DB, id string) (*entities.ExtractedText, error)
 	Create(db *gorm.DB, entity ...*entities.ExtractedText) error
 	DeleteByOutputFileID(db *gorm.DB, outputFileID string) error
 }
@@ -19,14 +19,12 @@ func NewExtractedTextRepository() ExtractedTextRepository {
 type extractedTextRepository struct {
 }
 
-func (r *extractedTextRepository) GetByExtractionResultID(db *gorm.DB, extractionResultID string) ([]*entities.ExtractedText, error) {
-	var results []*entities.ExtractedText
-	if err := db.Where(map[string]string{
-		"extractionResultID": extractionResultID,
-	}).Find(&results).Error; err != nil {
+func (r *extractedTextRepository) GetByID(db *gorm.DB, id string) (*entities.ExtractedText, error) {
+	var result *entities.ExtractedText
+	if err := db.Where("id = ?", id).Find(result).Error; err != nil {
 		return nil, errors.Wrap(err, "ExtractedTextRepository#GetByJobID")
 	}
-	return results, nil
+	return result, nil
 }
 
 func (r *extractedTextRepository) Create(db *gorm.DB, entity ...*entities.ExtractedText) error {
@@ -37,7 +35,7 @@ func (r *extractedTextRepository) Create(db *gorm.DB, entity ...*entities.Extrac
 }
 
 func (r *extractedTextRepository) DeleteByOutputFileID(db *gorm.DB, outputFileID string) error {
-	if err := db.Where("output_file_id", outputFileID).Delete(&entities.ExtractedText{}).Error; err != nil {
+	if err := db.Where("output_file_id = ?", outputFileID).Delete(&entities.ExtractedText{}).Error; err != nil {
 		return errors.Wrap(err, "ExtractedTextRepository#DeleteByOutputFileID")
 	}
 	return nil
