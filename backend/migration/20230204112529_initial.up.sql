@@ -1,11 +1,12 @@
 create table if not exists jobs
 (
-    id         varchar(26)  not null primary key,
-    name       varchar(255) not null,
-    status     varchar(10)  not null,
-    created_at timestamp    not null,
-    updated_at timestamp    not null,
-    deleted_at timestamp
+    id                varchar(26)  not null primary key,
+    name              varchar(255) not null,
+    original_file_key varchar(255) not null,
+    status            varchar(10)  not null,
+    created_at        timestamp    not null,
+    updated_at        timestamp    not null,
+    deleted_at        timestamp
 );
 
 create index if not exists idx_jobs_deleted_at on jobs (deleted_at);
@@ -14,12 +15,14 @@ create table if not exists input_files
 (
     id           varchar(26)  not null primary key,
     job_id       varchar(26)  not null references jobs (id),
+    page_no      integer      not null default 1,
     file_key     varchar(255) not null,
     file_name    varchar(255) not null,
     size         bigint       not null default 0,
     width        bigint       not null default 0,
     height       bigint       not null default 0,
     content_type varchar(100) not null default 'application/octet-stream',
+    status       varchar(10)  not null,
     created_at   timestamp    not null,
     updated_at   timestamp    not null,
     deleted_at   timestamp
