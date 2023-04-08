@@ -1,6 +1,12 @@
 @startuml
 
-enum Status {
+enum JobStatus {
+  running
+  succeeded
+  failed
+}
+
+enum InputFileStatus {
   running
   succeeded
   failed
@@ -9,7 +15,9 @@ enum Status {
 entity Jobs {
   * id: ULID
   --
-  * status: Status
+  * name: string
+  * original_file_key: string
+  * status: JobStatus
   * created_at: datetime
   * updated_at: datetime
     deleted_at: datetime
@@ -25,6 +33,7 @@ entity InputFiles {
   * size: number
   * width: number
   * height: number
+  * status: InputFileStatus
   * created_at: datetime
   * updated_at: datetime
     deleted_at: datetime
