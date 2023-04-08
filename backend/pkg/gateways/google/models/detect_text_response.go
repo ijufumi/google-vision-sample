@@ -1,12 +1,24 @@
 package models
 
+import "fmt"
+
 type DetectTextResponses struct {
 	Responses []DetectTextResponse `json:"responses"`
 }
 
 type DetectTextResponse struct {
+	Error              *Error             `json:"error"`
 	TextAnnotations    []TextAnnotation   `json:"textAnnotations"`
 	FullTextAnnotation FullTextAnnotation `json:"fullTextAnnotation"`
+}
+
+type Error struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
+func (e *Error) String() string {
+	return fmt.Sprintf("code: %d, messsage: %s", e.Code, e.Message)
 }
 
 type TextAnnotation struct {

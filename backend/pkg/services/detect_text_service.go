@@ -244,46 +244,52 @@ func (s *detectTextService) processDetectTextFromImage(jobID string, contentType
 		if err = json.Unmarshal(bytes, &detectResponse); err != nil {
 			return err
 		}
+		if len(detectResponse.Responses) == 0 {
+			return errors.New("response notfound")
+		}
+		response := detectResponse.Responses[0]
+		if response.Error != nil {
+			return errors.New(response.Error.String())
+		}
+
 		extractedTexts := make([]*entities.ExtractedText, 0)
 		orientation, err := s.imageConversionService.DetectOrientation(file.Name())
 		if err != nil {
 			return err
 		}
-		for _, response := range detectResponse.Responses {
-			for _, page := range response.FullTextAnnotation.Pages {
-				for _, block := range page.Blocks {
-					for _, paragraph := range block.Paragraphs {
-						texts := ""
-						for _, word := range paragraph.Words {
-							for _, symbol := range word.Symbols {
-								texts += symbol.Text
-							}
+		for _, page := range response.FullTextAnnotation.Pages {
+			for _, block := range page.Blocks {
+				for _, paragraph := range block.Paragraphs {
+					texts := ""
+					for _, word := range paragraph.Words {
+						for _, symbol := range word.Symbols {
+							texts += symbol.Text
 						}
-						points := paragraph.BoundingBox.Vertices.ToFloat()
-						points = s.imageConversionService.ConvertPoints(points, orientation, width, height)
-
-						xArray := make([]float64, 0)
-						yArray := make([]float64, 0)
-						for _, point := range points {
-							xArray = append(xArray, point[0])
-							yArray = append(yArray, point[1])
-						}
-						bottom, top := utils.MaxMinInArray(yArray...)
-						right, left := utils.MaxMinInArray(xArray...)
-						extractedText := &entities.ExtractedText{
-							ID:           utils.NewULID(),
-							JobID:        jobID,
-							InputFileID:  inputFileID,
-							OutputFileID: outputFileID,
-							Text:         texts,
-							Top:          top,
-							Bottom:       bottom,
-							Left:         left,
-							Right:        right,
-						}
-
-						extractedTexts = append(extractedTexts, extractedText)
 					}
+					points := paragraph.BoundingBox.Vertices.ToFloat()
+					points = s.imageConversionService.ConvertPoints(points, orientation, width, height)
+
+					xArray := make([]float64, 0)
+					yArray := make([]float64, 0)
+					for _, point := range points {
+						xArray = append(xArray, point[0])
+						yArray = append(yArray, point[1])
+					}
+					bottom, top := utils.MaxMinInArray(yArray...)
+					right, left := utils.MaxMinInArray(xArray...)
+					extractedText := &entities.ExtractedText{
+						ID:           utils.NewULID(),
+						JobID:        jobID,
+						InputFileID:  inputFileID,
+						OutputFileID: outputFileID,
+						Text:         texts,
+						Top:          top,
+						Bottom:       bottom,
+						Left:         left,
+						Right:        right,
+					}
+
+					extractedTexts = append(extractedTexts, extractedText)
 				}
 			}
 		}
