@@ -31,5 +31,6 @@ func Copy(src *os.File, dst *os.File) error {
 		return err
 	}
 	_, err = io.Copy(dst, src)
+	_, _ = dst.Seek(0, 0)
 	return err
 }

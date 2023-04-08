@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/ijufumi/google-vision-sample/pkg/configs"
+	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities/enums"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/options"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"github.com/pkg/errors"
@@ -18,7 +19,7 @@ import (
 )
 
 type StorageAPIClient interface {
-	UploadFile(key string, file *os.File, contentType string) error
+	UploadFile(key string, file *os.File, contentType enums.ContentType) error
 	DownloadFile(key string) (*os.File, error)
 	QueryFiles(key string) ([]string, error)
 	DeleteFile(key string) error
@@ -40,7 +41,7 @@ type storageAPIClient struct {
 	jwtConfig *jwt.Config
 }
 
-func (c *storageAPIClient) UploadFile(key string, file *os.File, contentType string) error {
+func (c *storageAPIClient) UploadFile(key string, file *os.File, contentType enums.ContentType) error {
 	client, err := c.newClient()
 	if err != nil {
 		return errors.Wrap(err, "StorageAPIClient#UploadFile")
@@ -51,7 +52,7 @@ func (c *storageAPIClient) UploadFile(key string, file *os.File, contentType str
 
 	object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
 	storageWriter := object.NewWriter(context.Background())
-	storageWriter.ContentType = contentType
+	storageWriter.ContentType = string(contentType)
 	defer func() {
 		_ = storageWriter.Close()
 	}()

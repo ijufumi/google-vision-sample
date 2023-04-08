@@ -24,7 +24,6 @@ type jobRepository struct {
 func (r *jobRepository) GetAll(db *gorm.DB) ([]*entities.Job, error) {
 	var results []*entities.Job
 	if err := db.
-		Preload("JobFiles").
 		Find(&results).Error; err != nil {
 		return nil, errors.Wrap(err, "JobRepository#GetAll")
 	}
@@ -34,8 +33,9 @@ func (r *jobRepository) GetAll(db *gorm.DB) ([]*entities.Job, error) {
 func (r *jobRepository) GetByID(db *gorm.DB, id string) (*entities.Job, error) {
 	var result entities.Job
 	if err := db.
-		Preload("JobFiles").
-		Preload("JobFiles.ExtractedTexts").
+		Preload("InputFiles").
+		Preload("InputFiles.OutputFiles").
+		Preload("InputFiles.OutputFiles.ExtractedTexts").
 		Where("id = ?", id).First(&result).Error; err != nil {
 		return nil, errors.Wrap(err, "JobRepository#GetByID")
 	}

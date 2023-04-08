@@ -1,41 +1,36 @@
 import { formatToDate } from "../components/dates"
-import ExtractedText, { Props as ExtractedTextProps } from "./ExtractedText"
+import OutputFile, { Props as OutputFileProp } from "./OutputFile"
 
 export interface Props {
   id: string
-  isOutput: boolean
   fileKey: string
   fileName: string
   size: number
   contentType: string
   createdAt: number
   updatedAt: number
-  extractedTexts: ExtractedTextProps[]
+  outputFiles: OutputFileProp[] | undefined
 }
 
-export default class JobFile {
+export default class InputFile {
   readonly id: string
-  readonly isOutput: boolean
   readonly fileKey: string
   readonly fileName: string
   readonly size: number
   readonly contentType: string
   readonly createdAt: number
   readonly updatedAt: number
-  readonly extractedTexts: ExtractedText[]
+  readonly outputFiles: OutputFile[]
 
   constructor(props: Props) {
     this.id = props.id
-    this.isOutput = props.isOutput
     this.fileKey = props.fileKey
     this.fileName = props.fileName
     this.size = props.size
     this.contentType = props.contentType
     this.createdAt = props.createdAt
     this.updatedAt = props.updatedAt
-    this.extractedTexts = props.extractedTexts.map(
-      (p) => new ExtractedText(p)
-    )
+    this.outputFiles = props.outputFiles?.map(file => new OutputFile(file)) || []
   }
 
   get readableCreatedAt() {

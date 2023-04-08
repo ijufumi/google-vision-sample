@@ -4,7 +4,6 @@ import {
   Badge,
   Button,
   Dialog,
-  DocumentOpenIcon,
   EyeOpenIcon,
   Heading,
   IconButton,
@@ -36,7 +35,6 @@ const App: FC<Props> = () => {
 
   const loadJobs = useCallback(async () => {
     const _jobs = await useCase.getJobs()
-    console.info("initialize...")
     if (_jobs) {
       setJobs(_jobs)
     } else {
@@ -49,7 +47,6 @@ const App: FC<Props> = () => {
       return
     }
     const initialize = async () => {
-      console.info("initialize2...")
       await loadJobs()
       setInitialized(true)
     }
@@ -137,8 +134,8 @@ const App: FC<Props> = () => {
         <Table>
           <Table.Head>
             <Table.TextHeaderCell>ID</Table.TextHeaderCell>
+            <Table.TextHeaderCell>Name</Table.TextHeaderCell>
             <Table.TextHeaderCell>Status</Table.TextHeaderCell>
-            <Table.TextHeaderCell>Input file name</Table.TextHeaderCell>
             <Table.TextHeaderCell>Created At</Table.TextHeaderCell>
             <Table.TextHeaderCell>Updated At</Table.TextHeaderCell>
             <Table.TextHeaderCell>Operations</Table.TextHeaderCell>
@@ -147,10 +144,10 @@ const App: FC<Props> = () => {
             {jobs.map((result) => (
               <Table.Row key={result.id}>
                 <Table.TextCell>{result.id}</Table.TextCell>
-                <Table.TextCell>{renderStatus(result.status)}</Table.TextCell>
                 <Table.TextCell>
-                  { result.inputFile && result.inputFile.fileName }
+                  { result.name }
                 </Table.TextCell>
+                <Table.TextCell>{renderStatus(result.status)}</Table.TextCell>
                 <Table.TextCell>{result.readableCreatedAt}</Table.TextCell>
                 <Table.TextCell>{result.readableUpdatedAt}</Table.TextCell>
                 <Table.Cell>
