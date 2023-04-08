@@ -355,7 +355,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 	inputFiles := make([]models.InputFile, 0)
 
 	for _, inputFile := range entity.InputFiles {
-		outputFiles := make([]models.OutputFile, 0)
+		outputFiles := make([]*models.OutputFile, 0)
 		for _, outputFile := range inputFile.OutputFiles {
 			extractedTexts := make([]*models.ExtractedText, 0)
 			for _, extractedText := range outputFile.ExtractedTexts {
@@ -372,7 +372,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 					UpdatedAt:    extractedText.UpdatedAt.Unix(),
 				})
 			}
-			outputFiles = append(outputFiles, models.OutputFile{
+			outputFiles = append(outputFiles, &models.OutputFile{
 				ID:             outputFile.ID,
 				JobID:          outputFile.JobID,
 				InputFileID:    outputFile.InputFileID,
@@ -394,6 +394,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 			Size:        inputFile.Size,
 			CreatedAt:   inputFile.CreatedAt.Unix(),
 			UpdatedAt:   inputFile.UpdatedAt.Unix(),
+			OutputFiles: outputFiles,
 		})
 	}
 	return &models.Job{
