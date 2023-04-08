@@ -4,7 +4,6 @@ import {
   Badge,
   Button,
   Dialog,
-  DocumentOpenIcon,
   EyeOpenIcon,
   Heading,
   IconButton,
