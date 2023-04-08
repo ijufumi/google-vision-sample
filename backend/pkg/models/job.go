@@ -10,5 +10,5 @@ type Job struct {
 	Status     enums.JobStatus `json:"status"`
 	CreatedAt  int64           `json:"createdAt"`
 	UpdatedAt  int64           `json:"updatedAt"`
-	InputFiles []InputFile     `json:"InputFiles"`
+	InputFiles []InputFile     `json:"inputFiles"`
 }
