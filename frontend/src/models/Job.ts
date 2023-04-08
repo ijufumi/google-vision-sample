@@ -13,7 +13,7 @@ export interface Props {
   status: JobStatus
   createdAt: number
   updatedAt: number
-  inputFiles: InputFileProps[]
+  inputFiles: InputFileProps[] | undefined
 }
 
 export default class Job {
@@ -30,7 +30,7 @@ export default class Job {
     this.status = props.status
     this.createdAt = props.createdAt
     this.updatedAt = props.updatedAt
-    this.inputFiles = props.inputFiles.map(f => new InputFile(f))
+    this.inputFiles = props.inputFiles?.map(f => new InputFile(f)) || []
   }
 
   get readableCreatedAt() {

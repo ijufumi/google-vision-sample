@@ -9,7 +9,7 @@ export interface Props {
   contentType: string
   createdAt: number
   updatedAt: number
-  extractedTexts: ExtractedTextProps[]
+  extractedTexts: ExtractedTextProps[] | undefined
 }
 
 export default class OutputFile {
@@ -30,9 +30,9 @@ export default class OutputFile {
     this.contentType = props.contentType
     this.createdAt = props.createdAt
     this.updatedAt = props.updatedAt
-    this.extractedTexts = props.extractedTexts.map(
+    this.extractedTexts = props.extractedTexts?.map(
       (p) => new ExtractedText(p)
-    )
+    ) || []
   }
 
   get readableCreatedAt() {
