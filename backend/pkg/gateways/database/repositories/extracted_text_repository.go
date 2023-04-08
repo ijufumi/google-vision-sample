@@ -28,6 +28,9 @@ func (r *extractedTextRepository) GetByID(db *gorm.DB, id string) (*entities.Ext
 }
 
 func (r *extractedTextRepository) Create(db *gorm.DB, entity ...*entities.ExtractedText) error {
+	if len(entity) == 0 {
+		return nil
+	}
 	if err := db.Create(&entity).Error; err != nil {
 		return errors.Wrap(err, "ExtractedTextRepository#Create")
 	}
