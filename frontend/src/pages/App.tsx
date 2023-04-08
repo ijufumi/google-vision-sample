@@ -35,7 +35,6 @@ const App: FC<Props> = () => {
 
   const loadJobs = useCallback(async () => {
     const _jobs = await useCase.getJobs()
-    console.info("initialize...")
     if (_jobs) {
       setJobs(_jobs)
     } else {
@@ -48,7 +47,6 @@ const App: FC<Props> = () => {
       return
     }
     const initialize = async () => {
-      console.info("initialize2...")
       await loadJobs()
       setInitialized(true)
     }
