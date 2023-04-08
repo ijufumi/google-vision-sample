@@ -401,8 +401,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 }
 
 func (s *detectTextService) detectContentType(file *os.File) string {
-	bytes, err := io.ReadAll(file)
-	_, _ = file.Seek(0, 0)
+	bytes, err := os.ReadFile(file.Name())
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("failed detecting content-type: %v", err))
 		return "application/octet-steam"
