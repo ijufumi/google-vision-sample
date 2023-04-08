@@ -72,7 +72,7 @@ entity ExtractedTexts {
 }
 
 Jobs ||..o{ InputFiles
-Jobs ||..o{ OutputFiles
+InputFiles ||..ro{ OutputFiles
 OutputFiles ||..do{ ExtractedTexts
 
 @enduml
