@@ -12,7 +12,7 @@ type InputFile struct {
 	PageNo      uint
 	FileKey     string
 	FileName    string
-	ContentType string
+	ContentType enums.ContentType
 	Size        uint
 	Width       uint
 	Height      uint

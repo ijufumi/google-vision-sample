@@ -1,6 +1,9 @@
 package entities
 
-import "gorm.io/gorm"
+import (
+	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities/enums"
+	"gorm.io/gorm"
+)
 
 type OutputFile struct {
 	gorm.Model
@@ -9,7 +12,7 @@ type OutputFile struct {
 	InputFileID    string
 	FileKey        string
 	FileName       string
-	ContentType    string
+	ContentType    enums.ContentType
 	Size           uint
 	Width          uint
 	Height         uint

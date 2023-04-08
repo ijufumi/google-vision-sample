@@ -14,7 +14,6 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -85,7 +84,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 	id := utils.NewULID()
 	key := fmt.Sprintf("%s/original/%s", id, filepath.Base(file.Name()))
 
-	err := s.storageAPIClient.UploadFile(key, file, contentType)
+	err := s.storageAPIClient.UploadFile(key, file, enums.ConvertToContentType(contentType))
 	if err != nil {
 		return err
 	}
@@ -132,10 +131,10 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 }
 
 func (s *detectTextService) processDetectText(id string, inputFile *os.File) error {
-	contentType := s.detectContentType(inputFile)
+	contentType := s.imageConversionService.DetectContentType(inputFile.Name())
 	s.logger.Info(fmt.Sprintf("Content-Type is %s", contentType))
 	switch {
-	case contentType == "application/pdf":
+	case contentType == enums.ContentType_Pdf:
 		imageFiles, err := s.imageConversionService.ConvertPdfToImages(inputFile.Name())
 		if err != nil {
 			return err
@@ -145,7 +144,7 @@ func (s *detectTextService) processDetectText(id string, inputFile *os.File) err
 			if inputFile == nil {
 				continue
 			}
-			err := s.processDetectTextFromImage(id, contentType, inputFile, uint(idx+1))
+			err := s.processDetectTextFromImage(id, enums.ContentType_Png, inputFile, uint(idx+1))
 			if err != nil {
 				errs = append(errs, err)
 			}
@@ -154,13 +153,13 @@ func (s *detectTextService) processDetectText(id string, inputFile *os.File) err
 			return errors.Join(errs...)
 		}
 		return nil
-	case strings.HasPrefix(contentType, "image/"):
+	case enums.IsImage(contentType):
 		return s.processDetectTextFromImage(id, contentType, inputFile, 1)
 	}
 	return errors.New(fmt.Sprintf("unsupported content-type : %s", contentType))
 }
 
-func (s *detectTextService) processDetectTextFromImage(jobID string, contentType string, file *os.File, pageNo uint) error {
+func (s *detectTextService) processDetectTextFromImage(jobID string, contentType enums.ContentType, file *os.File, pageNo uint) error {
 	width, height, err := s.imageConversionService.DetectSize(file.Name())
 	if err != nil {
 		return err
@@ -405,15 +404,6 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 		UpdatedAt:  entity.UpdatedAt.Unix(),
 		InputFiles: inputFiles,
 	}
-}
-
-func (s *detectTextService) detectContentType(file *os.File) string {
-	bytes, err := os.ReadFile(file.Name())
-	if err != nil {
-		s.logger.Error(fmt.Sprintf("failed detecting content-type: %v", err))
-		return "application/octet-steam"
-	}
-	return http.DetectContentType(bytes)
 }
 
 type detectTextService struct {

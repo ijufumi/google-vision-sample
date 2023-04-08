@@ -2,9 +2,11 @@ package services
 
 import (
 	"fmt"
+	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities/enums"
 	"go.uber.org/zap"
 	"gopkg.in/gographics/imagick.v2/imagick"
 	"math"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,6 +15,7 @@ import (
 type ImageConversionService interface {
 	DetectOrientation(filePath string) (imagick.OrientationType, error)
 	DetectSize(filePath string) (width, height uint, err error)
+	DetectContentType(filePath string) enums.ContentType
 	ConvertPoints(points [][]float64, orientation imagick.OrientationType, width, height uint) [][]float64
 	ConvertPdfToImages(pdfFilePath string) ([]*os.File, error)
 }
@@ -60,6 +63,16 @@ func (s *imageConversionService) DetectSize(filePath string) (width, height uint
 	width = magickWand.GetImageWidth()
 
 	return
+}
+
+func (s *imageConversionService) DetectContentType(filePath string) enums.ContentType {
+	bytes, err := os.ReadFile(filePath)
+	if err != nil {
+		s.logger.Error(fmt.Sprintf("failed detecting content-type: %v", err))
+		return enums.ContentType_OctetStream
+	}
+	return enums.ConvertToContentType(http.DetectContentType(bytes))
+
 }
 
 func (s *imageConversionService) ConvertPoints(points [][]float64, orientation imagick.OrientationType, width, height uint) [][]float64 {
