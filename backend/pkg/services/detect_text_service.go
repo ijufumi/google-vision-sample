@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities/enums"
@@ -10,11 +11,9 @@ import (
 	googleModels "github.com/ijufumi/google-vision-sample/pkg/gateways/google/models"
 	"github.com/ijufumi/google-vision-sample/pkg/models"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -84,7 +83,6 @@ func (s *detectTextService) GetSignedURL(key string) (*models.SignedURL, error) 
 
 func (s *detectTextService) DetectTexts(file *os.File, contentType string) error {
 	id := utils.NewULID()
-	inputFileID := utils.NewULID()
 	key := fmt.Sprintf("%s/original/%s", id, filepath.Base(file.Name()))
 
 	err := s.storageAPIClient.UploadFile(key, file, contentType)
@@ -92,10 +90,8 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 		return err
 	}
 
-	fileInfo, _ := file.Stat()
 	splitFileName := strings.Split(file.Name(), "/")
 	fileName := splitFileName[len(splitFileName)-1]
-	width, height := uint(0), uint(0)
 
 	job := &entities.Job{
 		ID:              id,
@@ -104,29 +100,6 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 		Status:          enums.JobStatus_Runing,
 	}
 	err = s.jobRepository.Create(s.db, job)
-	if err != nil {
-		return err
-	}
-
-	err = s.db.Transaction(func(tx *gorm.DB) error {
-		width, height, err = s.imageConversionService.DetectSize(file.Name())
-		if err != nil {
-			return err
-		}
-
-		err = s.inputFileRepository.Create(tx, &entities.InputFile{
-			ID:          inputFileID,
-			JobID:       id,
-			FileKey:     key,
-			FileName:    fileName,
-			ContentType: contentType,
-			Size:        uint(fileInfo.Size()),
-			Width:       width,
-			Height:      height,
-		})
-		return err
-	})
-
 	if err != nil {
 		return err
 	}
@@ -141,10 +114,18 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 	}
 
 	go func() {
-		err := s.processDetectText(id, tempFileForWork)
+		job, err := s.jobRepository.GetByID(s.db, id)
 		if err != nil {
 			s.logger.Error(fmt.Sprintf("%v was occurred.", err))
 		}
+		err = s.processDetectText(id, tempFileForWork)
+		if err != nil {
+			s.logger.Error(fmt.Sprintf("%v was occurred.", err))
+			job.Status = enums.JobStatus_Failed
+		} else {
+			job.Status = enums.JobStatus_Succeeded
+		}
+		_ = s.jobRepository.Update(s.db, job)
 		_ = os.Remove(tempFileForWork.Name())
 	}()
 	return nil
@@ -154,17 +135,30 @@ func (s *detectTextService) processDetectText(id string, inputFile *os.File) err
 	contentType := s.detectContentType(inputFile)
 	switch {
 	case contentType == "application/pdf":
+		imageFiles, err := s.imageConversionService.ConvertPdfToImages(inputFile.Name())
+		if err != nil {
+			return err
+		}
+		errs := make([]error, 0)
+		for idx, inputFile := range imageFiles {
+			if inputFile == nil {
+				continue
+			}
+			err := s.processDetectTextFromImage(id, contentType, inputFile, uint(idx+1))
+			if err != nil {
+				errs = append(errs, err)
+			}
+		}
+		if len(errs) != 0 {
+			return errors.Join(errs...)
+		}
 	case strings.HasPrefix(contentType, "image/"):
-
+		return s.processDetectTextFromImage(id, contentType, inputFile, 1)
 	}
 	return nil
 }
 
 func (s *detectTextService) processDetectTextFromImage(jobID string, contentType string, file *os.File, pageNo uint) error {
-	job, err := s.jobRepository.GetByID(s.db, jobID)
-	if err != nil {
-		return err
-	}
 	width, height, err := s.imageConversionService.DetectSize(file.Name())
 	if err != nil {
 		return err
@@ -249,7 +243,7 @@ func (s *detectTextService) processDetectTextFromImage(jobID string, contentType
 			return err
 		}
 		extractedTexts := make([]*entities.ExtractedText, 0)
-		orientation, err := s.imageConversionService.DetectOrientation(imageFilePath)
+		orientation, err := s.imageConversionService.DetectOrientation(file.Name())
 		if err != nil {
 			return err
 		}
@@ -397,7 +391,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 }
 
 func (s *detectTextService) detectContentType(file *os.File) string {
-	bytes, err := ioutil.ReadAll(file)
+	bytes, err := io.ReadAll(file)
 	_, _ = file.Seek(0, 0)
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("failed detecting content-type: %v", err))

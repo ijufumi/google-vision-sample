@@ -5,12 +5,16 @@ import (
 	"go.uber.org/zap"
 	"gopkg.in/gographics/imagick.v2/imagick"
 	"math"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 type ImageConversionService interface {
 	DetectOrientation(filePath string) (imagick.OrientationType, error)
 	DetectSize(filePath string) (width, height uint, err error)
 	ConvertPoints(points [][]float64, orientation imagick.OrientationType, width, height uint) [][]float64
+	ConvertPdfToImages(pdfFilePath string) ([]*os.File, error)
 }
 
 type imageConversionService struct {
@@ -93,6 +97,50 @@ func (s *imageConversionService) ConvertPoints(points [][]float64, orientation i
 	p4 = s.convertPoint(p4, sin, cos, m, afterM)
 
 	return [][]float64{p1, p2, p3, p4}
+}
+
+func (s *imageConversionService) ConvertPdfToImages(pdfFilePath string) ([]*os.File, error) {
+	imagick.Initialize()
+	defer imagick.Terminate()
+
+	magickWand := imagick.NewMagickWand()
+	defer magickWand.Destroy()
+
+	err := magickWand.ReadImage(pdfFilePath)
+	if err != nil {
+		s.logger.Error(fmt.Sprintf("error: %v", err))
+		return nil, err
+	}
+
+	err = magickWand.SetImageFormat("png")
+	if err != nil {
+		s.logger.Error(fmt.Sprintf("error: %v", err))
+		return nil, err
+	}
+
+	pageNo := magickWand.GetNumberImages()
+	s.logger.Info(fmt.Sprintf("The page number of %s is %d", pdfFilePath, pageNo))
+
+	imageFiles := make([]*os.File, pageNo)
+	originalFilename := filepath.Base(pdfFilePath)
+	for i := 0; i < int(pageNo); i++ {
+		if ret := magickWand.SetIteratorIndex(i); !ret {
+			continue
+		}
+		filePaths := []string{filepath.Dir(pdfFilePath), fmt.Sprintf("%s-%d.png", originalFilename, i)}
+		imageFilePath := strings.Join(filePaths, "/")
+		if err := magickWand.WriteImage(imageFilePath); err != nil {
+			s.logger.Error(fmt.Sprintf("error: %v", err))
+			continue
+		}
+		imageFile, err := os.Open(imageFilePath)
+		if err != nil {
+			s.logger.Error(fmt.Sprintf("error: %v", err))
+			return nil, err
+		}
+		imageFiles[i] = imageFile
+	}
+	return imageFiles, nil
 }
 
 func (s *imageConversionService) convertPoint(point []float64, sin, cos float64, beforeMiddlePoint, afterMiddlePoint []float64) []float64 {
