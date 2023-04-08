@@ -3,7 +3,7 @@ import { useParams } from "react-router"
 import { useNavigate } from "react-router"
 import { Stage, Layer, Rect } from "react-konva"
 import Konva from "konva"
-import { Pane, Table, Button } from "evergreen-ui"
+import { Pane, Table, Button, Text, IconButton, CaretLeftIcon, CaretRightIcon } from "evergreen-ui"
 import Job from "../models/Job"
 import JobUseCaseImpl from "../usecases/JobUseCase"
 import Image from "../components/Image"
@@ -15,7 +15,10 @@ export interface Props {}
 const ResultPage : FC<Props> = () => {
   const [initialized, setInitialized] = useState<boolean>(false)
   const [job, setJob] = useState<Job | undefined>(undefined)
+  const [resultIndex, setResultIndex] = useState<number>(-1)
+  const [maxResultsNumber, setMaxResultNumber] = useState<number>(0)
   const [inputFileUrl, setInputFileUrl] = useState<string>("")
+  const [extractedTexts, setExtractedTexts] = useState<ExtractedText[]>([])
   const [stageWidth, setStageWidth] = useState<number>(1)
   const [stageHeight, setStageHeight] = useState<number>(1)
   const [imageLoaded, setImageLoaded] = useState<boolean>(false)
@@ -52,12 +55,8 @@ const ResultPage : FC<Props> = () => {
     const _job = await useCase.getJob(jobId)
     if (_job) {
       setJob(_job)
-      if (_job.inputFile) {
-        const signedUrl = await useCase.getSignedUrl(_job.inputFile.fileKey)
-        if (signedUrl) {
-          setInputFileUrl(signedUrl.url)
-        }
-      }
+      setMaxResultNumber(_job.inputFiles.length)
+      setResultIndex(0)
     }
     setInitialized(true)
   }, [jobId, useCase])
@@ -68,6 +67,26 @@ const ResultPage : FC<Props> = () => {
     }
     initialize()
   }, [])
+
+  useEffect(() => {
+    if (!job || job.inputFiles.length < resultIndex) {
+      setInputFileUrl('')
+      setExtractedTexts([])
+      return
+    }
+    const inputFile = job.inputFiles[resultIndex]
+    const setResults = async () => {
+      const signedUrl = await useCase.getSignedUrl(inputFile.fileKey)
+      if (signedUrl) {
+        setInputFileUrl(signedUrl.url)
+        setExtractedTexts(inputFile.outputFiles[0].extractedTexts)
+      } else {
+        setInputFileUrl('')
+        setExtractedTexts([])
+      }
+    }
+    setResults()
+  }, [resultIndex])
 
   const handleBackToTop = () => {
     navigate("/")
@@ -93,15 +112,24 @@ const ResultPage : FC<Props> = () => {
       backgroundColor="#FFFFFF"
       margin="20px"
       position="relative"
-      height="calc(100vh - 40px)"
+      height="calc(100vh - 50px)"
     >
-      <Pane>
+      <Pane display="flex" marginBottom="10px">
         <Button onClick={handleBackToTop}>
           Return to top
         </Button>
+        {maxResultsNumber > 1 &&
+          <Pane display="flex" alignItems="center" marginLeft="10px">
+            <Text>{resultIndex}</Text> / <Text>{maxResultsNumber}</Text>
+            <Pane display="flex" marginLeft="5px">
+              <IconButton icon={CaretLeftIcon} disabled={resultIndex === 0} />
+              <IconButton icon={CaretRightIcon} disabled={resultIndex === maxResultsNumber-1} />
+            </Pane>
+          </Pane>
+        }
       </Pane>
       <Pane display="flex" width="100%" height="99%">
-        <Pane width="55%" marginRight={"5px"} height="100%" overflow="scroll">
+        <Pane width="59%" marginRight={"5px"} height="100%" overflow="scroll" border="1px solid #E6E8F0">
           { !imageLoaded && <Loader /> }
           <Stage ref={stageRef} width={window.innerWidth/2 - 10} height={window.innerHeight - 100}>
             <Layer>
@@ -113,7 +141,7 @@ const ResultPage : FC<Props> = () => {
               />
             </Layer>
             <Layer>
-              {job?.outputFile?.extractedTexts.map(result => {
+              {extractedTexts.map(result => {
                 return <Rect
                   key={result.id}
                   x={result.left * scale}
@@ -136,7 +164,7 @@ const ResultPage : FC<Props> = () => {
               <Table.TextHeaderCell>Texts</Table.TextHeaderCell>
             </Table.Head>
             <Table.Body overflow="scroll" height="calc(100% - 40px)">
-              {job?.outputFile?.extractedTexts.map((result) => {
+              {extractedTexts.map((result) => {
                 return (
                   <Table.Row key={result.id} style={selectedTextId === result.id ? selectedStyle : basicStyle}>
                     <Table.TextCell onClick={() => handleSelectText(result)}>{result.text}</Table.TextCell>
