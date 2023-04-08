@@ -133,6 +133,7 @@ func (s *detectTextService) DetectTexts(file *os.File, contentType string) error
 
 func (s *detectTextService) processDetectText(id string, inputFile *os.File) error {
 	contentType := s.detectContentType(inputFile)
+	s.logger.Info(fmt.Sprintf("Content-Type is %s", contentType))
 	switch {
 	case contentType == "application/pdf":
 		imageFiles, err := s.imageConversionService.ConvertPdfToImages(inputFile.Name())
@@ -152,10 +153,11 @@ func (s *detectTextService) processDetectText(id string, inputFile *os.File) err
 		if len(errs) != 0 {
 			return errors.Join(errs...)
 		}
+		return nil
 	case strings.HasPrefix(contentType, "image/"):
 		return s.processDetectTextFromImage(id, contentType, inputFile, 1)
 	}
-	return nil
+	return errors.New(fmt.Sprintf("unsupported content-type : %s", contentType))
 }
 
 func (s *detectTextService) processDetectTextFromImage(jobID string, contentType string, file *os.File, pageNo uint) error {
