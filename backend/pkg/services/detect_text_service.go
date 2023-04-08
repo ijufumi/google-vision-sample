@@ -331,6 +331,14 @@ func (s *detectTextService) DeleteResult(id string) error {
 			return err
 		}
 
+		job, err := s.jobRepository.GetByID(tx, id)
+		if err != nil {
+			return err
+		}
+		err = s.storageAPIClient.DeleteFile(job.OriginalFileKey)
+		if err != nil {
+			s.logger.Error(err.Error())
+		}
 		return s.jobRepository.Delete(tx, id)
 	})
 }
