@@ -23,7 +23,7 @@ type inputFileRepository struct {
 
 func (r *inputFileRepository) GetByID(db *gorm.DB, id string) (*entities.InputFile, error) {
 	var result entities.InputFile
-	if err := db.First(&result, id).Error; err != nil {
+	if err := db.First(&result, "id = ?", id).Error; err != nil {
 		return nil, errors.Wrap(err, "InputFileRepository#GetByID")
 	}
 	return &result, nil
