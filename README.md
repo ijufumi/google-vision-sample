@@ -10,46 +10,99 @@ It uses [Text Annotation API](https://cloud.google.com/vision/docs/ocr) for OCR.
 .
 ├── backend
 │ ├── cmd
+│ │ ├── app
+│ │ └── db
 │ ├── configs
 │ ├── docs
 │ ├── migration
 │ ├── pkg
+│ │ ├── configs
+│ │ ├── container
+│ │ ├── gateways
+│ │ │ ├── database
+│ │ │ └── google
+│ │ ├── http
+│ │ │ ├── handlers
+│ │ │ └── router
+│ │ ├── loggers
+│ │ ├── models
+│ │ ├── services
+│ │ └── utils
 │ └── scripts
 ├── deployment
 ├── docs
 └── frontend
   ├── public
   └── src
-     ├── components
-     ├── configs
-     ├── models
-     ├── pages
-     ├── repositories
-     └── usecases
+    ├── components
+    ├── configs
+    ├── models
+    ├── pages
+    ├── repositories
+    └── usecases
 ```
 
 ### `backend`
 
-### `backend/cmd`
+This is `Golang` application.
+
+### `backend/cmd/app`
+
+The `main.go` to launch an application.
+
+### `backend/cmd/db`
+
+The `main.go` to execute `golang-migrate` commands.
 
 ### `backend/configs`
 
+This directory is storing configuration files. like google credential file.
+
 ### `backend/docs`
+
+This directory is storing system documentation. like PlatUML file.
 
 ### `backend/migration`
 
-### `backend/pkg`
+This directory is for migration files to execute `golang-migrate` commands.
+
+### `backend/pkg/configs`
+
+### `backend/pkg/container`
+
+### `backend/pkg/gateways/database`
+
+### `backend/pkg/gateways/google`
+
+### `backend/pkg/http/handlers`
+
+### `backend/pkg/http/router`
+
+### `backend/pkg/loggers`
+
+### `backend/pkg/models`
+
+### `backend/pkg/services`
+
+### `backend/pkg/utils`
 
 ### `backend/scripts`
 
 ### `deployment`
 
+In the future, this directory will have IaC files.
+
 ### `docs`
+
+This directory has files for `Github pages` or `README.md`.
 
 ### `frontend`
 
+This is `React` application.
+
 ### `frontend/public`
 
+This directory stores `HTML` and `favicon.ico` and more.
 
 ### `frontend/src`
 
