@@ -69,6 +69,7 @@ const ResultPage : FC<Props> = () => {
   }, [])
 
   useEffect(() => {
+    setSelectedTextId('')
     if (!job || job.inputFiles.length < resultIndex) {
       setInputFileUrl('')
       setExtractedTexts([])
@@ -112,26 +113,30 @@ const ResultPage : FC<Props> = () => {
       backgroundColor="#FFFFFF"
       margin="20px"
       position="relative"
-      height="calc(100vh - 50px)"
+      height="calc(100vh - 40px)"
     >
-      <Pane display="flex" marginBottom="10px">
-        <Button onClick={handleBackToTop}>
-          Return to top
-        </Button>
-        {maxResultsNumber > 1 &&
-          <Pane display="flex" alignItems="center" marginLeft="10px">
-            <Text>{resultIndex}</Text> / <Text>{maxResultsNumber}</Text>
-            <Pane display="flex" marginLeft="5px">
-              <IconButton icon={CaretLeftIcon} disabled={resultIndex === 0} />
-              <IconButton icon={CaretRightIcon} disabled={resultIndex === maxResultsNumber-1} />
+      <Pane marginBottom="10px">
+        <Pane display="flex" justifyContent="space-between" width="59%">
+          <Button onClick={handleBackToTop}>
+            Return to top
+          </Button>
+          {maxResultsNumber > 1 &&
+            <Pane display="flex" alignItems="center">
+              <Text>{resultIndex+1}</Text>
+              <Text marginLeft="2px" marginRight="2px">{"/"}</Text>
+              <Text>{maxResultsNumber}</Text>
+              <Pane display="flex" marginLeft="10px">
+                <IconButton icon={CaretLeftIcon} disabled={resultIndex === 0} onClick={() => setResultIndex(resultIndex-1)} />
+                <IconButton icon={CaretRightIcon} disabled={resultIndex === maxResultsNumber-1} onClick={() => setResultIndex(resultIndex+1)} />
+              </Pane>
             </Pane>
-          </Pane>
-        }
+          }
+        </Pane>
       </Pane>
-      <Pane display="flex" width="100%" height="99%">
-        <Pane width="59%" marginRight={"5px"} height="100%" overflow="scroll" border="1px solid #E6E8F0">
+      <Pane display="flex" width="100%" height="95%">
+        <Pane width="59%" marginRight={"5px"} overflow="scroll">
           { !imageLoaded && <Loader /> }
-          <Stage ref={stageRef} width={window.innerWidth/2 - 10} height={window.innerHeight - 100}>
+          <Stage ref={stageRef} width={window.innerWidth/2 - 10} height={window.innerHeight - 90} style={{ border: "1px solid #E6E8F0" }}>
             <Layer>
               <Image
                 outerWidth={stageWidth}
@@ -158,12 +163,12 @@ const ResultPage : FC<Props> = () => {
             </Layer>
           </Stage>
         </Pane>
-        <Pane width="40%" height="calc(100% - 30px)">
-          <Table height="calc(100% - 30px)">
+        <Pane width="40%" height="100%">
+          <Table height="calc(100% - 5px)">
             <Table.Head>
               <Table.TextHeaderCell>Texts</Table.TextHeaderCell>
             </Table.Head>
-            <Table.Body overflow="scroll" height="calc(100% - 40px)">
+            <Table.Body overflow="scroll" height="calc(100% - 50px)">
               {extractedTexts.map((result) => {
                 return (
                   <Table.Row key={result.id} style={selectedTextId === result.id ? selectedStyle : basicStyle}>
