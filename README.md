@@ -1,5 +1,74 @@
 # Sample application for Google Cloud Vision
 
+This application is sample application to use Google Vision API.
+
+It uses [Text Annotation API](https://cloud.google.com/vision/docs/ocr) for OCR.
+
+## Application structure
+
+```
+.
+├── backend
+│ ├── cmd
+│ ├── configs
+│ ├── docs
+│ ├── migration
+│ ├── pkg
+│ └── scripts
+├── deployment
+├── docs
+└── frontend
+  ├── public
+  └── src
+     ├── components
+     ├── configs
+     ├── models
+     ├── pages
+     ├── repositories
+     └── usecases
+```
+
+### `backend`
+
+### `backend/cmd`
+
+### `backend/configs`
+
+### `backend/docs`
+
+### `backend/migration`
+
+### `backend/pkg`
+
+### `backend/scripts`
+
+### `deployment`
+
+### `docs`
+
+### `frontend`
+
+### `frontend/public`
+
+
+### `frontend/src`
+
+
+### `frontend/src/components`
+
+
+### `frontend/src/configs`
+
+
+### `frontend/src/models`
+
+
+### `frontend/src/pages`
+
+
+### `frontend/src/usecases`
+
+
 ## ERD
 
 ![ERD](./docs/tables.svg)
