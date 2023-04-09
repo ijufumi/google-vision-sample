@@ -48,6 +48,9 @@ func (c *visionAPIClient) DetectText(key string) (string, error) {
 				Features: []*visionpb.Feature{
 					&visionpb.Feature{Type: visionpb.Feature_TEXT_DETECTION},
 				},
+				ImageContext: &visionpb.ImageContext{
+					LanguageHints: []string{"ja"},
+				},
 			},
 		},
 		OutputConfig: &visionpb.OutputConfig{
