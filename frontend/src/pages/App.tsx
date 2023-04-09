@@ -186,7 +186,7 @@ const App: FC<Props> = () => {
           width="100%"
           paddingBottom="40px"
         >
-          <Heading size={900}>Google Vision API Client</Heading>
+          <Heading size={900}>Vision API Demo</Heading>
           <Button
             appearance="primary"
             iconAfter={UploadIcon}
