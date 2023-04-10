@@ -68,25 +68,47 @@ This directory is for migration files to execute `golang-migrate` commands.
 
 ### `backend/pkg/configs`
 
+This package has configurations of an application.
+
 ### `backend/pkg/container`
+
+This package has a DI container.
 
 ### `backend/pkg/gateways/database`
 
+This package is for database. such as connection, repositories and entities.
+
 ### `backend/pkg/gateways/google`
+
+This package is for google api. like a storage api and vision api.
 
 ### `backend/pkg/http/handlers`
 
+This package has all controllers of http endpoint.
+
 ### `backend/pkg/http/router`
+
+This package determines uri path of http endpoint.
 
 ### `backend/pkg/loggers`
 
+This package has wrapper of `zap.logger`.
+
 ### `backend/pkg/models`
+
+This package has input / output models for API.
 
 ### `backend/pkg/services`
 
+This package has business logic services.
+
 ### `backend/pkg/utils`
 
+This package has utilities.
+
 ### `backend/scripts`
+
+This directory has scripts for several purpose.
 
 ### `deployment`
 
@@ -107,6 +129,7 @@ This directory stores `HTML` and `favicon.ico` and more.
 ### `frontend/src`
 
 
+
 ### `frontend/src/components`
 
 
@@ -117,6 +140,9 @@ This directory stores `HTML` and `favicon.ico` and more.
 
 
 ### `frontend/src/pages`
+
+
+### `frontend/src/repositories`
 
 
 ### `frontend/src/usecases`
