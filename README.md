@@ -4,7 +4,7 @@ This application is sample application to use Google Vision API.
 
 It uses [Text Annotation API](https://cloud.google.com/vision/docs/ocr) for OCR.
 
-## Application structure
+## Application structures
 
 ```
 .
@@ -128,25 +128,31 @@ This directory stores `HTML` and `favicon.ico` and more.
 
 ### `frontend/src`
 
-
+This is codes of frontend.
 
 ### `frontend/src/components`
 
+This package is for several components.
 
 ### `frontend/src/configs`
 
+This package has a configuration of frontend app
 
 ### `frontend/src/models`
 
+This package has `Data Access Object` that is used between backend api.
 
 ### `frontend/src/pages`
 
+This package has source codes to show pages
 
 ### `frontend/src/repositories`
 
+This package has classes to access the backend api.
 
 ### `frontend/src/usecases`
 
+This package is the bridge code between pages and repositories.
 
 ## ERD
 
