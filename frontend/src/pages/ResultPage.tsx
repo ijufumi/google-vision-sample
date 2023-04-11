@@ -148,6 +148,7 @@ const ResultPage : FC<Props> = () => {
             <Layer>
               {extractedTexts.map(result => {
                 return <Rect
+                  draggable={true}
                   key={result.id}
                   x={result.left * scale}
                   y={result.top * scale}
