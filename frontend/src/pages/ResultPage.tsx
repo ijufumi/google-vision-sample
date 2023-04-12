@@ -1,10 +1,11 @@
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useParams } from "react-router"
 import { useNavigate } from "react-router"
-import { Stage, Layer, Rect } from "react-konva"
+import { Stage, Layer } from "react-konva"
 import Konva from "konva"
 import { Pane, Table, Button, Text, IconButton, CaretLeftIcon, CaretRightIcon } from "evergreen-ui"
 import Job from "../models/Job"
+import Rect from "../components/Rect"
 import JobUseCaseImpl from "../usecases/JobUseCase"
 import Image from "../components/Image"
 import Loader from "../components/Loader"
@@ -148,16 +149,11 @@ const ResultPage : FC<Props> = () => {
             <Layer>
               {extractedTexts.map(result => {
                 return <Rect
-                  draggable={true}
                   key={result.id}
                   x={result.left * scale}
                   y={result.top * scale}
                   width={(result.right - result.left) * scale}
                   height={(result.bottom - result.top) * scale}
-                  stroke={"#D14343"}
-                  fill={"#F9DADA"}
-                  opacity={0.3}
-                  strokeWidth={2}
                   visible={result.id === selectedTextId}
                 />
               })}
