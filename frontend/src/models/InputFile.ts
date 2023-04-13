@@ -1,4 +1,4 @@
-import { formatToDate } from "../components/dates"
+import { formatToDateString } from "../components/dates"
 import OutputFile, { Props as OutputFileProp } from "./OutputFile"
 
 export interface Props {
@@ -34,11 +34,11 @@ export default class InputFile {
   }
 
   get readableCreatedAt() {
-    return formatToDate(this.createdAt)
+    return formatToDateString(this.createdAt)
   }
 
   get readableUpdatedAt() {
-    return formatToDate(this.updatedAt)
+    return formatToDateString(this.updatedAt)
   }
 
   get isJSON() {

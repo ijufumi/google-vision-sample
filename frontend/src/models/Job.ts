@@ -1,5 +1,5 @@
 import InputFile, { Props as InputFileProps } from "./InputFile"
-import { formatToDate } from "../components/dates"
+import { formatToDateString } from "../components/dates"
 
 export enum JobStatus {
   Running = "running",
@@ -34,11 +34,11 @@ export default class Job {
   }
 
   get readableCreatedAt() {
-    return formatToDate(this.createdAt)
+    return formatToDateString(this.createdAt)
   }
 
   get readableUpdatedAt() {
-    return formatToDate(this.updatedAt)
+    return formatToDateString(this.updatedAt)
   }
 
   get inputFile() {

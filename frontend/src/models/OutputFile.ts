@@ -1,4 +1,4 @@
-import { formatToDate } from "../components/dates"
+import { formatToDateString } from "../components/dates"
 import ExtractedText, { Props as ExtractedTextProps } from "./ExtractedText"
 
 export interface Props {
@@ -36,10 +36,10 @@ export default class OutputFile {
   }
 
   get readableCreatedAt() {
-    return formatToDate(this.createdAt)
+    return formatToDateString(this.createdAt)
   }
 
   get readableUpdatedAt() {
-    return formatToDate(this.updatedAt)
+    return formatToDateString(this.updatedAt)
   }
 }
