@@ -1,11 +1,5 @@
-import React, { FC, useState, useCallback } from "react"
-import {
-  Dialog,
-  Pane,
-  FileUploader,
-  FileCard,
-  FileRejection,
-} from "evergreen-ui"
+import React, { FC, useCallback, useState } from "react"
+import { Dialog, FileCard, FileRejection, FileUploader, MimeType, Pane } from "evergreen-ui"
 
 interface Props {
   isShown: boolean
@@ -21,6 +15,8 @@ const FileUploadDialog: FC<Props> = ({ isShown, onClose, onUpload }) => {
     (fileRejections: FileRejection[]) => setFileRejections([fileRejections[0]]),
     []
   )
+  const acceptedMimeTypes = [MimeType.jpeg, MimeType.pdf, MimeType.png]
+
   const handleRemove = useCallback(() => {
     setFiles([])
     setFileRejections([])
@@ -55,6 +51,7 @@ const FileUploadDialog: FC<Props> = ({ isShown, onClose, onUpload }) => {
           maxFiles={1}
           onChange={handleChange}
           onRejected={handleRejected}
+          acceptedMimeTypes={acceptedMimeTypes}
           renderFile={(file) => {
             const { name, size, type } = file
             const fileRejection = fileRejections.find(
