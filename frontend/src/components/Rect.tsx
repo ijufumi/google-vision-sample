@@ -27,9 +27,9 @@ const Rect: FC<Props> = (props) => {
   return <React.Fragment>
     <KonvaRect
       draggable={true}
+      strokeEnabled={false}
       ref={rectRef}
-      stroke={"#D14343"}
-      fill={"#F9DADA"}
+      fill={"#FF8C00"}
       opacity={0.3}
       strokeWidth={2}
       {...props}
