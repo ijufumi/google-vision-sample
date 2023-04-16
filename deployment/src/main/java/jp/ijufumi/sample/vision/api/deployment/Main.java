@@ -1,9 +1,6 @@
-package com.mycompany.app;
-
-import software.constructs.Construct;
+package jp.ijufumi.sample.vision.api.deployment;
 
 import com.hashicorp.cdktf.App;
-import com.hashicorp.cdktf.TerraformStack;
 
 
 public class Main

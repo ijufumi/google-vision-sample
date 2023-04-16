@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package jp.ijufumi.sample.vision.api.deployment;
 
 import software.constructs.Construct;
 
