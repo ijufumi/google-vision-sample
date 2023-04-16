@@ -5,13 +5,31 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class Config {
 
-    private Dotenv dotenv;
+    private final Dotenv dotenv;
     private Config(Dotenv dotenv) {
         this.dotenv = dotenv;
     }
 
+    public String getEnv(String key, String defaultValue) {
+        return this.dotenv.get(key, defaultValue);
+    }
+
+    public Integer getEnv(String key, Integer defaultValue) {
+        try {
+            return Integer.parseInt(this.dotenv.get(key));
+        } catch (NumberFormatException e) {
+            System.out.println(e);
+            return defaultValue;
+        }
+    }
+
     public static Config read() {
-        Dotenv dotenv = Dotenv.load();
+        Dotenv dotenv = Dotenv
+                .configure()
+                .systemProperties()
+                .ignoreIfMalformed()
+                .ignoreIfMissing()
+                .load();
 
         return new Config(dotenv);
     }
