@@ -24,7 +24,7 @@ public class Config {
     }
 
     public static Config read() {
-        Dotenv dotenv = Dotenv
+        var dotenv = Dotenv
                 .configure()
                 .systemProperties()
                 .ignoreIfMalformed()
