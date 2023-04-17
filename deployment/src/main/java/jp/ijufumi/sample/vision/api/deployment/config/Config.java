@@ -23,6 +23,14 @@ public class Config {
         }
     }
 
+    public String ProjectId() {
+        return this.getEnv("PROJECT_ID", "");
+    }
+
+    public String Region() {
+        return this.getEnv("REGION", "");
+    }
+
     public static Config read() {
         var dotenv = Dotenv
                 .configure()
