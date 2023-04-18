@@ -3,6 +3,8 @@ package jp.ijufumi.sample.vision.api.deployment.config;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.util.List;
+
 public class Config {
 
     private final Dotenv dotenv;
@@ -29,6 +31,26 @@ public class Config {
 
     public String Region() {
         return this.getEnv("REGION", "");
+    }
+
+    public String Location() {
+        return this.getEnv("LOCATION", "");
+    }
+
+    public String BucketName() {
+        return this.getEnv("BUCKET_NAME", "");
+    }
+
+    public List<String> BucketCorsMethods() {
+        return List.of(this.getEnv("BUCKET_CORS_METHODS", "*").split(","));
+    }
+
+    public List<String> BucketCorsOrigins() {
+        return List.of(this.getEnv("BUCKET_CORS_ORIGINS", "*").split(","));
+    }
+
+    public Integer BucketCorsMaxAge() {
+        return this.getEnv("BUCKET_CORS_MAX_AGE", 3600);
     }
 
     public static Config read() {

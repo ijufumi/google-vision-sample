@@ -1,6 +1,7 @@
 package jp.ijufumi.sample.vision.api.deployment;
 
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
+import jp.ijufumi.sample.vision.api.deployment.stacks.BucketStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.CloudRunStack;
 import software.constructs.Construct;
 import com.hashicorp.cdktf.providers.google.provider.GoogleProvider;
@@ -18,6 +19,6 @@ public class MainStack extends TerraformStack
                 .project(config.ProjectId())
                 .build();
         CloudRunStack.create(this, config);
-        // define resources here
+        BucketStack.create(this, config);
     }
 }

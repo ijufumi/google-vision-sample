@@ -6,8 +6,10 @@ import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.constructs.Construct;
 
 public class CloudRunStack {
-    public static CloudRunV2Service create(final Construct scope, final Config config) {
-        var cloudRunConfig = CloudRunV2ServiceConfig.builder().build();
-        return new CloudRunV2Service(scope, "cloud-run", cloudRunConfig);
+    public static void create(final Construct scope, final Config config) {
+        var cloudRunConfig = CloudRunV2ServiceConfig
+                .builder()
+                .build();
+        new CloudRunV2Service(scope, "cloud-run", cloudRunConfig);
     }
 }
