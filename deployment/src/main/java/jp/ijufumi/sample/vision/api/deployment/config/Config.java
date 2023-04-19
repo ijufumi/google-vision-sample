@@ -16,6 +16,10 @@ public class Config {
         return this.dotenv.get(key, defaultValue);
     }
 
+    public String getEnv(String key) {
+        return this.getEnv(key, (String) null);
+    }
+
     public Integer getEnv(String key, Integer defaultValue) {
         try {
             return Integer.parseInt(this.dotenv.get(key));
@@ -51,6 +55,10 @@ public class Config {
 
     public Integer BucketCorsMaxAge() {
         return this.getEnv("BUCKET_CORS_MAX_AGE", 3600);
+    }
+
+    public String CloudRunContainerImage() {
+        return this.getEnv("CLOUD_RUN_CONTAINER_IMAGE");
     }
 
     public static Config read() {
