@@ -6,12 +6,12 @@ nwdiag {
 
     network public {
         router;
-        load-balancer;
+        load_balancer;
     }
 
     network private {
-        load-balancer;  
-        cloud-run;      
+        load_balancer;  
+        cloud_run;      
         database;
     }
 }
