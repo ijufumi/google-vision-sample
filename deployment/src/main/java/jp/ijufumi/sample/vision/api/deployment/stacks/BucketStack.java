@@ -9,7 +9,7 @@ import com.hashicorp.cdktf.providers.google.storage_bucket.StorageBucketCors;
 import java.util.List;
 
 public class BucketStack {
-    public static void create(Construct scope, Config config) {
+    public static void create(final Construct scope, final Config config) {
         var bucketCors = StorageBucketCors
                 .builder()
                 .method(config.BucketCorsMethods())
