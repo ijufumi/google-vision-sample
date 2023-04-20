@@ -7,6 +7,7 @@ nwdiag {
     network public {
         router;
         load_balancer;
+        bucket;
     }
 
     network private {
