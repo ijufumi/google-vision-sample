@@ -40,11 +40,6 @@
       <artifactId>cdktf-provider-google</artifactId>
       <version>7.0.1</version>
     </dependency>
-    <dependency>
-      <groupId>com.hashicorp</groupId>
-      <artifactId>cdktf-provider-google-beta</artifactId>
-      <version>7.0.1</version>
-    </dependency>
   </dependencies>
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
