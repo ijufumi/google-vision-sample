@@ -1,6 +1,7 @@
 package jp.ijufumi.sample.vision.api.deployment;
 
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
+import jp.ijufumi.sample.vision.api.deployment.stacks.ArtifactRegistryStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.BucketStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.CloudRunStack;
 import software.constructs.Construct;
@@ -20,5 +21,6 @@ public class MainStack extends TerraformStack
                 .build();
         CloudRunStack.create(this, config);
         BucketStack.create(this, config);
+        ArtifactRegistryStack.create(this, config);
     }
 }

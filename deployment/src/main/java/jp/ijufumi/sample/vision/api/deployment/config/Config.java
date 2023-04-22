@@ -61,6 +61,10 @@ public class Config {
         return this.getEnv("CLOUD_RUN_CONTAINER_IMAGE");
     }
 
+    public String RepositoryId() {
+        return this.getEnv("REPOSITORY_ID");
+    }
+
     public static Config read() {
         var dotenv = Dotenv
                 .configure()
