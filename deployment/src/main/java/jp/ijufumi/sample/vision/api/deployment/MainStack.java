@@ -3,6 +3,7 @@ package jp.ijufumi.sample.vision.api.deployment;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import jp.ijufumi.sample.vision.api.deployment.stacks.ArtifactRegistryStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.BucketStack;
+import jp.ijufumi.sample.vision.api.deployment.stacks.CloudCDNStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.CloudRunStack;
 import software.constructs.Construct;
 import com.hashicorp.cdktf.providers.google.provider.GoogleProvider;
@@ -22,5 +23,6 @@ public class MainStack extends TerraformStack
         CloudRunStack.create(this, config);
         BucketStack.create(this, config);
         ArtifactRegistryStack.create(this, config);
+        CloudCDNStack.create(this, config);
     }
 }
