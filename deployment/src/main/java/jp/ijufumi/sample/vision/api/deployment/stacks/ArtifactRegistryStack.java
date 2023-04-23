@@ -20,6 +20,6 @@ public class ArtifactRegistryStack {
         .dockerConfig(dockerConfig)
         .format("DOCKER")
         .build();
-    new ArtifactRegistryRepository(scope, "container-registry", registryConfig);
+    new ArtifactRegistryRepository(scope, "artifact-registry", registryConfig);
   }
 }
