@@ -7,18 +7,19 @@ import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.constructs.Construct;
 
 public class ArtifactRegistryStack {
-    public static void create(final Construct scope, final Config config) {
-        var dockerConfig = ArtifactRegistryRepositoryDockerConfig
-                .builder()
-                .immutableTags(true)
-                .build();
-        var registryConfig = ArtifactRegistryRepositoryConfig
-                .builder()
-                .location(config.Location())
-                .repositoryId(config.RepositoryId())
-                .dockerConfig(dockerConfig)
-                .format("DOCKER")
-                .build();
-        new ArtifactRegistryRepository(scope, "container-registry", registryConfig);
-    }
+
+  public static void create(final Construct scope, final Config config) {
+    var dockerConfig = ArtifactRegistryRepositoryDockerConfig
+        .builder()
+        .immutableTags(true)
+        .build();
+    var registryConfig = ArtifactRegistryRepositoryConfig
+        .builder()
+        .location(config.Location())
+        .repositoryId(config.RepositoryId())
+        .dockerConfig(dockerConfig)
+        .format("DOCKER")
+        .build();
+    new ArtifactRegistryRepository(scope, "container-registry", registryConfig);
+  }
 }
