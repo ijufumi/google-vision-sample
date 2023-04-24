@@ -5,6 +5,8 @@ import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2Servi
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplate;
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplateContainers;
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplateContainersPorts;
+import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplateContainersStartupProbe;
+import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplateContainersStartupProbeHttpGet;
 import java.util.List;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.constructs.Construct;
@@ -16,10 +18,21 @@ public class CloudRunStack {
         .builder()
         .containerPort(config.CloudRunContainerPort())
         .build();
+    var startupProbeGet = CloudRunV2ServiceTemplateContainersStartupProbeHttpGet
+        .builder()
+        .path(config.CloudRunContainerProbePath())
+        .build();
+    var startupProbe = CloudRunV2ServiceTemplateContainersStartupProbe
+        .builder()
+        .httpGet(startupProbeGet)
+        .periodSeconds(1000)
+        .timeoutSeconds(1000)
+        .build();
     var container = CloudRunV2ServiceTemplateContainers
         .builder()
         .image(config.CloudRunContainerImage())
         .ports(List.of(containerPort))
+        .startupProbe(startupProbe)
         .build();
     var template = CloudRunV2ServiceTemplate
         .builder()

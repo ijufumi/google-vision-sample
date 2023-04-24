@@ -28,7 +28,7 @@ public class Config {
       return defaultValue;
     }
   }
-  
+
   public String ProjectId() {
     return this.getEnv("PROJECT_ID", "");
   }
@@ -63,6 +63,10 @@ public class Config {
 
   public Integer CloudRunContainerPort() {
     return this.getEnv("CLOUD_RUN_CONTAINER_PORT", 0);
+  }
+
+  public String CloudRunContainerProbePath() {
+    return this.getEnv("CLOUD_RUN_CONTAINER_PROBE_PATH");
   }
 
   public String RepositoryId() {
