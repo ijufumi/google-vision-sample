@@ -21,8 +21,22 @@ jobs:
         uses: borales/actions-yarn@v4
         with:
           cmd: install
+          dir: 'frontend'
 
       - name: Build production bundle
         uses: borales/actions-yarn@v4
         with:
           cmd: build
+          dir: 'frontend'
+
+      - id: 'google auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.SERVICE_ACCOUNT_NAME }}
+
+      - id: 'upload-folder'
+        uses: 'google-github-actions/upload-cloud-storage@v1'
+        with:
+          path: 'frontend/build/'
+          destination: ${{ vars.STORAGE_BUCKET_NAME }}
