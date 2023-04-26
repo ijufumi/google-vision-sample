@@ -19,6 +19,7 @@ public class MainStack extends TerraformStack {
         .create(this, "gcp-provider")
         .region(config.Region())
         .project(config.ProjectId())
+        .credentials(config.Credentials())
         .build();
 
     CloudRunStack.create(this, config);

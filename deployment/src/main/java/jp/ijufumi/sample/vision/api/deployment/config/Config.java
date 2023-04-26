@@ -2,6 +2,10 @@ package jp.ijufumi.sample.vision.api.deployment.config;
 
 
 import io.github.cdimascio.dotenv.Dotenv;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 public class Config {
@@ -27,6 +31,27 @@ public class Config {
       System.out.println(e);
       return defaultValue;
     }
+  }
+
+  public String Credentials() {
+    var jsonString = this.CredentialsJson();
+    if (jsonString == null || jsonString.equals("")) {
+      try {
+        var bytes = Files.readAllBytes(Path.of(this.CredentialsJsonFile()));
+        return new String(bytes);
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    }
+    return jsonString;
+  }
+
+  public String CredentialsJson() {
+    return this.getEnv("CREDENTIALS_JSON", "");
+  }
+
+  public String CredentialsJsonFile() {
+    return this.getEnv("CREDENTIALS_JSON_FILE", "");
   }
 
   public String ProjectId() {
