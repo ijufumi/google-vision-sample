@@ -82,6 +82,10 @@ public class Config {
     return this.getEnv("BUCKET_CORS_MAX_AGE", 3600);
   }
 
+  public String CloudRunName() {
+    return this.getEnv("CLOUD_RUN_NAME");
+  }
+
   public String CloudRunContainerImage() {
     return this.getEnv("CLOUD_RUN_CONTAINER_IMAGE");
   }
