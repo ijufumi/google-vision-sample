@@ -11,3 +11,4 @@ cdktf.log
 *.iml
 target/
 .env
+src/main/resources/credentials
