@@ -82,6 +82,14 @@ public class Config {
     return this.getEnv("BUCKET_CORS_MAX_AGE", 3600);
   }
 
+  public Integer BackendBucketCdnPolicyTTL() {
+    return this.getEnv("BACKEND_BUCKET_CDN_POLICY_TTL", 3600);
+  }
+
+  public String BackendBucketName() {
+    return this.getEnv("BACKEND_BUCKET_NAME", "backend_bucket_name");
+  }
+
   public String CloudRunName() {
     return this.getEnv("CLOUD_RUN_NAME");
   }
