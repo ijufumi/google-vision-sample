@@ -111,7 +111,7 @@ public class Config {
   }
 
   public Integer CloudRunContainerProbeSeconds() {
-    return this.getEnv("CLOUD_RUN_CONTAINER_PROBE_SECOND", 600);
+    return this.getEnv("CLOUD_RUN_CONTAINER_PROBE_SECOND", 100);
   }
 
   public String RepositoryId() {
