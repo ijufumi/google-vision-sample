@@ -25,8 +25,8 @@ public class CloudRunStack {
     var startupProbe = CloudRunV2ServiceTemplateContainersStartupProbe
         .builder()
         .httpGet(startupProbeGet)
-        .periodSeconds(1000)
-        .timeoutSeconds(1000)
+        .periodSeconds(config.CloudRunContainerProbeSeconds())
+        .timeoutSeconds(config.CloudRunContainerProbeSeconds())
         .build();
     var container = CloudRunV2ServiceTemplateContainers
         .builder()

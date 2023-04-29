@@ -110,6 +110,10 @@ public class Config {
     return this.getEnv("CLOUD_RUN_CONTAINER_PROBE_PATH");
   }
 
+  public Integer CloudRunContainerProbeSeconds() {
+    return this.getEnv("CLOUD_RUN_CONTAINER_PROBE_SECOND", 600);
+  }
+
   public String RepositoryId() {
     return this.getEnv("REPOSITORY_ID");
   }
