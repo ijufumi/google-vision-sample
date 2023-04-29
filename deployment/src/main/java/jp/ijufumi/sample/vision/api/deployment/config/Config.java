@@ -26,7 +26,11 @@ public class Config {
 
   public Integer getEnv(String key, Integer defaultValue) {
     try {
-      return Integer.parseInt(this.dotenv.get(key));
+      var value = this.dotenv.get(key);
+      if (value == null || value.equals("")) {
+        return defaultValue;
+      }
+      return Integer.parseInt(value);
     } catch (NumberFormatException e) {
       System.out.println(e);
       return defaultValue;
