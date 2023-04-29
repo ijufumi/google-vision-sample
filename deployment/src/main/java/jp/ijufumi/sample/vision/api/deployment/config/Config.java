@@ -67,7 +67,7 @@ public class Config {
   }
 
   public String Location() {
-    return this.getEnv("LOCATION", "");
+    return this.getEnv("LOCATION", "us-west1");
   }
 
   public String BucketName() {
