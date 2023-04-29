@@ -87,7 +87,7 @@ public class Config {
   }
 
   public String BackendBucketName() {
-    return this.getEnv("BACKEND_BUCKET_NAME", "backend_bucket_name");
+    return this.getEnv("BACKEND_BUCKET_NAME", "backend-bucket-name");
   }
 
   public String CloudRunName() {
