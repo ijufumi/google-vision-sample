@@ -7,6 +7,8 @@ import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2Servi
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplateContainersPorts;
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplateContainersStartupProbe;
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplateContainersStartupProbeHttpGet;
+import com.hashicorp.cdktf.providers.google.cloud_run_v2_service_iam_member.CloudRunV2ServiceIamMember;
+import com.hashicorp.cdktf.providers.google.cloud_run_v2_service_iam_member.CloudRunV2ServiceIamMemberConfig;
 import java.util.List;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.constructs.Construct;
@@ -44,6 +46,14 @@ public class CloudRunStack {
         .name(config.CloudRunName())
         .location(config.Location())
         .build();
-    new CloudRunV2Service(scope, "cloud-run", cloudRunConfig);
+    var cloudRun = new CloudRunV2Service(scope, "cloud-run", cloudRunConfig);
+
+    var memberConfig = CloudRunV2ServiceIamMemberConfig
+        .builder()
+        .project(cloudRun.getProject())
+        .location(config.Location())
+        .name("")
+        .build();
+    new CloudRunV2ServiceIamMember(scope, "cloud-run-v2-service-iam-member", memberConfig);
   }
 }
