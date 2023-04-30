@@ -54,6 +54,7 @@ public class CloudRunStack {
         .location(config.Location())
         .name(config.CloudRunV2ServiceIamMemberName())
         .member("allUsers")
+        .role("projects")
         .build();
     new CloudRunV2ServiceIamMember(scope, "cloud-run-v2-service-iam-member", memberConfig);
   }
