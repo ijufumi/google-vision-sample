@@ -23,8 +23,8 @@ public class MainStack extends TerraformStack {
         .build();
 
     CloudRunStack.create(this, config);
-    BucketStack.create(this, config);
+    var bucket = BucketStack.create(this, config);
     ArtifactRegistryStack.create(this, config);
-    CloudCDNStack.create(this, config);
+    CloudCDNStack.create(this, config, bucket);
   }
 }

@@ -9,7 +9,7 @@ import software.constructs.Construct;
 
 public class BucketStack {
 
-  public static void create(final Construct scope, final Config config) {
+  public static StorageBucket create(final Construct scope, final Config config) {
     var bucketCors = StorageBucketCors
         .builder()
         .method(config.BucketCorsMethods())
@@ -23,6 +23,6 @@ public class BucketStack {
         .name(config.BucketName())
         .cors(List.of(bucketCors))
         .build();
-    new StorageBucket(scope, "storage-bucket", bucketConfig);
+    return new StorageBucket(scope, "storage-bucket", bucketConfig);
   }
 }
