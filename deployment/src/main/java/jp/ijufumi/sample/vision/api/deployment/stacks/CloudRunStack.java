@@ -51,8 +51,8 @@ public class CloudRunStack {
     var memberConfig = CloudRunV2ServiceIamMemberConfig
         .builder()
         .project(cloudRun.getProject())
-        .location(config.Location())
-        .name(config.CloudRunName())
+        .location(cloudRun.getLocation())
+        .name(cloudRun.getName())
         .member("allUsers")
         .role("projects")
         .build();
