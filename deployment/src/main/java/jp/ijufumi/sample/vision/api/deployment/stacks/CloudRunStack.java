@@ -52,7 +52,7 @@ public class CloudRunStack {
         .builder()
         .project(cloudRun.getProject())
         .location(config.Location())
-        .name(config.CloudRunV2ServiceIamMemberName())
+        .name(config.CloudRunName())
         .member("allUsers")
         .role("projects")
         .build();

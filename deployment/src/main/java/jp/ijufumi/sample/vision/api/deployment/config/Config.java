@@ -110,10 +110,6 @@ public class Config {
     return this.getEnv("CLOUD_RUN_CONTAINER_PROBE_PATH");
   }
 
-  public String CloudRunV2ServiceIamMemberName() {
-    return this.getEnv("CLOUD_RUN_V2_SERVICE_IAM_MEMBER_NAME", "cloud-run-v2-service-iam-member-name");
-  }
-
   public Integer CloudRunContainerProbeSeconds() {
     return this.getEnv("CLOUD_RUN_CONTAINER_PROBE_SECOND", 100);
   }
