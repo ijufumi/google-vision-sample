@@ -32,7 +32,7 @@ jobs:
 
       - name: Build
         run: |
-          docker buildx build -t ${{ env.IMAGE_URI }} backend
+          docker build -t ${{ env.IMAGE_URI }} backend
 
       - name: Push
         run: |
