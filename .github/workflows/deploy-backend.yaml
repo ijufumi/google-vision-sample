@@ -26,12 +26,17 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v1'
 
-      - name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          context: backend
-          push: true
-          tags: ${{ env.IMAGE_URI }}
+      - name: Configure docker for artifact registry
+        run: |
+          gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev
+
+      - name: Build
+        run: |
+          docker buildx build -t ${{ env.IMAGE_URI }} backend
+
+      - name: Push
+        run: |
+          docker push asia-docker.pkg.dev/my-project/sample-repository/example:${{ env.TAG }}
 
       - name: Deploy
         uses: google-github-actions/deploy-cloudrun@v1
