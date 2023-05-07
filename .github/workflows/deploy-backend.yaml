@@ -1,0 +1,36 @@
+name: Deploy backend
+
+on:
+  push:
+    paths:
+      - backend/
+  workflow_dispatch:
+
+env:
+  IMAGE_URI: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GCP_REPO_NAME }}/${{ vars.GCP_IMAGE_NAME }}:${{ github.sha }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - id: 'google auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ${{ env.IMAGE_URI }}
+
+      - id: 'deploy'
+        uses: 'google-github-actions/deploy-cloudrun@v1'
+        with:
+          service: ${{ vars.GCP_CLOUD_RUN_NAME }}
+          image: ${{ env.IMAGE_URI }}

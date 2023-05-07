@@ -1,0 +1,19 @@
+@startuml
+nwdiag {
+    internet [ shape = cloud ]
+    router
+    internet -- router
+
+    network public {
+        router;
+        load_balancer;
+        bucket;
+    }
+
+    network private {
+        load_balancer;  
+        cloud_run;      
+        database;
+    }
+}
+@enduml
