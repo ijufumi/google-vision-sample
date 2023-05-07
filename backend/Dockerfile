@@ -1,7 +1,6 @@
 FROM golang:1.20-bullseye as build
 
-RUN apt update \
-&& apt install -y ca-certificates libmagickwand-dev graphicsmagick-libmagick-dev-compat \
+RUN apt update && apt install -y libmagickwand-dev \
 && rm -rf /var/cache/apt
 
 WORKDIR /app
@@ -17,8 +16,7 @@ FROM debian:bullseye-slim as deploy
 
 WORKDIR /app
 
-RUN apt update \
-&& apt install -y ca-certificates libmagickwand-dev graphicsmagick-libmagick-dev-compat \
+RUN apt update && apt install -y libmagickwand-dev \
 && rm -rf /var/cache/apt
 
 RUN sed -i -E 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/g' /etc/ImageMagick-6/policy.xml
