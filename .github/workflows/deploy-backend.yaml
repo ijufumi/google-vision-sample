@@ -36,7 +36,7 @@ jobs:
 
       - name: Push
         run: |
-          docker push asia-docker.pkg.dev/my-project/sample-repository/example:${{ env.TAG }}
+          docker push ${{ env.IMAGE_URI }}
 
       - name: Deploy
         uses: google-github-actions/deploy-cloudrun@v1
