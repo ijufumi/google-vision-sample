@@ -5,6 +5,8 @@ import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2Servi
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplate;
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplateContainers;
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplateContainersEnv;
+import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplateContainersEnvValueSource;
+import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplateContainersEnvValueSourceSecretKeyRef;
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplateContainersPorts;
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplateContainersStartupProbe;
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplateContainersStartupProbeHttpGet;
@@ -34,6 +36,12 @@ public class CloudRunStack {
         .timeoutSeconds(config.CloudRunContainerProbeSeconds())
         .build();
 
+    var credentialRef = CloudRunV2ServiceTemplateContainersEnvValueSourceSecretKeyRef.builder()
+        .secret(config.Credentials()).version("1").build();
+    var credential = CloudRunV2ServiceTemplateContainersEnvValueSource
+        .builder()
+        .secretKeyRef(credentialRef)
+        .build();
     var environments = List.of(
         CloudRunV2ServiceTemplateContainersEnv
             .builder()
@@ -63,7 +71,7 @@ public class CloudRunStack {
         CloudRunV2ServiceTemplateContainersEnv
             .builder()
             .name("GOOGLE_CREDENTIAL")
-            .value(config.Credentials())
+            .valueSource(credential)
             .build()
     );
     var container = CloudRunV2ServiceTemplateContainers
