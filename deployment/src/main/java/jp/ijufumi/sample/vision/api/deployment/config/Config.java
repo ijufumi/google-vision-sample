@@ -118,6 +118,26 @@ public class Config {
     return this.getEnv("REPOSITORY_ID");
   }
 
+  public String AppPort() {
+    return this.getEnv("APP_PORT");
+  }
+
+  public String AppDbUser() {
+    return this.getEnv("APP_DB_USER");
+  }
+
+  public String AppDbPassword() {
+    return this.getEnv("APP_DB_PASSWORD");
+  }
+
+  public String AppDbPort() {
+    return this.getEnv("APP_DB_PORT");
+  }
+
+  public String AppDbName() {
+    return this.getEnv("APP_DB_NAME");
+  }
+
   public static Config read() {
     var dotenv = Dotenv
         .configure()
