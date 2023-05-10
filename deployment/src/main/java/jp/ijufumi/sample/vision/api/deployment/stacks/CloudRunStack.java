@@ -89,7 +89,7 @@ public class CloudRunStack {
         .builder()
         .template(template)
         .name(config.CloudRunName())
-        .location(config.Location())
+        .location(config.Region())
         .build();
     var cloudRun = new CloudRunV2Service(scope, "cloud-run", cloudRunConfig);
 

@@ -19,7 +19,7 @@ public class BucketStack {
     var bucketConfig = StorageBucketConfig
         .builder()
         .project(config.ProjectId())
-        .location(config.Location())
+        .location(config.Region())
         .name(config.BucketName())
         .cors(List.of(bucketCors))
         .build();

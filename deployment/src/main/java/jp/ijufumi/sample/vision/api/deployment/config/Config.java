@@ -63,11 +63,7 @@ public class Config {
   }
 
   public String Region() {
-    return this.getEnv("REGION", "");
-  }
-
-  public String Location() {
-    return this.getEnv("LOCATION", "us-west1");
+    return this.getEnv("REGION", "us-west1");
   }
 
   public String BucketName() {

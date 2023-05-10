@@ -15,7 +15,7 @@ public class ArtifactRegistryStack {
         .build();
     var registryConfig = ArtifactRegistryRepositoryConfig
         .builder()
-        .location(config.Location())
+        .location(config.Region())
         .repositoryId(config.RepositoryId())
         .dockerConfig(dockerConfig)
         .format("DOCKER")
