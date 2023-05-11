@@ -12,6 +12,7 @@ import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2Servi
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2ServiceTemplateContainersStartupProbeHttpGet;
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service_iam_member.CloudRunV2ServiceIamMember;
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service_iam_member.CloudRunV2ServiceIamMemberConfig;
+import com.hashicorp.cdktf.providers.google.secret_manager_secret_version.SecretManagerSecretVersion;
 import com.hashicorp.cdktf.providers.google.sql_database_instance.SqlDatabaseInstance;
 import java.util.List;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
@@ -20,7 +21,7 @@ import software.constructs.Construct;
 public class CloudRunStack {
 
   public static void create(final Construct scope, final Config config,
-      final SqlDatabaseInstance database) {
+      final SqlDatabaseInstance database, final SecretManagerSecretVersion credential) {
     var containerPort = CloudRunV2ServiceTemplateContainersPorts
         .builder()
         .containerPort(config.CloudRunContainerPort())
@@ -36,11 +37,11 @@ public class CloudRunStack {
         .timeoutSeconds(config.CloudRunContainerProbeSeconds())
         .build();
 
-    var credentialRef = CloudRunV2ServiceTemplateContainersEnvValueSourceSecretKeyRef.builder()
-        .secret(config.Credentials()).version("1").build();
-    var credential = CloudRunV2ServiceTemplateContainersEnvValueSource
+    var credentialValueRef = CloudRunV2ServiceTemplateContainersEnvValueSourceSecretKeyRef.builder()
+        .secret(credential.getSecret()).version("1").build();
+    var credentialValue = CloudRunV2ServiceTemplateContainersEnvValueSource
         .builder()
-        .secretKeyRef(credentialRef)
+        .secretKeyRef(credentialValueRef)
         .build();
     var environments = List.of(
         CloudRunV2ServiceTemplateContainersEnv
@@ -71,7 +72,7 @@ public class CloudRunStack {
         CloudRunV2ServiceTemplateContainersEnv
             .builder()
             .name("GOOGLE_CREDENTIAL")
-            .valueSource(credential)
+            .valueSource(credentialValue)
             .build()
     );
     var container = CloudRunV2ServiceTemplateContainers
