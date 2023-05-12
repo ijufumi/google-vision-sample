@@ -38,7 +38,7 @@ public class CloudRunStack {
         .build();
 
     var credentialValueRef = CloudRunV2ServiceTemplateContainersEnvValueSourceSecretKeyRef.builder()
-        .secret(credential.getSecret()).version("1").build();
+        .secret(credential.getSecret()).version("latest").build();
     var credentialValue = CloudRunV2ServiceTemplateContainersEnvValueSource
         .builder()
         .secretKeyRef(credentialValueRef)
