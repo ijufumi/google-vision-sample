@@ -19,6 +19,7 @@ public class DatabaseStack {
         .region(config.Region())
         .databaseVersion("POSTGRES_14")
         .settings(databaseSetting)
+        .deletionProtection(false)
         .build();
 
     return new SqlDatabaseInstance(scope, "sql-database-instance", databaseConfig);
