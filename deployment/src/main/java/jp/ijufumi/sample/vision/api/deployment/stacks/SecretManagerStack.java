@@ -23,6 +23,7 @@ public class SecretManagerStack {
         .builder()
         .secret(secret.getSecretId())
         .secretData(config.Credentials())
+        .enabled(true)
         .build();
     return new SecretManagerSecretVersion(scope, "secret-version-credential", secretVersionConfig);
   }
