@@ -34,6 +34,7 @@ public class SecretManagerStack {
         .secret(secret.getSecretId())
         .secretData(config.Credentials())
         .enabled(true)
+        .dependsOn(List.of(secret))
         .build();
     return new SecretManagerSecretVersion(scope, "secret-version-credential", secretVersionConfig);
   }
