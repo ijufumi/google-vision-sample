@@ -8,6 +8,7 @@ import com.hashicorp.cdktf.providers.google.secret_manager_secret.SecretManagerS
 import com.hashicorp.cdktf.providers.google.secret_manager_secret_version.SecretManagerSecretVersion;
 import com.hashicorp.cdktf.providers.google.secret_manager_secret_version.SecretManagerSecretVersionConfig;
 import java.util.List;
+import java.util.Map;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.constructs.Construct;
 
@@ -20,15 +21,19 @@ public class SecretManagerStack {
         .service("secretmanager.googleapis.com")
         .build();
     var service = new ProjectService(scope, "project-service", serviceConfig);
-    var replication = SecretManagerSecretReplication.builder().automatic(true).build();
+    var replication = SecretManagerSecretReplication
+        .builder()
+        .automatic(true)
+        .build();
     var secretConfig = SecretManagerSecretConfig
         .builder()
         .project(config.ProjectId())
         .secretId("google-credential")
+        .labels(Map.of("label", "google-credential"))
         .dependsOn(List.of(service))
         .replication(replication)
         .build();
-    var secret = new SecretManagerSecret(scope, "secret-credential", secretConfig);
+    var secret = new SecretManagerSecret(scope, "secret-manager-secret", secretConfig);
     var secretVersionConfig = SecretManagerSecretVersionConfig
         .builder()
         .secret(secret.getSecretId())
@@ -36,6 +41,6 @@ public class SecretManagerStack {
         .enabled(true)
         .dependsOn(List.of(secret))
         .build();
-    return new SecretManagerSecretVersion(scope, "secret-version-credential", secretVersionConfig);
+    return new SecretManagerSecretVersion(scope, "secret-manager-secret-version", secretVersionConfig);
   }
 }
