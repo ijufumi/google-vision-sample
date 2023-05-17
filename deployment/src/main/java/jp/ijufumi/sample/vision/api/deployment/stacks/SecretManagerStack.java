@@ -36,11 +36,12 @@ public class SecretManagerStack {
     var secret = new SecretManagerSecret(scope, "secret-manager-secret", secretConfig);
     var secretVersionConfig = SecretManagerSecretVersionConfig
         .builder()
-        .secret(secret.getSecretId())
+        .secret(secret.getId())
         .secretData(config.Credentials())
         .enabled(true)
         .dependsOn(List.of(secret))
         .build();
-    return new SecretManagerSecretVersion(scope, "secret-manager-secret-version", secretVersionConfig);
+    return new SecretManagerSecretVersion(scope, "secret-manager-secret-version",
+        secretVersionConfig);
   }
 }
