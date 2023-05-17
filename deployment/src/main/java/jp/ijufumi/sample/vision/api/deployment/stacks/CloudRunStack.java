@@ -38,7 +38,7 @@ public class CloudRunStack {
         .build();
 
     var credentialValueRef = CloudRunV2ServiceTemplateContainersEnvValueSourceSecretKeyRef.builder()
-        .secret(credential.getSecret()).version("latest").build();
+        .secret(credential.getSecret()).version(credential.getVersion()).build();
     var credentialValue = CloudRunV2ServiceTemplateContainersEnvValueSource
         .builder()
         .secretKeyRef(credentialValueRef)
@@ -91,6 +91,7 @@ public class CloudRunStack {
         .template(template)
         .name(config.CloudRunName())
         .location(config.Region())
+        .dependsOn(List.of(credential))
         .build();
     var cloudRun = new CloudRunV2Service(scope, "cloud-run", cloudRunConfig);
 
