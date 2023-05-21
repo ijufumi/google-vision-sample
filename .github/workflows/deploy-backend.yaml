@@ -43,5 +43,6 @@ jobs:
         with:
           service: ${{ vars.GCP_CLOUD_RUN_NAME }}
           image: ${{ env.IMAGE_URI }}
+          region:  ${{ env.GCP_REGION }}
           env_vars: |
             APP_PORT=8080
