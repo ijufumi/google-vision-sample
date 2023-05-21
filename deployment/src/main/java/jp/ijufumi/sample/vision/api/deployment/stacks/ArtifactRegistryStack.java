@@ -19,6 +19,7 @@ public class ArtifactRegistryStack {
         .repositoryId(config.RepositoryId())
         .dockerConfig(dockerConfig)
         .format("DOCKER")
+        .project(config.ProjectId())
         .build();
     new ArtifactRegistryRepository(scope, "artifact-registry", registryConfig);
   }
