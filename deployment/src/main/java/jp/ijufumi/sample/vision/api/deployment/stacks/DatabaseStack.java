@@ -3,22 +3,15 @@ package jp.ijufumi.sample.vision.api.deployment.stacks;
 import com.hashicorp.cdktf.providers.google.sql_database_instance.SqlDatabaseInstance;
 import com.hashicorp.cdktf.providers.google.sql_database_instance.SqlDatabaseInstanceConfig;
 import com.hashicorp.cdktf.providers.google.sql_database_instance.SqlDatabaseInstanceSettings;
-import com.hashicorp.cdktf.providers.google.sql_database_instance.SqlDatabaseInstanceSettingsIpConfiguration;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.constructs.Construct;
 
 public class DatabaseStack {
 
   public static SqlDatabaseInstance create(final Construct scope, final Config config) {
-    var ipConfiguration = SqlDatabaseInstanceSettingsIpConfiguration
-        .builder()
-        .enablePrivatePathForGoogleCloudServices(true)
-        .ipv4Enabled(false)
-        .build();
     var databaseSetting = SqlDatabaseInstanceSettings
         .builder()
         .tier("db-f1-micro")
-        .ipConfiguration(ipConfiguration)
         .build();
     var databaseConfig = SqlDatabaseInstanceConfig
         .builder()
