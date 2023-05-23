@@ -86,7 +86,7 @@ public class CloudRunStack {
         .dependsOn(List.of(credential))
         .build();
     var cloudRun = new CloudRunV2Service(scope, "cloud-run", cloudRunConfig);
-
+    
     var memberConfig = CloudRunV2ServiceIamMemberConfig
         .builder()
         .project(cloudRun.getProject())
