@@ -11,7 +11,7 @@ public class ArtifactRegistryStack {
   public static void create(final Construct scope, final Config config) {
     var dockerConfig = ArtifactRegistryRepositoryDockerConfig
         .builder()
-        .immutableTags(true)
+        .immutableTags(false)
         .build();
     var registryConfig = ArtifactRegistryRepositoryConfig
         .builder()
