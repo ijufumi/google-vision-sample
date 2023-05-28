@@ -15,8 +15,9 @@ public class DatabaseStack {
     var networkConfig = ComputeNetworkConfig
         .builder()
         .project(config.ProjectId())
+        .name("private-network")
         .build();
-    
+
     var network = new ComputeNetwork(scope, "private-network", networkConfig);
 
     var ipConfiguration = SqlDatabaseInstanceSettingsIpConfiguration
