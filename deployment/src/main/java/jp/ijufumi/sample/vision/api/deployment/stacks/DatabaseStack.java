@@ -28,6 +28,7 @@ public class DatabaseStack {
 
     var computeGlobalAddressConfig = ComputeGlobalAddressConfig
         .builder()
+        .name("global-access")
         .purpose("VPC_PEERING")
         .addressType("INTERNAL")
         .build();
