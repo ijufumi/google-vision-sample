@@ -20,14 +20,17 @@ public class CloudRunStack {
 
   public static void create(final Construct scope, final Config config,
       final SqlDatabaseInstance database, final SecretManagerSecretVersion credential) {
+
     var containerPort = CloudRunV2ServiceTemplateContainersPorts
         .builder()
         .containerPort(config.CloudRunContainerPort())
         .build();
+
     var startupProbeGet = CloudRunV2ServiceTemplateContainersStartupProbeHttpGet
         .builder()
         .path(config.CloudRunContainerProbePath())
         .build();
+
     var startupProbe = CloudRunV2ServiceTemplateContainersStartupProbe
         .builder()
         .httpGet(startupProbeGet)
@@ -67,6 +70,7 @@ public class CloudRunStack {
             .value(credential.getSecretData())
             .build()
     );
+
     var container = CloudRunV2ServiceTemplateContainers
         .builder()
         .image(config.CloudRunContainerImage())
@@ -74,10 +78,12 @@ public class CloudRunStack {
         .startupProbe(startupProbe)
         .env(environments)
         .build();
+
     var template = CloudRunV2ServiceTemplate
         .builder()
         .containers(List.of(container))
         .build();
+
     var cloudRunConfig = CloudRunV2ServiceConfig
         .builder()
         .template(template)
@@ -85,8 +91,9 @@ public class CloudRunStack {
         .location(config.Region())
         .dependsOn(List.of(credential))
         .build();
+
     var cloudRun = new CloudRunV2Service(scope, "cloud-run", cloudRunConfig);
-    
+
     var memberConfig = CloudRunV2ServiceIamMemberConfig
         .builder()
         .project(cloudRun.getProject())
@@ -95,6 +102,7 @@ public class CloudRunStack {
         .member("allUsers")
         .role("roles/run.admin")
         .build();
+
     new CloudRunV2ServiceIamMember(scope, "cloud-run-v2-service-iam-member", memberConfig);
   }
 }
