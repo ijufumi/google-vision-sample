@@ -11,6 +11,7 @@ import com.hashicorp.cdktf.providers.google.cloud_run_v2_service.CloudRunV2Servi
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service_iam_member.CloudRunV2ServiceIamMember;
 import com.hashicorp.cdktf.providers.google.cloud_run_v2_service_iam_member.CloudRunV2ServiceIamMemberConfig;
 import com.hashicorp.cdktf.providers.google.secret_manager_secret_version.SecretManagerSecretVersion;
+import com.hashicorp.cdktf.providers.google.sql_database_instance.SqlDatabaseInstance;
 import java.util.List;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.constructs.Construct;
@@ -18,14 +19,10 @@ import software.constructs.Construct;
 public class CloudRunStack {
 
   public static void create(final Construct scope, final Config config,
-      final SecretManagerSecretVersion credential) {
+      final SqlDatabaseInstance database, final SecretManagerSecretVersion credential) {
     var containerPort = CloudRunV2ServiceTemplateContainersPorts
         .builder()
         .containerPort(config.CloudRunContainerPort())
-        .build();
-    var dbContainerPort = CloudRunV2ServiceTemplateContainersPorts
-        .builder()
-        .containerPort(Integer.parseInt(config.AppDbPort()))
         .build();
     var startupProbeGet = CloudRunV2ServiceTemplateContainersStartupProbeHttpGet
         .builder()
@@ -62,7 +59,7 @@ public class CloudRunStack {
         CloudRunV2ServiceTemplateContainersEnv
             .builder()
             .name("DB_HOST")
-            .value("postgres")
+            .value(database.getConnectionName())
             .build(),
         CloudRunV2ServiceTemplateContainersEnv
             .builder()
@@ -73,20 +70,13 @@ public class CloudRunStack {
     var container = CloudRunV2ServiceTemplateContainers
         .builder()
         .image(config.CloudRunContainerImage())
-        .name("api")
         .ports(List.of(containerPort))
         .startupProbe(startupProbe)
         .env(environments)
         .build();
-    var dbContainer = CloudRunV2ServiceTemplateContainers
-        .builder()
-        .image("postgres:15-bullseye")
-        .name("postgres")
-        .ports(List.of(dbContainerPort))
-        .build();
     var template = CloudRunV2ServiceTemplate
         .builder()
-        .containers(List.of(container, dbContainer))
+        .containers(List.of(container))
         .build();
     var cloudRunConfig = CloudRunV2ServiceConfig
         .builder()
@@ -96,7 +86,7 @@ public class CloudRunStack {
         .dependsOn(List.of(credential))
         .build();
     var cloudRun = new CloudRunV2Service(scope, "cloud-run", cloudRunConfig);
-
+    
     var memberConfig = CloudRunV2ServiceIamMemberConfig
         .builder()
         .project(cloudRun.getProject())
