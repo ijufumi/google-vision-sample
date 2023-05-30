@@ -7,7 +7,6 @@ import jp.ijufumi.sample.vision.api.deployment.stacks.ArtifactRegistryStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.BucketStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.CloudCDNStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.CloudRunStack;
-import jp.ijufumi.sample.vision.api.deployment.stacks.DatabaseStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.SecretManagerStack;
 import software.constructs.Construct;
 
@@ -24,9 +23,8 @@ public class MainStack extends TerraformStack {
         .credentials(config.Credentials())
         .build();
 
-    var database = DatabaseStack.create(this, config);
     var credential = SecretManagerStack.create(this, config);
-    CloudRunStack.create(this, config, database, credential);
+    CloudRunStack.create(this, config, credential);
     var bucket = BucketStack.create(this, config);
     ArtifactRegistryStack.create(this, config);
     CloudCDNStack.create(this, config, bucket);
