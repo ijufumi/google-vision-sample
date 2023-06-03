@@ -41,7 +41,7 @@ public class DatabaseStack {
         .builder()
         .network(network.getId())
         .service("servicenetworking.googleapis.com")
-        .reservedPeeringRanges(List.of(computeGlobalAddress.getAddress()))
+        .reservedPeeringRanges(List.of(computeGlobalAddress.getName()))
         .build();
 
     var serviceNetworkingConnection = new ServiceNetworkingConnection(scope,
