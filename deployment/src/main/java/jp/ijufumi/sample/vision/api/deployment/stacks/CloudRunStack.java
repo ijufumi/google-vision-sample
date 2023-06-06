@@ -62,7 +62,7 @@ public class CloudRunStack {
         CloudRunV2ServiceTemplateContainersEnv
             .builder()
             .name("DB_HOST")
-            .value(database.getConnectionName())
+            .value(database.getFirstIpAddress())
             .build(),
         CloudRunV2ServiceTemplateContainersEnv
             .builder()
@@ -87,6 +87,7 @@ public class CloudRunStack {
     var cloudRunConfig = CloudRunV2ServiceConfig
         .builder()
         .template(template)
+        .project(config.ProjectId())
         .name(config.CloudRunName())
         .location(config.Region())
         .dependsOn(List.of(credential))
