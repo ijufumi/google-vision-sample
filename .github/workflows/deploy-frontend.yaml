@@ -6,6 +6,9 @@ on:
       - frontend/
   workflow_dispatch:
 
+env:
+  BACKEND_URL: https://ijufumi-sample-kyxvynepda-uw.a.run.app
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,13 +31,15 @@ jobs:
         with:
           cmd: build
           dir: 'frontend'
+        env:
+          REACT_APP_ENDPOINT_URL: ${{ env.BACKEND_URL }}/api/v1
 
-      - id: 'google auth'
+      - name: google auth
         uses: 'google-github-actions/auth@v1'
         with:
           credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
 
-      - id: 'upload-folder'
+      - name: upload-folder
         uses: 'google-github-actions/upload-cloud-storage@v1'
         with:
           path: 'frontend/build/'
