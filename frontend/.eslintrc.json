@@ -10,7 +10,7 @@
     "@typescript-eslint"
   ],
   "rules": {
-    "@typescript-eslint/strict-boolean-expressions": "warn",
+    "@typescript-eslint/strict-boolean-expressions": false,
     "@typescript-eslint/no-empty-interface": 0
   }
 }
