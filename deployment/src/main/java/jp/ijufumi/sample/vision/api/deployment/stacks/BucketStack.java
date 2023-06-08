@@ -22,6 +22,7 @@ public class BucketStack {
         .location(config.Region())
         .name(config.BucketName())
         .cors(List.of(bucketCors))
+        .forceDestroy(true)
         .build();
     return new StorageBucket(scope, "storage-bucket", bucketConfig);
   }
