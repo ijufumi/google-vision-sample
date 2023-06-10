@@ -3,6 +3,8 @@ package jp.ijufumi.sample.vision.api.deployment.stacks;
 import com.hashicorp.cdktf.providers.google.compute_backend_bucket.ComputeBackendBucket;
 import com.hashicorp.cdktf.providers.google.compute_backend_bucket.ComputeBackendBucketCdnPolicy;
 import com.hashicorp.cdktf.providers.google.compute_backend_bucket.ComputeBackendBucketConfig;
+import com.hashicorp.cdktf.providers.google.compute_global_address.ComputeGlobalAddress;
+import com.hashicorp.cdktf.providers.google.compute_global_address.ComputeGlobalAddressConfig;
 import com.hashicorp.cdktf.providers.google.storage_bucket.StorageBucket;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.constructs.Construct;
@@ -11,6 +13,12 @@ public class CloudCDNStack {
 
   public static void create(final Construct scope, final Config config,
       final StorageBucket bucket) {
+    var globalAddressConfig = ComputeGlobalAddressConfig
+        .builder()
+        .project(config.ProjectId())
+        .build();
+    new ComputeGlobalAddress(scope, "default", globalAddressConfig);
+
     var backendBucketCdnPolicy = ComputeBackendBucketCdnPolicy
         .builder()
         .cacheMode("CACHE_ALL_STATIC")
