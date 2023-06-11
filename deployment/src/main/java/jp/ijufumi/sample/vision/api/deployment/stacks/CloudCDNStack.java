@@ -60,6 +60,7 @@ public class CloudCDNStack {
 
     var globalForwardingRuleConfig = ComputeGlobalForwardingRuleConfig
         .builder()
+        .name("forwarding-rule-loadbalancer")
         .ipProtocol("TCP")
         .loadBalancingScheme("EXTERNAL")
         .ipAddress(globalAddress.getId())
