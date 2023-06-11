@@ -41,21 +41,21 @@ public class CloudCDNStack {
         .defaultService(backendBucket.getId())
         .name("url-loadbalancer")
         .build();
-    var urlMap = new ComputeUrlMap(scope, "default", urlMapConfig);
+    var urlMap = new ComputeUrlMap(scope, "compute-url-map", urlMapConfig);
 
     var globalAddressConfig = ComputeGlobalAddressConfig
         .builder()
         .project(config.ProjectId())
         .name("ip-loadbalancer")
         .build();
-    var globalAddress = new ComputeGlobalAddress(scope, "default", globalAddressConfig);
+    var globalAddress = new ComputeGlobalAddress(scope, "compute-global-address", globalAddressConfig);
 
     var httpProxyConfig = ComputeTargetHttpProxyConfig
         .builder()
         .name("proxy-loadbalancer")
         .urlMap(urlMap.getId())
         .build();
-    var httpProxy = new ComputeTargetHttpProxy(scope, "default", httpProxyConfig);
+    var httpProxy = new ComputeTargetHttpProxy(scope, "compute-target-http-proxy", httpProxyConfig);
 
     var globalForwardingRuleConfig = ComputeGlobalForwardingRuleConfig
         .builder()
@@ -65,7 +65,7 @@ public class CloudCDNStack {
         .target(httpProxy.getId())
         .portRange("80")
         .build();
-    new ComputeGlobalForwardingRule(scope, "default", globalForwardingRuleConfig);
+    new ComputeGlobalForwardingRule(scope, "compute-global-forwarding-rule", globalForwardingRuleConfig);
 
   }
 }
