@@ -22,11 +22,14 @@ public class CloudCDNStack {
     var globalAddressConfig = ComputeGlobalAddressConfig
         .builder()
         .project(config.ProjectId())
-        .name("loadbalancer")
+        .name("ip-loadbalancer")
         .build();
     var globalAddress = new ComputeGlobalAddress(scope, "default", globalAddressConfig);
 
-    var httpProxyConfig = ComputeTargetHttpProxyConfig.builder().build();
+    var httpProxyConfig = ComputeTargetHttpProxyConfig
+        .builder()
+        .name("proxy-loadbalancer")
+        .build();
     var httpProxy = new ComputeTargetHttpProxy(scope, "default", httpProxyConfig);
 
     var globalForwardingRuleConfig = ComputeGlobalForwardingRuleConfig
