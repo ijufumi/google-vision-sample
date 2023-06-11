@@ -19,29 +19,6 @@ public class CloudCDNStack {
 
   public static void create(final Construct scope, final Config config,
       final StorageBucket bucket) {
-    var globalAddressConfig = ComputeGlobalAddressConfig
-        .builder()
-        .project(config.ProjectId())
-        .name("ip-loadbalancer")
-        .build();
-    var globalAddress = new ComputeGlobalAddress(scope, "default", globalAddressConfig);
-
-    var httpProxyConfig = ComputeTargetHttpProxyConfig
-        .builder()
-        .name("proxy-loadbalancer")
-        .build();
-    var httpProxy = new ComputeTargetHttpProxy(scope, "default", httpProxyConfig);
-
-    var globalForwardingRuleConfig = ComputeGlobalForwardingRuleConfig
-        .builder()
-        .ipProtocol("TCP")
-        .loadBalancingScheme("EXTERNAL")
-        .ipAddress(globalAddress.getId())
-        .target(httpProxy.getId())
-        .portRange("80")
-        .build();
-    new ComputeGlobalForwardingRule(scope, "default", globalForwardingRuleConfig);
-
     var backendBucketCdnPolicy = ComputeBackendBucketCdnPolicy
         .builder()
         .cacheMode("CACHE_ALL_STATIC")
@@ -64,6 +41,30 @@ public class CloudCDNStack {
         .defaultService(backendBucket.getId())
         .build();
     var urlMap = new ComputeUrlMap(scope, "default", urlMapConfig);
-    httpProxy.setUrlMap(urlMap.getId());
+
+    var globalAddressConfig = ComputeGlobalAddressConfig
+        .builder()
+        .project(config.ProjectId())
+        .name("ip-loadbalancer")
+        .build();
+    var globalAddress = new ComputeGlobalAddress(scope, "default", globalAddressConfig);
+
+    var httpProxyConfig = ComputeTargetHttpProxyConfig
+        .builder()
+        .name("proxy-loadbalancer")
+        .urlMap(urlMap.getId())
+        .build();
+    var httpProxy = new ComputeTargetHttpProxy(scope, "default", httpProxyConfig);
+
+    var globalForwardingRuleConfig = ComputeGlobalForwardingRuleConfig
+        .builder()
+        .ipProtocol("TCP")
+        .loadBalancingScheme("EXTERNAL")
+        .ipAddress(globalAddress.getId())
+        .target(httpProxy.getId())
+        .portRange("80")
+        .build();
+    new ComputeGlobalForwardingRule(scope, "default", globalForwardingRuleConfig);
+
   }
 }
