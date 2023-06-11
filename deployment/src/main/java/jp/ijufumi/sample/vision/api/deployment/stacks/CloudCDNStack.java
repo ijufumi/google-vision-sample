@@ -22,6 +22,7 @@ public class CloudCDNStack {
     var globalAddressConfig = ComputeGlobalAddressConfig
         .builder()
         .project(config.ProjectId())
+        .name("loadbalancer")
         .build();
     var globalAddress = new ComputeGlobalAddress(scope, "default", globalAddressConfig);
 
