@@ -39,6 +39,7 @@ public class CloudCDNStack {
     var urlMapConfig = ComputeUrlMapConfig
         .builder()
         .defaultService(backendBucket.getId())
+        .name("url-loadbalancer")
         .build();
     var urlMap = new ComputeUrlMap(scope, "default", urlMapConfig);
 
