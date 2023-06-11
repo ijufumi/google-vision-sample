@@ -34,7 +34,7 @@ public class DatabaseStack {
         .network(network.getId())
         .build();
 
-    var computeGlobalAddress = new ComputeGlobalAddress(scope, "compute-global-address",
+    var computeGlobalAddress = new ComputeGlobalAddress(scope, "db-compute-global-address",
         computeGlobalAddressConfig);
 
     var serviceNetworkingConnectionConfig = ServiceNetworkingConnectionConfig

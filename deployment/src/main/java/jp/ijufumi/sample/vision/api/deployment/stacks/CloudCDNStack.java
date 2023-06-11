@@ -48,7 +48,8 @@ public class CloudCDNStack {
         .project(config.ProjectId())
         .name("ip-loadbalancer")
         .build();
-    var globalAddress = new ComputeGlobalAddress(scope, "compute-global-address", globalAddressConfig);
+    var globalAddress = new ComputeGlobalAddress(scope, "cdn-compute-global-address",
+        globalAddressConfig);
 
     var httpProxyConfig = ComputeTargetHttpProxyConfig
         .builder()
@@ -65,7 +66,8 @@ public class CloudCDNStack {
         .target(httpProxy.getId())
         .portRange("80")
         .build();
-    new ComputeGlobalForwardingRule(scope, "compute-global-forwarding-rule", globalForwardingRuleConfig);
+    new ComputeGlobalForwardingRule(scope, "compute-global-forwarding-rule",
+        globalForwardingRuleConfig);
 
   }
 }
