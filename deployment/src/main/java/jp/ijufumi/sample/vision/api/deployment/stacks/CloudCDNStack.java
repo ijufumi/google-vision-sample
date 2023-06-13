@@ -54,7 +54,7 @@ public class CloudCDNStack {
     var httpProxyConfig = ComputeTargetHttpProxyConfig
         .builder()
         .name("proxy-loadbalancer")
-        .urlMap(urlMap.getId())
+        .urlMap(urlMap.getSelfLink())
         .build();
     var httpProxy = new ComputeTargetHttpProxy(scope, "compute-target-http-proxy", httpProxyConfig);
 
@@ -63,8 +63,8 @@ public class CloudCDNStack {
         .name("forwarding-rule-loadbalancer")
         .ipProtocol("TCP")
         .loadBalancingScheme("EXTERNAL")
-        .ipAddress(globalAddress.getId())
-        .target(httpProxy.getId())
+        .ipAddress(globalAddress.getAddress())
+        .target(httpProxy.getSelfLink())
         .portRange("80")
         .build();
     new ComputeGlobalForwardingRule(scope, "compute-global-forwarding-rule",
