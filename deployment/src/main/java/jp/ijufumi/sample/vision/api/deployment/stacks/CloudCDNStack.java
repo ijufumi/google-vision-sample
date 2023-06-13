@@ -65,7 +65,7 @@ public class CloudCDNStack {
         .loadBalancingScheme("EXTERNAL")
         .ipAddress(globalAddress.getId())
         .target(httpProxy.getId())
-        .portRange("443")
+        .portRange("80")
         .build();
     new ComputeGlobalForwardingRule(scope, "compute-global-forwarding-rule",
         globalForwardingRuleConfig);
