@@ -11,7 +11,9 @@ import com.hashicorp.cdktf.providers.google.compute_target_http_proxy.ComputeTar
 import com.hashicorp.cdktf.providers.google.compute_target_http_proxy.ComputeTargetHttpProxyConfig;
 import com.hashicorp.cdktf.providers.google.compute_url_map.ComputeUrlMap;
 import com.hashicorp.cdktf.providers.google.compute_url_map.ComputeUrlMapConfig;
+import com.hashicorp.cdktf.providers.google.compute_url_map.ComputeUrlMapHostRule;
 import com.hashicorp.cdktf.providers.google.storage_bucket.StorageBucket;
+import java.util.List;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.constructs.Construct;
 
@@ -36,10 +38,16 @@ public class CloudCDNStack {
         .build();
     var backendBucket = new ComputeBackendBucket(scope, "backend-bucket", backendBucketConfig);
 
+    var hostRule = ComputeUrlMapHostRule
+        .builder()
+        .hosts(List.of("*"))
+        .pathMatcher("allpaths")
+        .build();
     var urlMapConfig = ComputeUrlMapConfig
         .builder()
         .defaultService(backendBucket.getId())
         .name("url-loadbalancer")
+        .hostRule(List.of(hostRule))
         .build();
     var urlMap = new ComputeUrlMap(scope, "compute-url-map", urlMapConfig);
 
