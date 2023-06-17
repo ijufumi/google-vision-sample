@@ -42,7 +42,7 @@ public class CloudCDNStack {
 
     var pathMatcherRule = ComputeUrlMapPathMatcherPathRule
         .builder()
-        .paths(List.of("*"))
+        .paths(List.of("/*"))
         .service(backendBucket.getId())
         .build();
     var pathMatcher = ComputeUrlMapPathMatcher
