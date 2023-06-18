@@ -54,6 +54,7 @@ public class CloudCDNStack {
     var hostRule = ComputeUrlMapHostRule
         .builder()
         .hosts(List.of("*"))
+        .pathMatcher(pathMatcher.getName())
         .build();
     var urlMapConfig = ComputeUrlMapConfig
         .builder()
