@@ -44,3 +44,4 @@ jobs:
         with:
           path: 'frontend/build/'
           destination: ${{ vars.STORAGE_BUCKET_NAME }}
+          parent: false
