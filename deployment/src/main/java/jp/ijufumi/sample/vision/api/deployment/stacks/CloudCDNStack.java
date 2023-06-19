@@ -58,7 +58,7 @@ public class CloudCDNStack {
         .build();
     var pathMatcher = ComputeUrlMapPathMatcher
         .builder()
-        .name("redirect-index")
+        .name("redirectindex")
         .defaultService(backendBucket.getId())
         .routeRules(List.of(routeRule))
         .build();
