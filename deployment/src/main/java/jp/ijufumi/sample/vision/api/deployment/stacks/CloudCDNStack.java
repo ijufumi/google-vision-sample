@@ -58,7 +58,7 @@ public class CloudCDNStack {
         .build();
     var pathMatcher = ComputeUrlMapPathMatcher
         .builder()
-        .name("redirectindex")
+        .name("redirect-index")
         .defaultService(backendBucket.getId())
         .routeRules(List.of(routeRule))
         .build();
@@ -72,6 +72,7 @@ public class CloudCDNStack {
         .defaultService(backendBucket.getId())
         .name("url-loadbalancer")
         .hostRule(List.of(hostRule))
+        .pathMatcher(List.of(pathMatcher))
         .build();
     var urlMap = new ComputeUrlMap(scope, "compute-url-map", urlMapConfig);
 
