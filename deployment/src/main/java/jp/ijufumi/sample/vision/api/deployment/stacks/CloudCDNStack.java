@@ -12,10 +12,6 @@ import com.hashicorp.cdktf.providers.google.compute_target_http_proxy.ComputeTar
 import com.hashicorp.cdktf.providers.google.compute_url_map.ComputeUrlMap;
 import com.hashicorp.cdktf.providers.google.compute_url_map.ComputeUrlMapConfig;
 import com.hashicorp.cdktf.providers.google.compute_url_map.ComputeUrlMapHostRule;
-import com.hashicorp.cdktf.providers.google.compute_url_map.ComputeUrlMapPathMatcher;
-import com.hashicorp.cdktf.providers.google.compute_url_map.ComputeUrlMapPathMatcherRouteRules;
-import com.hashicorp.cdktf.providers.google.compute_url_map.ComputeUrlMapPathMatcherRouteRulesMatchRules;
-import com.hashicorp.cdktf.providers.google.compute_url_map.ComputeUrlMapPathMatcherRouteRulesUrlRedirect;
 import com.hashicorp.cdktf.providers.google.storage_bucket.StorageBucket;
 import java.util.List;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
@@ -42,37 +38,15 @@ public class CloudCDNStack {
         .build();
     var backendBucket = new ComputeBackendBucket(scope, "backend-bucket", backendBucketConfig);
 
-    var routeRulePathMatcher = ComputeUrlMapPathMatcherRouteRulesMatchRules
-        .builder()
-        .fullPathMatch("/")
-        .build();
-    var routeRuleUrlRedirect = ComputeUrlMapPathMatcherRouteRulesUrlRedirect
-        .builder()
-        .pathRedirect("/index.html")
-        .build();
-    var routeRule = ComputeUrlMapPathMatcherRouteRules
-        .builder()
-        .priority(1)
-        .matchRules(List.of(routeRulePathMatcher))
-        .urlRedirect(routeRuleUrlRedirect)
-        .build();
-    var pathMatcher = ComputeUrlMapPathMatcher
-        .builder()
-        .name("redirect-index")
-        .defaultService(backendBucket.getId())
-        .routeRules(List.of(routeRule))
-        .build();
     var hostRule = ComputeUrlMapHostRule
         .builder()
         .hosts(List.of("*"))
-        .pathMatcher(pathMatcher.getName())
         .build();
     var urlMapConfig = ComputeUrlMapConfig
         .builder()
         .defaultService(backendBucket.getId())
         .name("url-loadbalancer")
         .hostRule(List.of(hostRule))
-        .pathMatcher(List.of(pathMatcher))
         .build();
     var urlMap = new ComputeUrlMap(scope, "compute-url-map", urlMapConfig);
 
