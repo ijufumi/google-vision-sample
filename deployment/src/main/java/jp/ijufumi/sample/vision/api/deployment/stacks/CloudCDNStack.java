@@ -15,6 +15,7 @@ import com.hashicorp.cdktf.providers.google.compute_url_map.ComputeUrlMapHostRul
 import com.hashicorp.cdktf.providers.google.compute_url_map.ComputeUrlMapPathMatcher;
 import com.hashicorp.cdktf.providers.google.compute_url_map.ComputeUrlMapPathMatcherRouteRules;
 import com.hashicorp.cdktf.providers.google.compute_url_map.ComputeUrlMapPathMatcherRouteRulesMatchRules;
+import com.hashicorp.cdktf.providers.google.compute_url_map.ComputeUrlMapPathMatcherRouteRulesUrlRedirect;
 import com.hashicorp.cdktf.providers.google.storage_bucket.StorageBucket;
 import java.util.List;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
@@ -45,11 +46,15 @@ public class CloudCDNStack {
         .builder()
         .fullPathMatch("/")
         .build();
+    var routeRuleUrlRedirect = ComputeUrlMapPathMatcherRouteRulesUrlRedirect
+        .builder()
+        .pathRedirect("/index.html")
+        .build();
     var routeRule = ComputeUrlMapPathMatcherRouteRules
         .builder()
         .priority(1)
         .matchRules(List.of(routeRulePathMatcher))
-        .service(backendBucket.getId())
+        .urlRedirect(routeRuleUrlRedirect)
         .build();
     var pathMatcher = ComputeUrlMapPathMatcher
         .builder()
