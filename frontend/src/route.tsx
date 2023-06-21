@@ -10,7 +10,7 @@ const AppRoute: FC <Props> = () => {
     <BrowserRouter>
       <Routes>
         <Route
-          path="/:jobId"
+          path="/jobs/:jobId"
           element={<ResultPage />}
         />
         <Route

@@ -99,7 +99,7 @@ const App: FC<Props> = () => {
   }
 
   const showResultPage = (id: string) => {
-    navigate(`/${id}`)
+    navigate(`/jobs/${id}`)
   }
 
   const renderStatus = (status: JobStatus) => {
