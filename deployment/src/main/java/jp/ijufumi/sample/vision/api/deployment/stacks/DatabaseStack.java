@@ -6,17 +6,21 @@ import com.hashicorp.cdktf.providers.google.compute_network.ComputeNetwork;
 import com.hashicorp.cdktf.providers.google.compute_network.ComputeNetworkConfig;
 import com.hashicorp.cdktf.providers.google.service_networking_connection.ServiceNetworkingConnection;
 import com.hashicorp.cdktf.providers.google.service_networking_connection.ServiceNetworkingConnectionConfig;
+import com.hashicorp.cdktf.providers.google.sql_database.SqlDatabase;
+import com.hashicorp.cdktf.providers.google.sql_database.SqlDatabaseConfig;
 import com.hashicorp.cdktf.providers.google.sql_database_instance.SqlDatabaseInstance;
 import com.hashicorp.cdktf.providers.google.sql_database_instance.SqlDatabaseInstanceConfig;
 import com.hashicorp.cdktf.providers.google.sql_database_instance.SqlDatabaseInstanceSettings;
 import com.hashicorp.cdktf.providers.google.sql_database_instance.SqlDatabaseInstanceSettingsIpConfiguration;
+import com.hashicorp.cdktf.providers.google.sql_user.SqlUser;
+import com.hashicorp.cdktf.providers.google.sql_user.SqlUserConfig;
 import java.util.List;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.constructs.Construct;
 
 public class DatabaseStack {
 
-  public static SqlDatabaseInstance create(final Construct scope, final Config config) {
+  public static SqlDatabase create(final Construct scope, final Config config) {
     var networkConfig = ComputeNetworkConfig
         .builder()
         .project(config.ProjectId())
@@ -60,7 +64,7 @@ public class DatabaseStack {
         .ipConfiguration(ipConfiguration)
         .build();
 
-    var databaseConfig = SqlDatabaseInstanceConfig
+    var databaseInstanceConfig = SqlDatabaseInstanceConfig
         .builder()
         .project(config.ProjectId())
         .region(config.Region())
@@ -70,6 +74,23 @@ public class DatabaseStack {
         .dependsOn(List.of(serviceNetworkingConnection))
         .build();
 
-    return new SqlDatabaseInstance(scope, "sql-database-instance", databaseConfig);
+    var databaseInstance = new SqlDatabaseInstance(scope, "sql-database-instance",
+        databaseInstanceConfig);
+
+    var userConfig = SqlUserConfig
+        .builder()
+        .name(config.AppDbUser())
+        .password(config.AppDbPassword())
+        .instance(databaseInstance.getId())
+        .build();
+    new SqlUser(scope, "sql-user", userConfig);
+
+    var databaseConfig = SqlDatabaseConfig
+        .builder()
+        .name(config.AppDbName())
+        .instance(databaseInstance.getId())
+        .build();
+
+    return new SqlDatabase(scope, "sql-database", databaseConfig);
   }
 }
