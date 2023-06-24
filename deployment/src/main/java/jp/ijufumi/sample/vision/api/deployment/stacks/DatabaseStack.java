@@ -20,7 +20,7 @@ import software.constructs.Construct;
 
 public class DatabaseStack {
 
-  public static SqlDatabase create(final Construct scope, final Config config) {
+  public static SqlDatabaseInstance create(final Construct scope, final Config config) {
     var networkConfig = ComputeNetworkConfig
         .builder()
         .project(config.ProjectId())
@@ -91,6 +91,8 @@ public class DatabaseStack {
         .instance(databaseInstance.getId())
         .build();
 
-    return new SqlDatabase(scope, "sql-database", databaseConfig);
+    new SqlDatabase(scope, "sql-database", databaseConfig);
+    
+    return databaseInstance;
   }
 }
