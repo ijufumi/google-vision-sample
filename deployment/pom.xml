@@ -37,8 +37,8 @@
     </dependency>
     <dependency>
       <groupId>com.hashicorp</groupId>
-      <artifactId>cdktf-provider-google</artifactId>
-      <version>7.0.10</version>
+      <artifactId>cdktf-provider-aws</artifactId>
+      <version>15.0.0</version>
     </dependency>
   </dependencies>
   <build>

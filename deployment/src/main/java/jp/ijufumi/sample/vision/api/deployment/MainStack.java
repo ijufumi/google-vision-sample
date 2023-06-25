@@ -1,14 +1,8 @@
 package jp.ijufumi.sample.vision.api.deployment;
 
 import com.hashicorp.cdktf.TerraformStack;
-import com.hashicorp.cdktf.providers.google.provider.GoogleProvider;
+import com.hashicorp.cdktf.providers.aws.provider.AwsProvider;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
-import jp.ijufumi.sample.vision.api.deployment.stacks.ArtifactRegistryStack;
-import jp.ijufumi.sample.vision.api.deployment.stacks.BucketStack;
-import jp.ijufumi.sample.vision.api.deployment.stacks.CloudCDNStack;
-import jp.ijufumi.sample.vision.api.deployment.stacks.CloudRunStack;
-import jp.ijufumi.sample.vision.api.deployment.stacks.DatabaseStack;
-import jp.ijufumi.sample.vision.api.deployment.stacks.SecretManagerStack;
 import software.constructs.Construct;
 
 public class MainStack extends TerraformStack {
@@ -16,19 +10,9 @@ public class MainStack extends TerraformStack {
   public MainStack(final Construct scope, final String id, final Config config) {
     super(scope, id);
 
-    GoogleProvider
+    AwsProvider
         .Builder
         .create(this, "gcp-provider")
-        .region(config.Region())
-        .project(config.ProjectId())
-        .credentials(config.Credentials())
         .build();
-
-    var database = DatabaseStack.create(this, config);
-    var credential = SecretManagerStack.create(this, config);
-    CloudRunStack.create(this, config, database, credential);
-    var bucket = BucketStack.create(this, config);
-    ArtifactRegistryStack.create(this, config);
-    CloudCDNStack.create(this, config, bucket);
   }
 }
