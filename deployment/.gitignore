@@ -1,14 +1,13 @@
-.terraform
-cdktf.out
-cdktf.log
-*terraform.*.tfstate*
-
+.classpath.txt
+target
 .classpath
 .project
 .idea
 .settings
 .vscode
 *.iml
-target/
-.env
-src/main/resources/credentials
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+
