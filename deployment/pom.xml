@@ -31,7 +31,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <mainClass>com.myorg.DeploymentApp</mainClass>
+                    <mainClass>jp.ijufumi.sample.vision.api.deployment.MainApp</mainClass>
                 </configuration>
             </plugin>
         </plugins>
