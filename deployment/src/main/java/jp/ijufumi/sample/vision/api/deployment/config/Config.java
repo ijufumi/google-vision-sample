@@ -2,23 +2,58 @@ package jp.ijufumi.sample.vision.api.deployment.config;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-public class Config {
+public interface Config {
+
+  static Config build() {
+    var dotenv = Dotenv
+        .configure()
+        .systemProperties()
+        .ignoreIfMalformed()
+        .ignoreIfMissing()
+        .load();
+
+    return new ConfigObj(dotenv);
+  }
+
+  String accountId();
+
+  String region();
+}
+
+class ConfigObj implements Config {
+
+  @Override
+  public String accountId() {
+    var accountId = this.getEnv("CDK_DEFAULT_ACCOUNT");
+    if (accountId != null) {
+      return accountId;
+    }
+    return this.getEnv("AWS_ACCOUNT_ID");
+  }
+
+  public String region() {
+    var region = this.getEnv("CDK_DEFAULT_REGION");
+    if (region != null) {
+      return region;
+    }
+    return this.getEnv("AWS_DEFAULT_REGION");
+  }
 
   private final Dotenv dotenv;
 
-  private Config(Dotenv dotenv) {
+  ConfigObj(Dotenv dotenv) {
     this.dotenv = dotenv;
   }
 
-  public String getEnv(String key, String defaultValue) {
+  String getEnv(String key, String defaultValue) {
     return this.dotenv.get(key, defaultValue);
   }
 
-  public String getEnv(String key) {
+  String getEnv(String key) {
     return this.getEnv(key, (String) null);
   }
 
-  public Integer getEnv(String key, Integer defaultValue) {
+  Integer getEnv(String key, Integer defaultValue) {
     try {
       var value = this.dotenv.get(key);
       if (value == null || value.equals("")) {
@@ -29,16 +64,5 @@ public class Config {
       System.out.println(e);
       return defaultValue;
     }
-  }
-
-  public static Config read() {
-    var dotenv = Dotenv
-        .configure()
-        .systemProperties()
-        .ignoreIfMalformed()
-        .ignoreIfMissing()
-        .load();
-
-    return new Config(dotenv);
   }
 }
