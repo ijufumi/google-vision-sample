@@ -1,8 +1,8 @@
 package jp.ijufumi.sample.vision.api.deployment;
 
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
-import software.amazon.awscdk.Stack;
-import software.amazon.awscdk.StackProps;
+import software.amazon.awscdk.core.Stack;
+import software.amazon.awscdk.core.StackProps;
 import software.constructs.Construct;
 // import software.amazon.awscdk.Duration;
 // import software.amazon.awscdk.services.sqs.Queue;
