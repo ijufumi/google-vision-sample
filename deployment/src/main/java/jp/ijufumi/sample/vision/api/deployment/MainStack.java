@@ -1,5 +1,6 @@
 package jp.ijufumi.sample.vision.api.deployment;
 
+import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.constructs.Construct;
@@ -8,11 +9,8 @@ import software.constructs.Construct;
 
 public class MainStack extends Stack {
 
-  public MainStack(final Construct scope, final String id) {
-    this(scope, id, null);
-  }
-
-  public MainStack(final Construct scope, final String id, final StackProps props) {
+  public MainStack(final Construct scope, final String id, final StackProps props,
+      final Config config) {
     super(scope, id, props);
 
     // The code that defines your stack goes here

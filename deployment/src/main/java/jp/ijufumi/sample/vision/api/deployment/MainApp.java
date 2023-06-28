@@ -16,7 +16,7 @@ public class MainApp {
             .account(config.accountId())
             .region(config.region())
             .build())
-        .build());
+        .build(), config);
 
     app.synth();
   }
