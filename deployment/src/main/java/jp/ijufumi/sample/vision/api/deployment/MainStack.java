@@ -1,7 +1,7 @@
 package jp.ijufumi.sample.vision.api.deployment;
 
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
-import jp.ijufumi.sample.vision.api.deployment.stacks.BucketStack;
+import jp.ijufumi.sample.vision.api.deployment.stacks.S3Stack;
 import software.amazon.awscdk.core.Stack;
 import software.amazon.awscdk.core.StackProps;
 import software.constructs.Construct;
@@ -12,6 +12,6 @@ public class MainStack extends Stack {
       final Config config) {
     super(scope, id, props);
 
-    BucketStack.build(scope, config);
+    S3Stack.build(scope, config);
   }
 }
