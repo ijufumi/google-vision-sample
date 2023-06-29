@@ -18,6 +18,8 @@ public interface Config {
   String accountId();
 
   String region();
+
+  String bucket();
 }
 
 class ConfigObj implements Config {
@@ -31,12 +33,18 @@ class ConfigObj implements Config {
     return this.getEnv("AWS_ACCOUNT_ID");
   }
 
+  @Override
   public String region() {
     var region = this.getEnv("CDK_DEFAULT_REGION");
     if (region != null) {
       return region;
     }
     return this.getEnv("AWS_DEFAULT_REGION");
+  }
+
+  @Override
+  public String bucket() {
+    return null;
   }
 
   private final Dotenv dotenv;
