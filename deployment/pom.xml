@@ -43,6 +43,12 @@
     </build>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/software.amazon.awscdk/cloudfront -->
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>cloudfront</artifactId>
+            <version>${cdk.version}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/software.amazon.awscdk/s3 -->
         <dependency>
             <groupId>software.amazon.awscdk</groupId>
