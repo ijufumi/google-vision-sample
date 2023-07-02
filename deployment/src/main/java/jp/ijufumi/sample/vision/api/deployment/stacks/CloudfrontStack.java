@@ -6,6 +6,7 @@ import software.amazon.awscdk.services.cloudfront.CachePolicy;
 import software.amazon.awscdk.services.cloudfront.CacheQueryStringBehavior;
 import software.amazon.awscdk.services.cloudfront.CachedMethods;
 import software.amazon.awscdk.services.cloudfront.Distribution;
+import software.amazon.awscdk.services.cloudfront.OriginAccessIdentity;
 import software.amazon.awscdk.services.cloudfront.PriceClass;
 import software.amazon.awscdk.services.cloudfront.ViewerProtocolPolicy;
 import software.amazon.awscdk.services.cloudfront.origins.S3Origin;
@@ -19,9 +20,16 @@ import software.constructs.Construct;
 public class CloudfrontStack {
 
   public static void build(final Construct scope, final Config config, final IBucket bucket) {
+
+    var originAccessIdentity = OriginAccessIdentity
+        .Builder
+        .create(scope, "origin-access-identity")
+        .build();
+
     var s3Origin = S3Origin
         .Builder
         .create(bucket)
+        .originAccessIdentity(originAccessIdentity)
         .build();
 
     var cachePolicy = CachePolicy
