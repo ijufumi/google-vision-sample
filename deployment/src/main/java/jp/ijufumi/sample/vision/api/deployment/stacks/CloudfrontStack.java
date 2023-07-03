@@ -6,6 +6,7 @@ import software.amazon.awscdk.services.cloudfront.CachePolicy;
 import software.amazon.awscdk.services.cloudfront.CacheQueryStringBehavior;
 import software.amazon.awscdk.services.cloudfront.CachedMethods;
 import software.amazon.awscdk.services.cloudfront.Distribution;
+import software.amazon.awscdk.services.cloudfront.GeoRestriction;
 import software.amazon.awscdk.services.cloudfront.OriginAccessIdentity;
 import software.amazon.awscdk.services.cloudfront.PriceClass;
 import software.amazon.awscdk.services.cloudfront.ViewerProtocolPolicy;
@@ -21,6 +22,9 @@ public class CloudfrontStack {
 
   public static void build(final Construct scope, final Config config, final IBucket bucket) {
 
+    /**
+     * TODO: Add error page
+     */
     var originAccessIdentity = OriginAccessIdentity
         .Builder
         .create(scope, "origin-access-identity")
@@ -56,6 +60,7 @@ public class CloudfrontStack {
         .logFilePrefix("logs")
         .logIncludesCookies(true)
         .priceClass(PriceClass.PRICE_CLASS_200)
+        .geoRestriction(GeoRestriction.allowlist("AQ", "CV"))
         .build();
   }
 }
