@@ -14,6 +14,6 @@ public class MainStack extends Stack {
     super(scope, id, props);
 
     var bucket = S3Stack.build(scope, config);
-    CloudfrontStack.build(scope, config, bucket);
+    CloudfrontStack.build(scope, bucket);
   }
 }

@@ -22,7 +22,7 @@ import software.constructs.Construct;
  */
 public class CloudfrontStack {
 
-  public static void build(final Construct scope, final Config config, final IBucket bucket) {
+  public static void build(final Construct scope, final IBucket bucket) {
 
     var originAccessIdentity = OriginAccessIdentity
         .Builder
