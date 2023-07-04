@@ -1,11 +1,13 @@
 package jp.ijufumi.sample.vision.api.deployment.stacks;
 
+import java.util.List;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.amazon.awscdk.services.cloudfront.BehaviorOptions;
 import software.amazon.awscdk.services.cloudfront.CachePolicy;
 import software.amazon.awscdk.services.cloudfront.CacheQueryStringBehavior;
 import software.amazon.awscdk.services.cloudfront.CachedMethods;
 import software.amazon.awscdk.services.cloudfront.Distribution;
+import software.amazon.awscdk.services.cloudfront.ErrorResponse;
 import software.amazon.awscdk.services.cloudfront.GeoRestriction;
 import software.amazon.awscdk.services.cloudfront.OriginAccessIdentity;
 import software.amazon.awscdk.services.cloudfront.PriceClass;
@@ -22,9 +24,6 @@ public class CloudfrontStack {
 
   public static void build(final Construct scope, final Config config, final IBucket bucket) {
 
-    /**
-     * TODO: Add error page
-     */
     var originAccessIdentity = OriginAccessIdentity
         .Builder
         .create(scope, "origin-access-identity")
@@ -50,6 +49,27 @@ public class CloudfrontStack {
         .cachePolicy(cachePolicy)
         .build();
 
+    var errorResponse401 = ErrorResponse
+        .builder()
+        .httpStatus(401)
+        .responseHttpStatus(200)
+        .responsePagePath("index.html")
+        .build();
+
+    var errorResponse403 = ErrorResponse
+        .builder()
+        .httpStatus(403)
+        .responseHttpStatus(200)
+        .responsePagePath("index.html")
+        .build();
+
+    var errorResponse404 = ErrorResponse
+        .builder()
+        .httpStatus(404)
+        .responseHttpStatus(200)
+        .responsePagePath("index.html")
+        .build();
+
     Distribution
         .Builder
         .create(scope, "id-cloudfront")
@@ -61,6 +81,7 @@ public class CloudfrontStack {
         .logIncludesCookies(true)
         .priceClass(PriceClass.PRICE_CLASS_200)
         .geoRestriction(GeoRestriction.allowlist("AQ", "CV"))
+        .errorResponses(List.of(errorResponse401, errorResponse403, errorResponse404))
         .build();
   }
 }
