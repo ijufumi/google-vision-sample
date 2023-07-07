@@ -8,6 +8,7 @@ import software.amazon.awscdk.services.ecs.ContainerImage;
 import software.amazon.awscdk.services.ecs.Ec2Service;
 import software.amazon.awscdk.services.ecs.TaskDefinition;
 import software.amazon.awscdk.services.iam.ManagedPolicy;
+import software.amazon.awscdk.services.iam.PolicyStatement;
 import software.amazon.awscdk.services.iam.Role;
 import software.amazon.awscdk.services.iam.ServicePrincipal;
 import software.constructs.Construct;
@@ -15,9 +16,16 @@ import software.constructs.Construct;
 public class ECSStack {
 
   public static void build(final Construct scope) {
-    // TODO: Should add authorization that needed to execute task
+    var statement = PolicyStatement
+        .Builder
+        .create()
+        .build();
+    statement.addActions("s3:*");
+    statement.addAllResources();
     var ecsTaskRolePolicy = ManagedPolicy
-        .Builder.create(scope, "ecs-role-policy")
+        .Builder
+        .create(scope, "ecs-role-policy")
+        .statements(List.of(statement))
         .build();
 
     var ecsTaskServicePrincipal = ServicePrincipal

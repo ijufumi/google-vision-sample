@@ -2,6 +2,7 @@ package jp.ijufumi.sample.vision.api.deployment;
 
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import jp.ijufumi.sample.vision.api.deployment.stacks.CloudfrontStack;
+import jp.ijufumi.sample.vision.api.deployment.stacks.ECSStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.S3Stack;
 import software.amazon.awscdk.core.Stack;
 import software.amazon.awscdk.core.StackProps;
@@ -15,5 +16,6 @@ public class MainStack extends Stack {
 
     var bucket = S3Stack.build(scope, config);
     CloudfrontStack.build(scope, bucket);
+    ECSStack.build(scope);
   }
 }
