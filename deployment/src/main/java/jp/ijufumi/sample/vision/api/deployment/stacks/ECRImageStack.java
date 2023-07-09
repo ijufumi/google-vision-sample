@@ -20,13 +20,16 @@ public class ECRImageStack {
         .imageTagMutability(TagMutability.MUTABLE)
         .removalPolicy(RemovalPolicy.DESTROY)
         .build();
+
     var dockerImageAsset = DockerImageAsset
         .Builder
         .create(scope, "docker-image-asset")
         .directory(config.backendCode())
         .platform(Platform.LINUX_ARM64)
         .build();
+
     dockerImageAsset.setRepository(ecrRepository);
+    
     return ContainerImage.fromDockerImageAsset(dockerImageAsset);
   }
 }

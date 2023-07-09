@@ -22,6 +22,7 @@ public class ECSStack {
         .build();
     statement.addActions("s3:*");
     statement.addAllResources();
+    
     var ecsTaskRolePolicy = ManagedPolicy
         .Builder
         .create(scope, "ecs-role-policy")
