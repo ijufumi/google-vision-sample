@@ -20,6 +20,10 @@ public interface Config {
   String region();
 
   String bucket();
+
+  String repositoryName();
+
+  String backendCode();
 }
 
 class ConfigObj implements Config {
@@ -44,7 +48,17 @@ class ConfigObj implements Config {
 
   @Override
   public String bucket() {
-    return null;
+    return this.getEnv("S3_BUCKET_NAME");
+  }
+
+  @Override
+  public String repositoryName() {
+    return this.getEnv("ECR_REPOSITORY_NAME");
+  }
+
+  @Override
+  public String backendCode() {
+    return this.getEnv("BACKEND_CODE_DIRECTORY");
   }
 
   private final Dotenv dotenv;

@@ -2,6 +2,7 @@ package jp.ijufumi.sample.vision.api.deployment;
 
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import jp.ijufumi.sample.vision.api.deployment.stacks.CloudfrontStack;
+import jp.ijufumi.sample.vision.api.deployment.stacks.ECRImageStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.ECSStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.S3Stack;
 import software.amazon.awscdk.core.Stack;
@@ -15,7 +16,8 @@ public class MainStack extends Stack {
     super(scope, id, props);
 
     var bucket = S3Stack.build(scope, config);
+    var dockerImage = ECRImageStack.build(scope, config);
     CloudfrontStack.build(scope, bucket);
-    ECSStack.build(scope);
+    ECSStack.build(scope, dockerImage);
   }
 }

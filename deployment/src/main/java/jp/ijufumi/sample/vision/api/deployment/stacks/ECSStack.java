@@ -15,7 +15,7 @@ import software.constructs.Construct;
 
 public class ECSStack {
 
-  public static void build(final Construct scope) {
+  public static void build(final Construct scope, final ContainerImage appImage) {
     var statement = PolicyStatement
         .Builder
         .create()
@@ -53,9 +53,6 @@ public class ECSStack {
         .compatibility(Compatibility.EC2)
         .taskRole(ecsRole)
         .build();
-
-    var appImage = ContainerImage
-        .fromRegistry("postgres:latest");
 
     var appContainer = ContainerDefinitionProps
         .builder()
