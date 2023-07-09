@@ -1,7 +1,11 @@
 package jp.ijufumi.sample.vision.api.deployment.stacks;
 
 import java.util.List;
-import software.amazon.awscdk.services.ecs.Cluster;
+import software.amazon.awscdk.services.ec2.InstanceClass;
+import software.amazon.awscdk.services.ec2.InstanceSize;
+import software.amazon.awscdk.services.ec2.InstanceType;
+import software.amazon.awscdk.services.ecs.AddCapacityOptions;
+import software.amazon.awscdk.services.ecs.Cluster.Builder;
 import software.amazon.awscdk.services.ecs.Compatibility;
 import software.amazon.awscdk.services.ecs.ContainerDefinitionProps;
 import software.amazon.awscdk.services.ecs.ContainerImage;
@@ -22,7 +26,7 @@ public class ECSStack {
         .build();
     statement.addActions("s3:*");
     statement.addAllResources();
-    
+
     var ecsTaskRolePolicy = ManagedPolicy
         .Builder
         .create(scope, "ecs-role-policy")
@@ -42,10 +46,16 @@ public class ECSStack {
         .managedPolicies(List.of(ecsTaskRolePolicy))
         .build();
 
-    var ecsCluster = Cluster
-        .Builder
+    var capacityOptions = AddCapacityOptions
+        .builder()
+        .instanceType(InstanceType.of(InstanceClass.ARM1, InstanceSize.MICRO))
+        .allowAllOutbound(true)
+        .build();
+
+    var ecsCluster = Builder
         .create(scope, "ecs-cluster")
         .clusterName("ecs-cluster")
+        .capacity(capacityOptions)
         .build();
 
     var appTaskDefinition = TaskDefinition
