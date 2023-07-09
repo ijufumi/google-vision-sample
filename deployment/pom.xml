@@ -43,6 +43,21 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>secretsmanager</artifactId>
+            <version>${cdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>ecr-assets</artifactId>
+            <version>${cdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>ecr</artifactId>
+            <version>${cdk.version}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/software.amazon.awscdk/ecs -->
         <dependency>
             <groupId>software.amazon.awscdk</groupId>
