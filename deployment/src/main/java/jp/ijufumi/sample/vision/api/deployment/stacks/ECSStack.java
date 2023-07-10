@@ -1,6 +1,7 @@
 package jp.ijufumi.sample.vision.api.deployment.stacks;
 
 import java.util.List;
+import java.util.Map;
 import software.amazon.awscdk.services.ec2.InstanceClass;
 import software.amazon.awscdk.services.ec2.InstanceSize;
 import software.amazon.awscdk.services.ec2.InstanceType;
@@ -10,6 +11,7 @@ import software.amazon.awscdk.services.ecs.Compatibility;
 import software.amazon.awscdk.services.ecs.ContainerDefinitionProps;
 import software.amazon.awscdk.services.ecs.ContainerImage;
 import software.amazon.awscdk.services.ecs.Ec2Service;
+import software.amazon.awscdk.services.ecs.Secret;
 import software.amazon.awscdk.services.ecs.TaskDefinition;
 import software.amazon.awscdk.services.iam.ManagedPolicy;
 import software.amazon.awscdk.services.iam.PolicyStatement;
@@ -19,7 +21,8 @@ import software.constructs.Construct;
 
 public class ECSStack {
 
-  public static void build(final Construct scope, final ContainerImage appImage) {
+  public static void build(final Construct scope, final ContainerImage appImage,
+      final software.amazon.awscdk.services.secretsmanager.Secret googleCredential) {
     var statement = PolicyStatement
         .Builder
         .create()
@@ -65,11 +68,13 @@ public class ECSStack {
         .taskRole(ecsRole)
         .build();
 
+    var googleCredentialSecret = Secret.fromSecretsManager(googleCredential);
     var appContainer = ContainerDefinitionProps
         .builder()
         .containerName("db")
         .taskDefinition(appTaskDefinition)
         .image(appImage)
+        .secrets(Map.of("GOOGLE_CREDENTIAL", googleCredentialSecret))
         .build();
     appTaskDefinition.addContainer("app-container", appContainer);
 

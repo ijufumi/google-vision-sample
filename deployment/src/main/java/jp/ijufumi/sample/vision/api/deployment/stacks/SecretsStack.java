@@ -9,9 +9,9 @@ import software.constructs.Construct;
 
 public class SecretsStack {
 
-  public static void build(final Construct scope, final Config config) {
+  public static Secret build(final Construct scope, final Config config) {
     var secretValue = SecretValue.Builder.create(config.googleCredential()).build();
-    Secret
+    return Secret
         .Builder
         .create(scope, "google-credential-secret")
         .removalPolicy(RemovalPolicy.DESTROY)
