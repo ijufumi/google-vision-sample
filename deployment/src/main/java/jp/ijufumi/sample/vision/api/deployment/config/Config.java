@@ -24,6 +24,8 @@ public interface Config {
   String repositoryName();
 
   String backendCode();
+
+  String googleCredential();
 }
 
 class ConfigObj implements Config {
@@ -59,6 +61,11 @@ class ConfigObj implements Config {
   @Override
   public String backendCode() {
     return this.getEnv("BACKEND_CODE_DIRECTORY");
+  }
+
+  @Override
+  public String googleCredential() {
+    return this.getEnv("APP_GOOGLE_CREDENTIAL");
   }
 
   private final Dotenv dotenv;
