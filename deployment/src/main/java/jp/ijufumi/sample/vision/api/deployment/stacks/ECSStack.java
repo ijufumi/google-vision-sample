@@ -11,6 +11,7 @@ import software.amazon.awscdk.services.ecs.Compatibility;
 import software.amazon.awscdk.services.ecs.ContainerDefinitionProps;
 import software.amazon.awscdk.services.ecs.ContainerImage;
 import software.amazon.awscdk.services.ecs.Ec2Service;
+import software.amazon.awscdk.services.ecs.LoadBalancerTargetOptions;
 import software.amazon.awscdk.services.ecs.Secret;
 import software.amazon.awscdk.services.ecs.TaskDefinition;
 import software.amazon.awscdk.services.iam.ManagedPolicy;
@@ -78,12 +79,17 @@ public class ECSStack {
         .build();
     appTaskDefinition.addContainer("app-container", appContainer);
 
-    Ec2Service
+    var app = Ec2Service
         .Builder
         .create(scope, "app-service")
         .assignPublicIp(true)
         .cluster(ecsCluster)
         .serviceName("app")
+        .build();
+    var appTarget = LoadBalancerTargetOptions
+        .builder()
+        .containerName(appContainer.getContainerName())
+        .containerPort(8080)
         .build();
 
     var dbTaskDefinition = TaskDefinition
