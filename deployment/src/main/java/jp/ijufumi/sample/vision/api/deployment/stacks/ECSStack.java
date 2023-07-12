@@ -14,6 +14,7 @@ import software.amazon.awscdk.services.ecs.Ec2Service;
 import software.amazon.awscdk.services.ecs.LoadBalancerTargetOptions;
 import software.amazon.awscdk.services.ecs.Secret;
 import software.amazon.awscdk.services.ecs.TaskDefinition;
+import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationLoadBalancer;
 import software.amazon.awscdk.services.iam.ManagedPolicy;
 import software.amazon.awscdk.services.iam.PolicyStatement;
 import software.amazon.awscdk.services.iam.Role;
@@ -86,11 +87,14 @@ public class ECSStack {
         .cluster(ecsCluster)
         .serviceName("app")
         .build();
+
     var appTarget = LoadBalancerTargetOptions
         .builder()
         .containerName(appContainer.getContainerName())
         .containerPort(8080)
         .build();
+    app.loadBalancerTarget(appTarget);
+    var alb = ApplicationLoadBalancer.Builder.create(scope, "ecs-alb").build();
 
     var dbTaskDefinition = TaskDefinition
         .Builder
@@ -118,4 +122,5 @@ public class ECSStack {
         .serviceName("db")
         .build();
   }
+
 }
