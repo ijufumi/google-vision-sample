@@ -63,6 +63,12 @@
             <artifactId>ecr</artifactId>
             <version>${cdk.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/software.amazon.awscdk/ecs-patterns -->
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>ecs-patterns</artifactId>
+            <version>${cdk.version}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/software.amazon.awscdk/ecs -->
         <dependency>
             <groupId>software.amazon.awscdk</groupId>
