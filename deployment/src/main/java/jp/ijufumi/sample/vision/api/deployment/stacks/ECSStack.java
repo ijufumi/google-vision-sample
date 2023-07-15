@@ -11,7 +11,7 @@ import software.amazon.awscdk.services.ecs.Compatibility;
 import software.amazon.awscdk.services.ecs.ContainerDefinitionProps;
 import software.amazon.awscdk.services.ecs.ContainerImage;
 import software.amazon.awscdk.services.ecs.Ec2Service;
-import software.amazon.awscdk.services.ecs.LoadBalancerTargetOptions;
+import software.amazon.awscdk.services.ecs.PortMapping;
 import software.amazon.awscdk.services.ecs.Secret;
 import software.amazon.awscdk.services.ecs.TaskDefinition;
 import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationListener;
@@ -73,11 +73,18 @@ public class ECSStack {
         .build();
 
     var googleCredentialSecret = Secret.fromSecretsManager(googleCredential);
+
+    var appPortMapping = PortMapping
+        .builder()
+        .containerPort(8080)
+        .hostPort(80)
+        .build();
     var appContainer = ContainerDefinitionProps
         .builder()
         .containerName("db")
         .taskDefinition(appTaskDefinition)
         .image(appImage)
+        .portMappings(List.of(appPortMapping))
         .secrets(Map.of("GOOGLE_CREDENTIAL", googleCredentialSecret))
         .build();
     appTaskDefinition.addContainer("app-container", appContainer);
@@ -85,17 +92,10 @@ public class ECSStack {
     var app = Ec2Service
         .Builder
         .create(scope, "app-service")
-        .assignPublicIp(true)
+        .assignPublicIp(false)
         .cluster(ecsCluster)
         .serviceName("app")
         .build();
-
-    var appTarget = LoadBalancerTargetOptions
-        .builder()
-        .containerName(appContainer.getContainerName())
-        .containerPort(8080)
-        .build();
-    app.loadBalancerTarget(appTarget);
 
     var alb = ApplicationLoadBalancer
         .Builder
@@ -106,10 +106,11 @@ public class ECSStack {
         .create(scope, "alb-target-group")
         .targets(List.of(app))
         .build();
-    var albListener = ApplicationListener
+    ApplicationListener
         .Builder
         .create(scope, "ecs-alb-listener")
         .loadBalancer(alb)
+        .defaultTargetGroups(List.of(albTargetGroup))
         .build();
 
     var dbTaskDefinition = TaskDefinition
