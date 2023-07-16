@@ -2,6 +2,7 @@ package jp.ijufumi.sample.vision.api.deployment.stacks;
 
 import java.util.List;
 import java.util.Map;
+import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.amazon.awscdk.services.ec2.InstanceClass;
 import software.amazon.awscdk.services.ec2.InstanceSize;
 import software.amazon.awscdk.services.ec2.InstanceType;
@@ -25,7 +26,8 @@ import software.constructs.Construct;
 
 public class ECSStack {
 
-  public static void build(final Construct scope, final ContainerImage appImage,
+  public static ApplicationLoadBalancer build(final Construct scope, final Config config,
+      final ContainerImage appImage,
       final software.amazon.awscdk.services.secretsmanager.Secret googleCredential) {
     var statement = PolicyStatement
         .Builder
@@ -100,7 +102,9 @@ public class ECSStack {
     var alb = ApplicationLoadBalancer
         .Builder
         .create(scope, "ecs-alb")
+        .loadBalancerName(config.apiDomainName())
         .build();
+
     var albTargetGroup = ApplicationTargetGroup
         .Builder
         .create(scope, "alb-target-group")
@@ -138,6 +142,7 @@ public class ECSStack {
         .cluster(ecsCluster)
         .serviceName("db")
         .build();
-  }
 
+    return alb;
+  }
 }
