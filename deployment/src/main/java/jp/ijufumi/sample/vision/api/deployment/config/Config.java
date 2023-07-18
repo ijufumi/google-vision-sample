@@ -86,12 +86,12 @@ class ConfigObj implements Config {
 
   @Override
   public String hostZoneId() {
-    return this.getEnv("APP_HOST_ZONE_ID");
+    return this.getEnv("HOST_ZONE_ID");
   }
 
   @Override
   public String apiDomainName() {
-    return this.getEnv("APP_API_DOMAIN_NAME");
+    return this.getEnv("API_DOMAIN_NAME");
   }
 
   private final Dotenv dotenv;
