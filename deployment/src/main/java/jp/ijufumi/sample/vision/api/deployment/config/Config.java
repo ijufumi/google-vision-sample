@@ -1,6 +1,9 @@
 package jp.ijufumi.sample.vision.api.deployment.config;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public interface Config {
 
@@ -69,6 +72,15 @@ class ConfigObj implements Config {
 
   @Override
   public String googleCredential() {
+    var credentialFilePath = this.getEnv("APP_GOOGLE_CREDENTIAL_FILE");
+    if (credentialFilePath != null) {
+      try {
+        return Files.readString(Path.of(credentialFilePath));
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
     return this.getEnv("APP_GOOGLE_CREDENTIAL");
   }
 
