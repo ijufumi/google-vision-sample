@@ -33,6 +33,16 @@ public interface Config {
   String hostZoneId();
 
   String apiDomainName();
+
+  String dbName();
+
+  String dbHost();
+
+  String dbUser();
+
+  String dbPassword();
+
+  int dbPort();
 }
 
 class ConfigObj implements Config {
@@ -92,6 +102,31 @@ class ConfigObj implements Config {
   @Override
   public String apiDomainName() {
     return this.getEnv("API_DOMAIN_NAME");
+  }
+
+  @Override
+  public String dbName() {
+    return this.getEnv("APP_DB_NAME");
+  }
+
+  @Override
+  public String dbHost() {
+    return this.getEnv("APP_DB_HOST");
+  }
+
+  @Override
+  public String dbUser() {
+    return this.getEnv("APP_DB_USER");
+  }
+
+  @Override
+  public String dbPassword() {
+    return this.getEnv("APP_DB_PASSWORD");
+  }
+
+  @Override
+  public int dbPort() {
+    return this.getEnv("APP_DB_PORT", 5432);
   }
 
   private final Dotenv dotenv;
