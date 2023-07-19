@@ -82,7 +82,6 @@ public class ECSStack {
         .hostPort(80)
         .build();
     var appEnvironment = Map.of(
-        "GOOGLE_CREDENTIAL", config.googleCredential(),
         "DB_HOST", config.dbHost(),
         "DB_NAME", config.dbName(),
         "DB_USER", config.dbUser(),
