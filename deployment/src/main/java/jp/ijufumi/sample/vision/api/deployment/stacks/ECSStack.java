@@ -137,7 +137,7 @@ public class ECSStack {
 
     var dbContainer = ContainerDefinitionProps
         .builder()
-        .containerName("db")
+        .containerName(config.dbHost())
         .taskDefinition(dbTaskDefinition)
         .image(dbImage)
         .build();
