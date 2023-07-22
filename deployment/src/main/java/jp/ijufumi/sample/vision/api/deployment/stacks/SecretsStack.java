@@ -4,7 +4,6 @@ import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.amazon.awscdk.core.RemovalPolicy;
 import software.amazon.awscdk.core.SecretValue;
 import software.amazon.awscdk.services.secretsmanager.Secret;
-import software.amazon.awscdk.services.secretsmanager.SecretStringGenerator;
 import software.constructs.Construct;
 
 public class SecretsStack {
@@ -17,7 +16,6 @@ public class SecretsStack {
         .removalPolicy(RemovalPolicy.DESTROY)
         .secretName("GOOGLE_CREDENTIAL")
         .secretStringValue(secretValue)
-        .generateSecretString(SecretStringGenerator.builder().build())
         .build();
   }
 }
