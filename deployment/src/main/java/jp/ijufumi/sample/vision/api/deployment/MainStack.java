@@ -17,11 +17,11 @@ public class MainStack extends Stack {
       final Config config) {
     super(scope, id, props);
 
-    var secret = SecretsStack.build(scope, config);
-    var bucket = S3Stack.build(scope, config);
-    var dockerImage = ECRImageStack.build(scope, config);
-    CloudfrontStack.build(scope, bucket);
-    var alb = ECSStack.build(scope, config, dockerImage, secret);
-    Route53Stack.build(scope, config, alb);
+    var secret = SecretsStack.build(this, config);
+    var bucket = S3Stack.build(this, config);
+    var dockerImage = ECRImageStack.build(this, config);
+    CloudfrontStack.build(this, bucket);
+    var alb = ECSStack.build(this, config, dockerImage, secret);
+    Route53Stack.build(this, config, alb);
   }
 }
