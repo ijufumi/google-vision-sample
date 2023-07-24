@@ -95,6 +95,7 @@ public class ECSStack {
         .portMappings(List.of(appPortMapping))
         .secrets(Map.of("GOOGLE_CREDENTIAL", googleCredentialSecret))
         .environment(appEnvironment)
+        .taskDefinition(appTaskDefinition)
         .build();
     appTaskDefinition.addContainer("app-container", appContainer);
 
@@ -139,6 +140,7 @@ public class ECSStack {
         .builder()
         .containerName(config.dbHost())
         .image(dbImage)
+        .taskDefinition(dbTaskDefinition)
         .build();
     dbTaskDefinition.addContainer("db-container", dbContainer);
 
