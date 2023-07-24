@@ -91,7 +91,6 @@ public class ECSStack {
     var appContainer = ContainerDefinitionProps
         .builder()
         .containerName("db")
-        .taskDefinition(appTaskDefinition)
         .image(appImage)
         .portMappings(List.of(appPortMapping))
         .secrets(Map.of("GOOGLE_CREDENTIAL", googleCredentialSecret))
@@ -105,6 +104,7 @@ public class ECSStack {
         .assignPublicIp(false)
         .cluster(ecsCluster)
         .serviceName("app")
+        .taskDefinition(appTaskDefinition)
         .build();
 
     var alb = ApplicationLoadBalancer
@@ -138,7 +138,6 @@ public class ECSStack {
     var dbContainer = ContainerDefinitionProps
         .builder()
         .containerName(config.dbHost())
-        .taskDefinition(dbTaskDefinition)
         .image(dbImage)
         .build();
     dbTaskDefinition.addContainer("db-container", dbContainer);
@@ -149,6 +148,7 @@ public class ECSStack {
         .assignPublicIp(false)
         .cluster(ecsCluster)
         .serviceName("db")
+        .taskDefinition(dbTaskDefinition)
         .build();
 
     return alb;
