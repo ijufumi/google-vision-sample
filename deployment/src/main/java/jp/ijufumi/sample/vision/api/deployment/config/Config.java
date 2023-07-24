@@ -89,6 +89,14 @@ class ConfigObj implements Config {
       } catch (IOException e) {
         e.printStackTrace();
       }
+      try {
+        var resource = getClass().getClassLoader().getResource(credentialFilePath);
+        if (resource != null) {
+          return Files.readString(Path.of(resource.getPath()));
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
 
     return this.getEnv("APP_GOOGLE_CREDENTIAL");
