@@ -22,6 +22,8 @@ public interface Config {
 
   String region();
 
+  String vpcName();
+
   String bucket();
 
   String repositoryName();
@@ -63,6 +65,11 @@ class ConfigObj implements Config {
       return region;
     }
     return this.getEnv("AWS_DEFAULT_REGION");
+  }
+
+  @Override
+  public String vpcName() {
+    return this.getEnv("VPC_NAME");
   }
 
   @Override
