@@ -5,6 +5,7 @@ import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationLoadBal
 import software.amazon.awscdk.services.route53.HostedZone;
 import software.amazon.awscdk.services.route53.RecordSet;
 import software.amazon.awscdk.services.route53.RecordTarget;
+import software.amazon.awscdk.services.route53.RecordType;
 import software.constructs.Construct;
 
 public class Route53Stack {
@@ -20,6 +21,7 @@ public class Route53Stack {
         .recordName(config.apiDomainName())
         .zone(hostZone)
         .target(recordTarget)
+        .recordType(RecordType.A)
         .build();
   }
 }
