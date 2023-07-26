@@ -115,6 +115,7 @@ public class ECSStack {
         .Builder
         .create(scope, "ecs-alb")
         .loadBalancerName(config.apiDomainName())
+        .vpc(vpc)
         .build();
 
     var albTargetGroup = ApplicationTargetGroup
