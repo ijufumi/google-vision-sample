@@ -6,6 +6,7 @@ import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.amazon.awscdk.services.ec2.InstanceClass;
 import software.amazon.awscdk.services.ec2.InstanceSize;
 import software.amazon.awscdk.services.ec2.InstanceType;
+import software.amazon.awscdk.services.ec2.Vpc;
 import software.amazon.awscdk.services.ecs.AddCapacityOptions;
 import software.amazon.awscdk.services.ecs.Cluster.Builder;
 import software.amazon.awscdk.services.ecs.Compatibility;
@@ -27,6 +28,7 @@ import software.constructs.Construct;
 public class ECSStack {
 
   public static ApplicationLoadBalancer build(final Construct scope, final Config config,
+      final Vpc vpc,
       final ContainerImage appImage,
       final software.amazon.awscdk.services.secretsmanager.Secret googleCredential) {
     var statement = PolicyStatement
@@ -65,6 +67,7 @@ public class ECSStack {
         .create(scope, "ecs-cluster")
         .clusterName("ecs-cluster")
         .capacity(capacityOptions)
+        .vpc(vpc)
         .build();
 
     var appTaskDefinition = TaskDefinition

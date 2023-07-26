@@ -23,7 +23,7 @@ public class MainStack extends Stack {
     var bucket = S3Stack.build(this, config);
     var dockerImage = ECRImageStack.build(this, config);
     CloudfrontStack.build(this, bucket);
-    var alb = ECSStack.build(this, config, dockerImage, secret);
+    var alb = ECSStack.build(this, config, vpc, dockerImage, secret);
     Route53Stack.build(this, config, alb);
   }
 }
