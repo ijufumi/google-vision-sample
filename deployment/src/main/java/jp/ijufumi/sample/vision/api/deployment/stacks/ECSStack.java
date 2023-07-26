@@ -19,6 +19,7 @@ import software.amazon.awscdk.services.ecs.TaskDefinition;
 import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationListener;
 import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationLoadBalancer;
 import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationTargetGroup;
+import software.amazon.awscdk.services.elasticloadbalancingv2.ListenerCertificate;
 import software.amazon.awscdk.services.iam.ManagedPolicy;
 import software.amazon.awscdk.services.iam.PolicyStatement;
 import software.amazon.awscdk.services.iam.Role;
@@ -123,11 +124,15 @@ public class ECSStack {
         .create(scope, "alb-target-group")
         .targets(List.of(app))
         .build();
+
+    var certification = ListenerCertificate.fromArn(config.certificationArn());
     ApplicationListener
         .Builder
         .create(scope, "ecs-alb-listener")
         .loadBalancer(alb)
         .defaultTargetGroups(List.of(albTargetGroup))
+        .port(443)
+        .certificates(List.of(certification))
         .build();
 
     var dbTaskDefinition = TaskDefinition

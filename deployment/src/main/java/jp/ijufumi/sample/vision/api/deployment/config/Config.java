@@ -24,6 +24,8 @@ public interface Config {
 
   String vpcName();
 
+  String certificationArn();
+
   String bucket();
 
   String repositoryName();
@@ -70,6 +72,11 @@ class ConfigObj implements Config {
   @Override
   public String vpcName() {
     return this.getEnv("VPC_NAME");
+  }
+
+  @Override
+  public String certificationArn() {
+    return this.getEnv("CERTIFICATION_ARN");
   }
 
   @Override
