@@ -3,6 +3,7 @@ package jp.ijufumi.sample.vision.api.deployment.stacks;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationLoadBalancer;
 import software.amazon.awscdk.services.route53.HostedZone;
+import software.amazon.awscdk.services.route53.HostedZoneAttributes;
 import software.amazon.awscdk.services.route53.RecordSet;
 import software.amazon.awscdk.services.route53.RecordTarget;
 import software.amazon.awscdk.services.route53.RecordType;
@@ -12,8 +13,9 @@ public class Route53Stack {
 
   public static void build(final Construct scope, final Config config, final
   ApplicationLoadBalancer alb) {
+    var hostZoneAttribute = HostedZoneAttributes.builder().hostedZoneId(config.hostZoneId()).build();
     var hostZone = HostedZone
-        .fromHostedZoneId(scope, "host-zone-id", config.hostZoneId());
+        .fromHostedZoneAttributes(scope, "host-zone", hostZoneAttribute);
     var recordTarget = RecordTarget.fromValues(alb.getLoadBalancerDnsName());
     RecordSet
         .Builder
