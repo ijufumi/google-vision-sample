@@ -21,7 +21,7 @@ public class Route53Stack {
         .recordName(config.apiDomainName())
         .zone(hostZone)
         .target(recordTarget)
-        .recordType(RecordType.A)
+        .recordType(RecordType.CNAME)
         .build();
   }
 }
