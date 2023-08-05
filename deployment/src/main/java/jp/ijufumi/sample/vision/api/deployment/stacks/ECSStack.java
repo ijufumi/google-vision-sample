@@ -100,6 +100,8 @@ public class ECSStack {
         .secrets(Map.of("GOOGLE_CREDENTIAL", googleCredentialSecret))
         .environment(appEnvironment)
         .taskDefinition(appTaskDefinition)
+        .cpu(0.5)
+        .memoryLimitMiB(256)
         .build();
     appTaskDefinition.addContainer("app-container", appContainer);
 
@@ -123,6 +125,8 @@ public class ECSStack {
         .Builder
         .create(scope, "alb-target-group")
         .targets(List.of(app))
+        .port(8080)
+        .vpc(vpc)
         .build();
 
     var certification = ListenerCertificate.fromArn(config.certificationArn());
@@ -150,6 +154,8 @@ public class ECSStack {
         .containerName(config.dbHost())
         .image(dbImage)
         .taskDefinition(dbTaskDefinition)
+        .cpu(0.5)
+        .memoryLimitMiB(256)
         .build();
     dbTaskDefinition.addContainer("db-container", dbContainer);
 
