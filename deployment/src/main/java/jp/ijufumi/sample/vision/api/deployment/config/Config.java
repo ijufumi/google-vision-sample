@@ -36,6 +36,8 @@ public interface Config {
 
   String hostZoneId();
 
+  String hostZoneName();
+
   String apiDomainName();
 
   String dbName();
@@ -122,6 +124,11 @@ class ConfigObj implements Config {
   @Override
   public String hostZoneId() {
     return this.getEnv("HOST_ZONE_ID");
+  }
+
+  @Override
+  public String hostZoneName() {
+    return this.getEnv("HOST_ZONE_NAME");
   }
 
   @Override

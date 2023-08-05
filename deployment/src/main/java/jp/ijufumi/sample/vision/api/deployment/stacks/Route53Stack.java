@@ -13,7 +13,11 @@ public class Route53Stack {
 
   public static void build(final Construct scope, final Config config, final
   ApplicationLoadBalancer alb) {
-    var hostZoneAttribute = HostedZoneAttributes.builder().hostedZoneId(config.hostZoneId()).build();
+    var hostZoneAttribute = HostedZoneAttributes
+        .builder()
+        .hostedZoneId(config.hostZoneId())
+        .zoneName(config.hostZoneName())
+        .build();
     var hostZone = HostedZone
         .fromHostedZoneAttributes(scope, "host-zone", hostZoneAttribute);
     var recordTarget = RecordTarget.fromValues(alb.getLoadBalancerDnsName());
