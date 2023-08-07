@@ -2,6 +2,7 @@ package jp.ijufumi.sample.vision.api.deployment.stacks;
 
 import java.util.List;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
+import software.amazon.awscdk.services.cloudfront.AllowedMethods;
 import software.amazon.awscdk.services.cloudfront.BehaviorOptions;
 import software.amazon.awscdk.services.cloudfront.CachePolicy;
 import software.amazon.awscdk.services.cloudfront.CacheQueryStringBehavior;
@@ -45,6 +46,7 @@ public class CloudfrontStack {
         .builder()
         .origin(s3Origin)
         .cachedMethods(CachedMethods.CACHE_GET_HEAD_OPTIONS)
+        .allowedMethods(AllowedMethods.ALLOW_GET_HEAD_OPTIONS)
         .viewerProtocolPolicy(ViewerProtocolPolicy.ALLOW_ALL)
         .cachePolicy(cachePolicy)
         .build();
