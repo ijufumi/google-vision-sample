@@ -2,6 +2,7 @@ package jp.ijufumi.sample.vision.api.deployment.stacks;
 
 import java.util.List;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
+import software.amazon.awscdk.core.Duration;
 import software.amazon.awscdk.services.cloudfront.AllowedMethods;
 import software.amazon.awscdk.services.cloudfront.BehaviorOptions;
 import software.amazon.awscdk.services.cloudfront.CachePolicy;
@@ -56,6 +57,7 @@ public class CloudfrontStack {
         .httpStatus(401)
         .responseHttpStatus(200)
         .responsePagePath("index.html")
+        .ttl(Duration.millis(0))
         .build();
 
     var errorResponse403 = ErrorResponse
@@ -63,6 +65,7 @@ public class CloudfrontStack {
         .httpStatus(403)
         .responseHttpStatus(200)
         .responsePagePath("index.html")
+        .ttl(Duration.millis(0))
         .build();
 
     var errorResponse404 = ErrorResponse
@@ -70,6 +73,7 @@ public class CloudfrontStack {
         .httpStatus(404)
         .responseHttpStatus(200)
         .responsePagePath("index.html")
+        .ttl(Duration.millis(0))
         .build();
 
     Distribution
