@@ -10,6 +10,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <cdk.version>1.204.0</cdk.version>
+        <cdk2.version>2.90.0</cdk2.version>
         <junit.version>5.7.1</junit.version>
     </properties>
 
@@ -43,6 +44,13 @@
     </build>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/software.amazon.awscdk/aws-cdk-lib -->
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>aws-cdk-lib</artifactId>
+            <version>${cdk2.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>software.amazon.awscdk</groupId>
             <artifactId>route53</artifactId>
