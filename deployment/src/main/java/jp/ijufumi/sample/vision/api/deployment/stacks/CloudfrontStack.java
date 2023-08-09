@@ -1,8 +1,7 @@
 package jp.ijufumi.sample.vision.api.deployment.stacks;
 
 import java.util.List;
-import jp.ijufumi.sample.vision.api.deployment.config.Config;
-import software.amazon.awscdk.core.Duration;
+import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.services.cloudfront.AllowedMethods;
 import software.amazon.awscdk.services.cloudfront.BehaviorOptions;
 import software.amazon.awscdk.services.cloudfront.CachePolicy;

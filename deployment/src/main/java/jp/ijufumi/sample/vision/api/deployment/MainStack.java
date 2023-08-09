@@ -8,8 +8,8 @@ import jp.ijufumi.sample.vision.api.deployment.stacks.Route53Stack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.S3Stack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.SecretsStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.VpcStack;
-import software.amazon.awscdk.core.Stack;
-import software.amazon.awscdk.core.StackProps;
+import software.amazon.awscdk.Stack;
+import software.amazon.awscdk.StackProps;
 import software.constructs.Construct;
 
 public class MainStack extends Stack {

@@ -1,7 +1,7 @@
 package jp.ijufumi.sample.vision.api.deployment.stacks;
 
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
-import software.amazon.awscdk.core.RemovalPolicy;
+import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.services.ecr.Repository;
 import software.amazon.awscdk.services.ecr.TagMutability;
 import software.amazon.awscdk.services.ecr.assets.DockerImageAsset;
@@ -29,7 +29,7 @@ public class ECRImageStack {
         .build();
 
     dockerImageAsset.setRepository(ecrRepository);
-    
+
     return ContainerImage.fromDockerImageAsset(dockerImageAsset);
   }
 }

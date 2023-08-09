@@ -1,8 +1,8 @@
 package jp.ijufumi.sample.vision.api.deployment.stacks;
 
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
-import software.amazon.awscdk.core.RemovalPolicy;
-import software.amazon.awscdk.core.SecretValue;
+import software.amazon.awscdk.RemovalPolicy;
+import software.amazon.awscdk.SecretValue;
 import software.amazon.awscdk.services.secretsmanager.Secret;
 import software.constructs.Construct;
 
