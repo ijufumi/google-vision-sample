@@ -55,7 +55,7 @@ public class CloudfrontStack {
         .builder()
         .httpStatus(400)
         .responseHttpStatus(200)
-        .responsePagePath("index.html")
+        .responsePagePath("/index.html")
         .ttl(Duration.millis(0))
         .build();
 
@@ -63,7 +63,7 @@ public class CloudfrontStack {
         .builder()
         .httpStatus(403)
         .responseHttpStatus(200)
-        .responsePagePath("index.html")
+        .responsePagePath("/index.html")
         .ttl(Duration.millis(0))
         .build();
 
@@ -71,7 +71,7 @@ public class CloudfrontStack {
         .builder()
         .httpStatus(404)
         .responseHttpStatus(200)
-        .responsePagePath("index.html")
+        .responsePagePath("/index.html")
         .ttl(Duration.millis(0))
         .build();
 
@@ -79,7 +79,7 @@ public class CloudfrontStack {
         .builder()
         .httpStatus(500)
         .responseHttpStatus(200)
-        .responsePagePath("index.html")
+        .responsePagePath("/index.html")
         .ttl(Duration.millis(0))
         .build();
 
@@ -87,7 +87,7 @@ public class CloudfrontStack {
         .builder()
         .httpStatus(503)
         .responseHttpStatus(200)
-        .responsePagePath("index.html")
+        .responsePagePath("/index.html")
         .ttl(Duration.millis(0))
         .build();
 
@@ -96,7 +96,7 @@ public class CloudfrontStack {
         .create(scope, "id-cloudfront")
         .defaultBehavior(behaviorOption)
         .enabled(true)
-        .defaultRootObject("index.html")
+        .defaultRootObject("/index.html")
         .logBucket(bucket)
         .logFilePrefix("logs")
         .logIncludesCookies(true)
