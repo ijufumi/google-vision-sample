@@ -51,9 +51,9 @@ public class CloudfrontStack {
         .cachePolicy(cachePolicy)
         .build();
 
-    var errorResponse401 = ErrorResponse
+    var errorResponse400 = ErrorResponse
         .builder()
-        .httpStatus(401)
+        .httpStatus(400)
         .responseHttpStatus(200)
         .responsePagePath("index.html")
         .ttl(Duration.millis(0))
@@ -75,6 +75,22 @@ public class CloudfrontStack {
         .ttl(Duration.millis(0))
         .build();
 
+    var errorResponse500 = ErrorResponse
+        .builder()
+        .httpStatus(500)
+        .responseHttpStatus(200)
+        .responsePagePath("index.html")
+        .ttl(Duration.millis(0))
+        .build();
+
+    var errorResponse503 = ErrorResponse
+        .builder()
+        .httpStatus(503)
+        .responseHttpStatus(200)
+        .responsePagePath("index.html")
+        .ttl(Duration.millis(0))
+        .build();
+
     Distribution
         .Builder
         .create(scope, "id-cloudfront")
@@ -86,7 +102,7 @@ public class CloudfrontStack {
         .logIncludesCookies(true)
         .priceClass(PriceClass.PRICE_CLASS_200)
         .geoRestriction(GeoRestriction.allowlist("AQ", "CV"))
-        .errorResponses(List.of(errorResponse401, errorResponse403, errorResponse404))
+        .errorResponses(List.of(errorResponse400, errorResponse403, errorResponse404, errorResponse500, errorResponse503))
         .build();
   }
 }
