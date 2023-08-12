@@ -96,6 +96,7 @@ public class CloudfrontStack {
         .create(scope, "id-cloudfront")
         .defaultBehavior(behaviorOption)
         .enabled(true)
+        .enableLogging(true)
         .defaultRootObject("/index.html")
         .logBucket(bucket)
         .logFilePrefix("logs")
