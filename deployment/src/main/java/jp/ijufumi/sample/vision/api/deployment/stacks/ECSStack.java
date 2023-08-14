@@ -76,6 +76,8 @@ public class ECSStack {
         .create(scope, "app-task-definition")
         .compatibility(Compatibility.EC2)
         .taskRole(ecsRole)
+        .cpu("0.5")
+        .memoryMiB("256")
         .build();
 
     var googleCredentialSecret = Secret.fromSecretsManager(googleCredential);
@@ -143,6 +145,8 @@ public class ECSStack {
         .Builder
         .create(scope, "db-task-definition")
         .compatibility(Compatibility.EC2)
+        .cpu("0.5")
+        .memoryMiB("256")
         .taskRole(ecsRole)
         .build();
 
