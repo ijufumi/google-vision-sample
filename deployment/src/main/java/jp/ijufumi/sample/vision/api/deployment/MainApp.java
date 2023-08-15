@@ -11,12 +11,14 @@ public class MainApp {
     var app = new App();
 
     var config = Config.build();
-    new MainStack(app, "DeploymentStack", StackProps.builder()
+    var props = StackProps
+        .builder()
         .env(Environment.builder()
             .account(config.accountId())
             .region(config.region())
             .build())
-        .build(), config);
+        .build();
+    new MainStack(app, "DeploymentStack", props, config);
 
     app.synth();
   }
