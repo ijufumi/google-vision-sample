@@ -102,6 +102,8 @@ public class ECSStack {
         .taskDefinition(appTaskDefinition)
         .cpu(0.5)
         .memoryLimitMiB(256)
+        .hostname("app")
+        .privileged(true)
         .build();
     appTaskDefinition.addContainer("app-container", appContainer);
 
@@ -151,11 +153,13 @@ public class ECSStack {
 
     var dbContainer = ContainerDefinitionProps
         .builder()
-        .containerName(config.dbHost())
+        .containerName("db")
+        .hostname(config.dbHost())
         .image(dbImage)
         .taskDefinition(dbTaskDefinition)
         .cpu(0.5)
         .memoryLimitMiB(256)
+        .privileged(true)
         .build();
     dbTaskDefinition.addContainer("db-container", dbContainer);
 
