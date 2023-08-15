@@ -94,7 +94,7 @@ public class ECSStack {
     );
     var appContainer = ContainerDefinitionProps
         .builder()
-        .containerName("db")
+        .containerName("app")
         .image(appImage)
         .portMappings(List.of(appPortMapping))
         .secrets(Map.of("GOOGLE_CREDENTIAL", googleCredentialSecret))
