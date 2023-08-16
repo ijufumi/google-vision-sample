@@ -100,7 +100,7 @@ public class ECSStack {
         .secrets(Map.of("GOOGLE_CREDENTIAL", googleCredentialSecret))
         .environment(appEnvironment)
         .taskDefinition(appTaskDefinition)
-        .cpu(0.5)
+        .cpu(1)
         .memoryLimitMiB(256)
         .hostname("app")
         .privileged(true)
@@ -157,7 +157,7 @@ public class ECSStack {
         .hostname(config.dbHost())
         .image(dbImage)
         .taskDefinition(dbTaskDefinition)
-        .cpu(0.5)
+        .cpu(1)
         .memoryLimitMiB(256)
         .privileged(true)
         .build();
