@@ -8,11 +8,13 @@ import software.amazon.awscdk.services.ec2.InstanceSize;
 import software.amazon.awscdk.services.ec2.InstanceType;
 import software.amazon.awscdk.services.ec2.Vpc;
 import software.amazon.awscdk.services.ecs.AddCapacityOptions;
+import software.amazon.awscdk.services.ecs.AwsLogDriverProps;
 import software.amazon.awscdk.services.ecs.Cluster.Builder;
 import software.amazon.awscdk.services.ecs.Compatibility;
 import software.amazon.awscdk.services.ecs.ContainerDefinitionProps;
 import software.amazon.awscdk.services.ecs.ContainerImage;
 import software.amazon.awscdk.services.ecs.Ec2Service;
+import software.amazon.awscdk.services.ecs.LogDriver;
 import software.amazon.awscdk.services.ecs.PortMapping;
 import software.amazon.awscdk.services.ecs.Secret;
 import software.amazon.awscdk.services.ecs.TaskDefinition;
@@ -24,6 +26,7 @@ import software.amazon.awscdk.services.iam.ManagedPolicy;
 import software.amazon.awscdk.services.iam.PolicyStatement;
 import software.amazon.awscdk.services.iam.Role;
 import software.amazon.awscdk.services.iam.ServicePrincipal;
+import software.amazon.awscdk.services.logs.LogGroup;
 import software.constructs.Construct;
 
 public class ECSStack {
@@ -37,6 +40,7 @@ public class ECSStack {
         .create()
         .build();
     statement.addActions("s3:*");
+    statement.addActions("logs:*");
     statement.addAllResources();
 
     var ecsTaskRolePolicy = ManagedPolicy
@@ -92,6 +96,11 @@ public class ECSStack {
         "DB_PASSWORD", config.dbPassword(),
         "DB_PORT", Integer.toString(config.dbPort())
     );
+    var appLogProps = AwsLogDriverProps
+        .builder()
+        .logGroup(LogGroup.Builder.create(scope, "app-container-log-group").logGroupName("app-container").build())
+        .build();
+    var appLogConfig = LogDriver.awsLogs(appLogProps);
     var appContainer = ContainerDefinitionProps
         .builder()
         .containerName("app")
@@ -104,6 +113,7 @@ public class ECSStack {
         .memoryLimitMiB(256)
         .hostname("app")
         .privileged(true)
+        .logging(appLogConfig)
         .build();
     appTaskDefinition.addContainer("app-container", appContainer);
 
@@ -151,12 +161,18 @@ public class ECSStack {
     var dbImage = ContainerImage
         .fromRegistry("postgres:latest");
 
+    var dbLogProps = AwsLogDriverProps
+        .builder()
+        .logGroup(LogGroup.Builder.create(scope, "db-container-log-group").logGroupName("db-container").build())
+        .build();
+    var dbLogConfig = LogDriver.awsLogs(dbLogProps);
     var dbContainer = ContainerDefinitionProps
         .builder()
         .containerName("db")
         .hostname(config.dbHost())
         .image(dbImage)
         .taskDefinition(dbTaskDefinition)
+        .logging(dbLogConfig)
         .cpu(1)
         .memoryLimitMiB(256)
         .privileged(true)
