@@ -99,6 +99,7 @@ public class ECSStack {
     var appLogProps = AwsLogDriverProps
         .builder()
         .logGroup(LogGroup.Builder.create(scope, "app-container-log-group").logGroupName("app-container").build())
+        .streamPrefix("app-container")
         .build();
     var appLogConfig = LogDriver.awsLogs(appLogProps);
     var appContainer = ContainerDefinitionProps
@@ -164,6 +165,7 @@ public class ECSStack {
     var dbLogProps = AwsLogDriverProps
         .builder()
         .logGroup(LogGroup.Builder.create(scope, "db-container-log-group").logGroupName("db-container").build())
+        .streamPrefix("db-container")
         .build();
     var dbLogConfig = LogDriver.awsLogs(dbLogProps);
     var dbContainer = ContainerDefinitionProps
