@@ -168,12 +168,18 @@ public class ECSStack {
         .streamPrefix("db-container")
         .build();
     var dbLogConfig = LogDriver.awsLogs(dbLogProps);
+    var dbEnvironment = Map.of(
+        "POSTGRES_DB", config.dbName(),
+        "POSTGRES_USER", config.dbUser(),
+        "POSTGRES_PASSWORD", config.dbPassword()
+    );
     var dbContainer = ContainerDefinitionProps
         .builder()
         .containerName("db")
         .hostname(config.dbHost())
         .image(dbImage)
         .taskDefinition(dbTaskDefinition)
+        .environment(dbEnvironment)
         .logging(dbLogConfig)
         .cpu(1)
         .memoryLimitMiB(256)
