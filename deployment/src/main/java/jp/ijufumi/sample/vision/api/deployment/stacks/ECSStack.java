@@ -42,6 +42,7 @@ public class ECSStack {
         .build();
     statement.addActions("s3:*");
     statement.addActions("logs:*");
+    statement.addActions("ecr:*");
     statement.addAllResources();
 
     var ecsTaskRolePolicy = ManagedPolicy
