@@ -3,6 +3,7 @@ package jp.ijufumi.sample.vision.api.deployment.stacks;
 import java.util.List;
 import java.util.Map;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
+import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.services.ec2.InstanceClass;
 import software.amazon.awscdk.services.ec2.InstanceSize;
 import software.amazon.awscdk.services.ec2.InstanceType;
@@ -96,9 +97,14 @@ public class ECSStack {
         "DB_PASSWORD", config.dbPassword(),
         "DB_PORT", Integer.toString(config.dbPort())
     );
+    var appLogGroup = LogGroup.Builder
+        .create(scope, "app-container-log-group")
+        .logGroupName("app-container")
+        .removalPolicy(RemovalPolicy.DESTROY)
+        .build();
     var appLogProps = AwsLogDriverProps
         .builder()
-        .logGroup(LogGroup.Builder.create(scope, "app-container-log-group").logGroupName("app-container").build())
+        .logGroup(appLogGroup)
         .streamPrefix("app-container")
         .build();
     var appLogConfig = LogDriver.awsLogs(appLogProps);
@@ -162,9 +168,14 @@ public class ECSStack {
     var dbImage = ContainerImage
         .fromRegistry("postgres:latest");
 
+    var dbLogGroup = LogGroup.Builder
+        .create(scope, "db-container-log-group")
+        .logGroupName("db-container")
+        .removalPolicy(RemovalPolicy.DESTROY)
+        .build();
     var dbLogProps = AwsLogDriverProps
         .builder()
-        .logGroup(LogGroup.Builder.create(scope, "db-container-log-group").logGroupName("db-container").build())
+        .logGroup(dbLogGroup)
         .streamPrefix("db-container")
         .build();
     var dbLogConfig = LogDriver.awsLogs(dbLogProps);
