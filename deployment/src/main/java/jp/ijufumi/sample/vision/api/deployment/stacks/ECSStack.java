@@ -16,6 +16,7 @@ import software.amazon.awscdk.services.ecs.ContainerDefinitionProps;
 import software.amazon.awscdk.services.ecs.ContainerImage;
 import software.amazon.awscdk.services.ecs.Ec2Service;
 import software.amazon.awscdk.services.ecs.LogDriver;
+import software.amazon.awscdk.services.ecs.NetworkMode;
 import software.amazon.awscdk.services.ecs.PortMapping;
 import software.amazon.awscdk.services.ecs.Secret;
 import software.amazon.awscdk.services.ecs.TaskDefinition;
@@ -82,6 +83,7 @@ public class ECSStack {
         .create(scope, "app-task-definition")
         .compatibility(Compatibility.EC2)
         .taskRole(ecsRole)
+        .networkMode(NetworkMode.BRIDGE)
         .build();
 
     var googleCredentialSecret = Secret.fromSecretsManager(googleCredential);
