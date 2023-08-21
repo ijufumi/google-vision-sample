@@ -26,6 +26,7 @@ public class ECRImageStack {
         .create(scope, "docker-image-asset")
         .directory(config.backendCode())
         .platform(Platform.LINUX_ARM64)
+        .assetName("backend-asset")
         .build();
 
     dockerImageAsset.setRepository(ecrRepository);
