@@ -83,6 +83,7 @@ public class ECSStack {
         .create(scope, "app-task-definition")
         .compatibility(Compatibility.EC2)
         .taskRole(ecsRole)
+        .executionRole(ecsRole)
         .networkMode(NetworkMode.BRIDGE)
         .build();
 
