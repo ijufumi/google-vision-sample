@@ -24,6 +24,7 @@ import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationListene
 import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationLoadBalancer;
 import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationTargetGroup;
 import software.amazon.awscdk.services.elasticloadbalancingv2.ListenerCertificate;
+import software.amazon.awscdk.services.iam.Effect;
 import software.amazon.awscdk.services.iam.ManagedPolicy;
 import software.amazon.awscdk.services.iam.PolicyStatement;
 import software.amazon.awscdk.services.iam.Role;
@@ -40,11 +41,10 @@ public class ECSStack {
     var statement = PolicyStatement
         .Builder
         .create()
+        .actions(List.of("s3:*", "logs:*", "ecr:*"))
+        .resources(List.of("*"))
+        .effect(Effect.ALLOW)
         .build();
-    statement.addActions("s3:*");
-    statement.addActions("logs:*");
-    statement.addActions("ecr:*");
-    statement.addAllResources();
 
     var ecsTaskRolePolicy = ManagedPolicy
         .Builder
