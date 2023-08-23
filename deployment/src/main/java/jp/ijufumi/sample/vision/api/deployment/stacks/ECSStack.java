@@ -67,7 +67,7 @@ public class ECSStack {
 
     var capacityOptions = AddCapacityOptions
         .builder()
-        .instanceType(InstanceType.of(InstanceClass.T3, InstanceSize.XLARGE))
+        .instanceType(InstanceType.of(InstanceClass.T4G, InstanceSize.XLARGE))
         .allowAllOutbound(true)
         .build();
 
