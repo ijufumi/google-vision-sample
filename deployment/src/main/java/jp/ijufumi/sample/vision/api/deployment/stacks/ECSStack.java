@@ -11,6 +11,7 @@ import software.amazon.awscdk.services.ec2.InstanceType;
 import software.amazon.awscdk.services.ec2.Vpc;
 import software.amazon.awscdk.services.ecs.AddCapacityOptions;
 import software.amazon.awscdk.services.ecs.AwsLogDriverProps;
+import software.amazon.awscdk.services.ecs.CloudMapNamespaceOptions;
 import software.amazon.awscdk.services.ecs.CloudMapOptions;
 import software.amazon.awscdk.services.ecs.Cluster.Builder;
 import software.amazon.awscdk.services.ecs.Compatibility;
@@ -82,11 +83,18 @@ public class ECSStack {
         .allowAllOutbound(true)
         .build();
 
+    var cloudMapNamespace = CloudMapNamespaceOptions
+        .builder()
+        .vpc(vpc)
+        .name("default-namespace")
+        .build();
+
     var ecsCluster = Builder
         .create(scope, "ecs-cluster")
         .clusterName("ecs-cluster")
         .capacity(capacityOptions)
         .vpc(vpc)
+        .defaultCloudMapNamespace(cloudMapNamespace)
         .build();
 
     var appTaskDefinition = TaskDefinition
