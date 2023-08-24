@@ -34,6 +34,7 @@ import software.amazon.awscdk.services.iam.Role;
 import software.amazon.awscdk.services.iam.ServicePrincipal;
 import software.amazon.awscdk.services.logs.LogGroup;
 import software.amazon.awscdk.services.servicediscovery.DnsRecordType;
+import software.amazon.awscdk.services.servicediscovery.NamespaceType;
 import software.constructs.Construct;
 
 public class ECSStack {
@@ -45,7 +46,7 @@ public class ECSStack {
 
     var cloudMapOption = CloudMapOptions
         .builder()
-        .dnsRecordType(DnsRecordType.A)
+        .dnsRecordType(DnsRecordType.SRV)
         .dnsTtl(Duration.seconds(60))
         .failureThreshold(1)
         .build();
@@ -87,6 +88,8 @@ public class ECSStack {
         .builder()
         .vpc(vpc)
         .name("default-namespace")
+        .type(NamespaceType.DNS_PRIVATE)
+        .useForServiceConnect(true)
         .build();
 
     var ecsCluster = Builder
@@ -229,7 +232,6 @@ public class ECSStack {
         .cluster(ecsCluster)
         .serviceName("db")
         .taskDefinition(dbTaskDefinition)
-        .cloudMapOptions(cloudMapOption)
         .build();
 
     return alb;
