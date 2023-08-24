@@ -34,7 +34,6 @@ import software.amazon.awscdk.services.iam.Role;
 import software.amazon.awscdk.services.iam.ServicePrincipal;
 import software.amazon.awscdk.services.logs.LogGroup;
 import software.amazon.awscdk.services.servicediscovery.DnsRecordType;
-import software.amazon.awscdk.services.servicediscovery.NamespaceType;
 import software.constructs.Construct;
 
 public class ECSStack {
@@ -43,13 +42,6 @@ public class ECSStack {
       final Vpc vpc,
       final ContainerImage appImage,
       final software.amazon.awscdk.services.secretsmanager.Secret googleCredential) {
-
-    var cloudMapOption = CloudMapOptions
-        .builder()
-        .dnsRecordType(DnsRecordType.SRV)
-        .dnsTtl(Duration.seconds(60))
-        .failureThreshold(1)
-        .build();
 
     var statement = PolicyStatement
         .Builder
@@ -88,8 +80,6 @@ public class ECSStack {
         .builder()
         .vpc(vpc)
         .name("default-namespace")
-        .type(NamespaceType.DNS_PRIVATE)
-        .useForServiceConnect(true)
         .build();
 
     var ecsCluster = Builder
@@ -106,7 +96,7 @@ public class ECSStack {
         .compatibility(Compatibility.EC2)
         .taskRole(ecsRole)
         .executionRole(ecsRole)
-        .networkMode(NetworkMode.BRIDGE)
+        .networkMode(NetworkMode.AWS_VPC)
         .build();
 
     var googleCredentialSecret = Secret.fromSecretsManager(googleCredential);
@@ -150,6 +140,13 @@ public class ECSStack {
         .build();
     appTaskDefinition.addContainer("app-container", appContainer);
 
+    var appCloudMapOption = CloudMapOptions
+        .builder()
+        .dnsRecordType(DnsRecordType.SRV)
+        .dnsTtl(Duration.seconds(60))
+        .failureThreshold(1)
+        .name("app")
+        .build();
     var app = Ec2Service
         .Builder
         .create(scope, "app-service")
@@ -157,7 +154,7 @@ public class ECSStack {
         .cluster(ecsCluster)
         .serviceName("app")
         .taskDefinition(appTaskDefinition)
-        .cloudMapOptions(cloudMapOption)
+        .cloudMapOptions(appCloudMapOption)
         .build();
 
     var alb = ApplicationLoadBalancer
@@ -232,6 +229,13 @@ public class ECSStack {
         .build();
     dbTaskDefinition.addContainer("db-container", dbContainer);
 
+    var dbCloudMapOption = CloudMapOptions
+        .builder()
+        .dnsRecordType(DnsRecordType.SRV)
+        .dnsTtl(Duration.seconds(60))
+        .failureThreshold(1)
+        .name("db")
+        .build();
     Ec2Service
         .Builder
         .create(scope, "db-service")
@@ -239,7 +243,7 @@ public class ECSStack {
         .cluster(ecsCluster)
         .serviceName("db")
         .taskDefinition(dbTaskDefinition)
-        .cloudMapOptions(cloudMapOption)
+        .cloudMapOptions(dbCloudMapOption)
         .build();
 
     return alb;
