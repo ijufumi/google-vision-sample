@@ -222,6 +222,7 @@ public class ECSStack {
         .containerName("db")
         .hostname(config.dbHost())
         .image(dbImage)
+        .portMappings(List.of(dbPortMapping))
         .taskDefinition(dbTaskDefinition)
         .environment(dbEnvironment)
         .logging(dbLogConfig)
