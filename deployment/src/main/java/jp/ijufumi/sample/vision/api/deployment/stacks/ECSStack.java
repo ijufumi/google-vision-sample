@@ -211,6 +211,12 @@ public class ECSStack {
         "POSTGRES_USER", config.dbUser(),
         "POSTGRES_PASSWORD", config.dbPassword()
     );
+
+    var dbPortMapping = PortMapping
+        .builder()
+        .containerPort(5432)
+        .hostPort(5432)
+        .build();
     var dbContainer = ContainerDefinitionProps
         .builder()
         .containerName("db")
@@ -232,6 +238,7 @@ public class ECSStack {
         .cluster(ecsCluster)
         .serviceName("db")
         .taskDefinition(dbTaskDefinition)
+        .cloudMapOptions(cloudMapOption)
         .build();
 
     return alb;
