@@ -134,7 +134,6 @@ public class ECSStack {
         .taskDefinition(appTaskDefinition)
         .cpu(1)
         .memoryLimitMiB(256)
-        .hostname("app")
         .privileged(true)
         .logging(appLogConfig)
         .build();
@@ -216,8 +215,7 @@ public class ECSStack {
         .build();
     var dbContainer = ContainerDefinitionProps
         .builder()
-        .containerName("db")
-        .hostname(config.dbHost())
+        .containerName(config.dbHost())
         .image(dbImage)
         .portMappings(List.of(dbPortMapping))
         .taskDefinition(dbTaskDefinition)
