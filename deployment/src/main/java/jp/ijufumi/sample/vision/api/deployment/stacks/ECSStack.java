@@ -79,7 +79,7 @@ public class ECSStack {
     var cloudMapNamespace = CloudMapNamespaceOptions
         .builder()
         .vpc(vpc)
-        .name("default-namespace")
+        .name(config.route53Namespace())
         .build();
 
     var ecsCluster = Builder
@@ -107,7 +107,7 @@ public class ECSStack {
         .hostPort(8080)
         .build();
     var appEnvironment = Map.of(
-        "DB_HOST", config.dbHost(),
+        "DB_HOST", String.format("%s.%s", config.dbHost(), config.route53Namespace()),
         "DB_NAME", config.dbName(),
         "DB_USER", config.dbUser(),
         "DB_PASSWORD", config.dbPassword(),

@@ -49,6 +49,8 @@ public interface Config {
   String dbPassword();
 
   int dbPort();
+
+  String route53Namespace();
 }
 
 class ConfigObj implements Config {
@@ -159,6 +161,11 @@ class ConfigObj implements Config {
   @Override
   public int dbPort() {
     return this.getEnv("APP_DB_PORT", 5432);
+  }
+
+  @Override
+  public String route53Namespace() {
+    return this.getEnv("ROUTE53_NAMESPACE");
   }
 
   private final Dotenv dotenv;
