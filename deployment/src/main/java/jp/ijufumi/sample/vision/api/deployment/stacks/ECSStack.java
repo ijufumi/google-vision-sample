@@ -104,7 +104,7 @@ public class ECSStack {
     var appPortMapping = PortMapping
         .builder()
         .containerPort(8080)
-        .hostPort(80)
+        .hostPort(8080)
         .build();
     var appEnvironment = Map.of(
         "DB_HOST", config.dbHost(),
