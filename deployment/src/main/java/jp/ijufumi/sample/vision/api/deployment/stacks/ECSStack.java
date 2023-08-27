@@ -34,6 +34,7 @@ import software.amazon.awscdk.services.iam.ServicePrincipal;
 import software.amazon.awscdk.services.logs.LogGroup;
 import software.amazon.awscdk.services.servicediscovery.DnsRecordType;
 import software.amazon.awscdk.services.servicediscovery.NamespaceType;
+import software.amazon.awscdk.services.servicediscovery.PrivateDnsNamespace;
 import software.constructs.Construct;
 
 public class ECSStack {
@@ -82,6 +83,12 @@ public class ECSStack {
         .name(config.route53Namespace())
         .useForServiceConnect(true)
         .type(NamespaceType.DNS_PRIVATE)
+        .build();
+
+    var privateDnsNamespace = PrivateDnsNamespace
+        .Builder.create(scope, "private-dns-namespace")
+        .vpc(vpc)
+        .name(config.route53Namespace())
         .build();
 
     var ecsCluster = Builder
@@ -145,6 +152,7 @@ public class ECSStack {
         .dnsRecordType(DnsRecordType.SRV)
         .dnsTtl(Duration.seconds(60))
         .failureThreshold(1)
+        .cloudMapNamespace(privateDnsNamespace)
         .name("app")
         .build();
     var app = Ec2Service
@@ -235,6 +243,7 @@ public class ECSStack {
         .dnsTtl(Duration.seconds(60))
         .failureThreshold(1)
         .name("db")
+        .cloudMapNamespace(privateDnsNamespace)
         .build();
     Ec2Service
         .Builder
