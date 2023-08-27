@@ -33,6 +33,7 @@ import software.amazon.awscdk.services.iam.Role;
 import software.amazon.awscdk.services.iam.ServicePrincipal;
 import software.amazon.awscdk.services.logs.LogGroup;
 import software.amazon.awscdk.services.servicediscovery.DnsRecordType;
+import software.amazon.awscdk.services.servicediscovery.NamespaceType;
 import software.constructs.Construct;
 
 public class ECSStack {
@@ -79,6 +80,8 @@ public class ECSStack {
         .builder()
         .vpc(vpc)
         .name(config.route53Namespace())
+        .useForServiceConnect(true)
+        .type(NamespaceType.DNS_PRIVATE)
         .build();
 
     var ecsCluster = Builder
