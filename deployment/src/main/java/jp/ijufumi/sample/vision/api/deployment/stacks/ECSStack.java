@@ -8,6 +8,7 @@ import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.services.ec2.InstanceClass;
 import software.amazon.awscdk.services.ec2.InstanceSize;
 import software.amazon.awscdk.services.ec2.InstanceType;
+import software.amazon.awscdk.services.ec2.SubnetSelection;
 import software.amazon.awscdk.services.ec2.Vpc;
 import software.amazon.awscdk.services.ecs.AddCapacityOptions;
 import software.amazon.awscdk.services.ecs.AwsLogDriverProps;
@@ -152,6 +153,7 @@ public class ECSStack {
         .serviceName("app")
         .taskDefinition(appTaskDefinition)
         .cloudMapOptions(appCloudMapOption)
+        .vpcSubnets(SubnetSelection.builder().subnets(vpc.getPrivateSubnets()).build())
         .build();
 
     var alb = ApplicationLoadBalancer
@@ -242,6 +244,7 @@ public class ECSStack {
         .serviceName("db")
         .taskDefinition(dbTaskDefinition)
         .cloudMapOptions(dbCloudMapOption)
+        .vpcSubnets(SubnetSelection.builder().subnets(vpc.getPrivateSubnets()).build())
         .build();
 
     return alb;
