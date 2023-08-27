@@ -3,6 +3,7 @@ package jp.ijufumi.sample.vision.api.deployment.stacks;
 import java.util.List;
 import java.util.Map;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
+import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.services.ec2.InstanceClass;
 import software.amazon.awscdk.services.ec2.InstanceSize;
@@ -10,6 +11,8 @@ import software.amazon.awscdk.services.ec2.InstanceType;
 import software.amazon.awscdk.services.ec2.Vpc;
 import software.amazon.awscdk.services.ecs.AddCapacityOptions;
 import software.amazon.awscdk.services.ecs.AwsLogDriverProps;
+import software.amazon.awscdk.services.ecs.CloudMapNamespaceOptions;
+import software.amazon.awscdk.services.ecs.CloudMapOptions;
 import software.amazon.awscdk.services.ecs.Cluster.Builder;
 import software.amazon.awscdk.services.ecs.Compatibility;
 import software.amazon.awscdk.services.ecs.ContainerDefinitionProps;
@@ -29,6 +32,7 @@ import software.amazon.awscdk.services.iam.PolicyStatement;
 import software.amazon.awscdk.services.iam.Role;
 import software.amazon.awscdk.services.iam.ServicePrincipal;
 import software.amazon.awscdk.services.logs.LogGroup;
+import software.amazon.awscdk.services.servicediscovery.DnsRecordType;
 import software.constructs.Construct;
 
 public class ECSStack {
@@ -67,8 +71,14 @@ public class ECSStack {
 
     var capacityOptions = AddCapacityOptions
         .builder()
-        .instanceType(InstanceType.of(InstanceClass.T3A, InstanceSize.XLARGE))
+        .instanceType(InstanceType.of(InstanceClass.T3A, InstanceSize.MEDIUM))
         .allowAllOutbound(true)
+        .build();
+
+    var cloudMapNamespace = CloudMapNamespaceOptions
+        .builder()
+        .vpc(vpc)
+        .name(config.route53Namespace())
         .build();
 
     var ecsCluster = Builder
@@ -76,6 +86,7 @@ public class ECSStack {
         .clusterName("ecs-cluster")
         .capacity(capacityOptions)
         .vpc(vpc)
+        .defaultCloudMapNamespace(cloudMapNamespace)
         .build();
 
     var appTaskDefinition = TaskDefinition
@@ -94,7 +105,7 @@ public class ECSStack {
         .hostPort(8080)
         .build();
     var appEnvironment = Map.of(
-        "DB_HOST", config.dbHost(),
+        "DB_HOST", String.format("%s.%s", config.dbHost(), config.route53Namespace()),
         "DB_NAME", config.dbName(),
         "DB_USER", config.dbUser(),
         "DB_PASSWORD", config.dbPassword(),
@@ -119,13 +130,20 @@ public class ECSStack {
         .secrets(Map.of("GOOGLE_CREDENTIAL", googleCredentialSecret))
         .environment(appEnvironment)
         .taskDefinition(appTaskDefinition)
-        .cpu(1)
+        .cpu(100)
         .memoryLimitMiB(256)
         .privileged(true)
         .logging(appLogConfig)
         .build();
     appTaskDefinition.addContainer("app-container", appContainer);
 
+    var appCloudMapOption = CloudMapOptions
+        .builder()
+        .dnsRecordType(DnsRecordType.A)
+        .dnsTtl(Duration.seconds(60))
+        .failureThreshold(1)
+        .name("app")
+        .build();
     var app = Ec2Service
         .Builder
         .create(scope, "app-service")
@@ -133,6 +151,7 @@ public class ECSStack {
         .cluster(ecsCluster)
         .serviceName("app")
         .taskDefinition(appTaskDefinition)
+        .cloudMapOptions(appCloudMapOption)
         .build();
 
     var alb = ApplicationLoadBalancer
@@ -200,13 +219,20 @@ public class ECSStack {
         .taskDefinition(dbTaskDefinition)
         .environment(dbEnvironment)
         .logging(dbLogConfig)
-        .cpu(1)
+        .cpu(100)
         .memoryLimitMiB(256)
         .privileged(true)
         .hostname(config.dbHost())
         .build();
     dbTaskDefinition.addContainer("db-container", dbContainer);
 
+    var dbCloudMapOption = CloudMapOptions
+        .builder()
+        .dnsRecordType(DnsRecordType.A)
+        .dnsTtl(Duration.seconds(60))
+        .failureThreshold(1)
+        .name("db")
+        .build();
     Ec2Service
         .Builder
         .create(scope, "db-service")
@@ -214,6 +240,7 @@ public class ECSStack {
         .cluster(ecsCluster)
         .serviceName("db")
         .taskDefinition(dbTaskDefinition)
+        .cloudMapOptions(dbCloudMapOption)
         .build();
 
     return alb;
