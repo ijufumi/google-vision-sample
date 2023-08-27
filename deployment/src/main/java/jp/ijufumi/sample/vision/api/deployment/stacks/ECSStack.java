@@ -96,7 +96,7 @@ public class ECSStack {
         .compatibility(Compatibility.EC2)
         .taskRole(ecsRole)
         .executionRole(ecsRole)
-        .networkMode(NetworkMode.AWS_VPC)
+        .networkMode(NetworkMode.HOST)
         .build();
 
     var googleCredentialSecret = Secret.fromSecretsManager(googleCredential);
