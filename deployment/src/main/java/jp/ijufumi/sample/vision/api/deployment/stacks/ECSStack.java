@@ -11,7 +11,6 @@ import software.amazon.awscdk.services.ec2.InstanceType;
 import software.amazon.awscdk.services.ec2.Vpc;
 import software.amazon.awscdk.services.ecs.AddCapacityOptions;
 import software.amazon.awscdk.services.ecs.AwsLogDriverProps;
-import software.amazon.awscdk.services.ecs.CloudMapNamespaceOptions;
 import software.amazon.awscdk.services.ecs.CloudMapOptions;
 import software.amazon.awscdk.services.ecs.Cluster.Builder;
 import software.amazon.awscdk.services.ecs.Compatibility;
@@ -33,7 +32,6 @@ import software.amazon.awscdk.services.iam.Role;
 import software.amazon.awscdk.services.iam.ServicePrincipal;
 import software.amazon.awscdk.services.logs.LogGroup;
 import software.amazon.awscdk.services.servicediscovery.DnsRecordType;
-import software.amazon.awscdk.services.servicediscovery.NamespaceType;
 import software.amazon.awscdk.services.servicediscovery.PrivateDnsNamespace;
 import software.constructs.Construct;
 
@@ -77,14 +75,6 @@ public class ECSStack {
         .allowAllOutbound(true)
         .build();
 
-    var cloudMapNamespace = CloudMapNamespaceOptions
-        .builder()
-        .vpc(vpc)
-        .name(config.route53Namespace())
-        .useForServiceConnect(true)
-        .type(NamespaceType.DNS_PRIVATE)
-        .build();
-
     var privateDnsNamespace = PrivateDnsNamespace
         .Builder.create(scope, "private-dns-namespace")
         .vpc(vpc)
@@ -96,7 +86,6 @@ public class ECSStack {
         .clusterName("ecs-cluster")
         .capacity(capacityOptions)
         .vpc(vpc)
-        .defaultCloudMapNamespace(cloudMapNamespace)
         .build();
 
     var appTaskDefinition = TaskDefinition
