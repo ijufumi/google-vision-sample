@@ -227,7 +227,6 @@ public class ECSStack {
         .cpu(100)
         .memoryLimitMiB(256)
         .privileged(true)
-        .hostname(config.dbHost())
         .build();
     dbTaskDefinition.addContainer("db-container", dbContainer);
 
