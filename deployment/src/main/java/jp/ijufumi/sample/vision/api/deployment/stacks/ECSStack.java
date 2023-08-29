@@ -141,7 +141,7 @@ public class ECSStack {
 
     var appCloudMapOption = CloudMapOptions
         .builder()
-        .dnsRecordType(DnsRecordType.SRV)
+        .dnsRecordType(DnsRecordType.A)
         .dnsTtl(Duration.seconds(300))
         .failureThreshold(1)
         .cloudMapNamespace(privateDnsNamespace)
@@ -232,7 +232,7 @@ public class ECSStack {
 
     var dbCloudMapOption = CloudMapOptions
         .builder()
-        .dnsRecordType(DnsRecordType.SRV)
+        .dnsRecordType(DnsRecordType.A)
         .dnsTtl(Duration.seconds(300))
         .failureThreshold(1)
         .name("db")
