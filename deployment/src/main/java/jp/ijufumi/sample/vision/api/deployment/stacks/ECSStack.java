@@ -8,6 +8,9 @@ import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.services.ec2.InstanceClass;
 import software.amazon.awscdk.services.ec2.InstanceSize;
 import software.amazon.awscdk.services.ec2.InstanceType;
+import software.amazon.awscdk.services.ec2.Peer;
+import software.amazon.awscdk.services.ec2.Port;
+import software.amazon.awscdk.services.ec2.SecurityGroup;
 import software.amazon.awscdk.services.ec2.SubnetSelection;
 import software.amazon.awscdk.services.ec2.Vpc;
 import software.amazon.awscdk.services.ecs.AddCapacityOptions;
@@ -238,6 +241,9 @@ public class ECSStack {
         .name("db")
         .cloudMapNamespace(privateDnsNamespace)
         .build();
+    var dbSecurityGroup = SecurityGroup.Builder.create(scope, "db-security-group").vpc(vpc)
+        .allowAllOutbound(true).build();
+    dbSecurityGroup.addIngressRule(Peer.ipv4(vpc.getVpcCidrBlock()), Port.tcp(5432));
     Ec2Service
         .Builder
         .create(scope, "db-service")
@@ -247,6 +253,7 @@ public class ECSStack {
         .taskDefinition(dbTaskDefinition)
         .cloudMapOptions(dbCloudMapOption)
         .vpcSubnets(SubnetSelection.builder().subnets(vpc.getPrivateSubnets()).build())
+        .securityGroups(List.of(dbSecurityGroup))
         .build();
 
     return alb;
