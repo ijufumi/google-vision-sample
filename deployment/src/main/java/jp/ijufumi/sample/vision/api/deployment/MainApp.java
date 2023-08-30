@@ -18,7 +18,7 @@ public class MainApp {
             .region(config.region())
             .build())
         .build();
-    new MainStack(app, "DeploymentStack", props, config);
+    new MainStack(app, "vision-sample-deployment-stack", props, config);
 
     app.synth();
   }
