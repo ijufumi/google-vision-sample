@@ -175,7 +175,7 @@ public class ECSStack {
         .targets(List.of(app))
         .port(8080)
         .vpc(vpc)
-        .healthCheck(HealthCheck.builder().path("/api/v1/health").build())
+        .healthCheck(HealthCheck.builder().path("/health").build())
         .build();
 
     var certification = ListenerCertificate.fromArn(config.certificationArn());
