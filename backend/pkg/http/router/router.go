@@ -20,22 +20,23 @@ func NewRouter(c container.Container) Router {
 	corsConfig.AllowAllOrigins = true
 	r.Use(cors.New(corsConfig))
 
-	api := r.Group("api/v1")
+	api := r.Group("api")
 	{
 		healthHandler := container.Invoke[handlers.HealthHandler](c)
 		api.GET("/health", healthHandler.Get)
 
+		v1 := api.Group("v1")
 		detectTextHandler := container.Invoke[handlers.DetectTextHandler](c)
-		api.GET("/detect_texts", detectTextHandler.Gets)
-		api.GET("/detect_texts/:id", detectTextHandler.GetByID)
-		api.POST("/detect_texts", detectTextHandler.Create)
-		api.DELETE("/detect_texts/:id", detectTextHandler.Delete)
+		v1.GET("/detect_texts", detectTextHandler.Gets)
+		v1.GET("/detect_texts/:id", detectTextHandler.GetByID)
+		v1.POST("/detect_texts", detectTextHandler.Create)
+		v1.DELETE("/detect_texts/:id", detectTextHandler.Delete)
 
 		signedURLHandler := container.Invoke[handlers.SignedURLHandler](c)
-		api.GET("/signed_urls", signedURLHandler.GetByKey)
+		v1.GET("/signed_urls", signedURLHandler.GetByKey)
 
 		configsHandler := container.Invoke[handlers.ConfigsHandler](c)
-		api.POST("/configs/cors", configsHandler.SetupCORS)
+		v1.POST("/configs/cors", configsHandler.SetupCORS)
 	}
 	return &router{engine: r}
 }
