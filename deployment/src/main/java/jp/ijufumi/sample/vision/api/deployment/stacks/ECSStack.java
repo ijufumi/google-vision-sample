@@ -29,6 +29,7 @@ import software.amazon.awscdk.services.ecs.TaskDefinition;
 import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationListener;
 import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationLoadBalancer;
 import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationTargetGroup;
+import software.amazon.awscdk.services.elasticloadbalancingv2.HealthCheck;
 import software.amazon.awscdk.services.elasticloadbalancingv2.ListenerCertificate;
 import software.amazon.awscdk.services.iam.Effect;
 import software.amazon.awscdk.services.iam.ManagedPolicy;
@@ -174,6 +175,7 @@ public class ECSStack {
         .targets(List.of(app))
         .port(8080)
         .vpc(vpc)
+        .healthCheck(HealthCheck.builder().path("/api/v1/health").build())
         .build();
 
     var certification = ListenerCertificate.fromArn(config.certificationArn());
