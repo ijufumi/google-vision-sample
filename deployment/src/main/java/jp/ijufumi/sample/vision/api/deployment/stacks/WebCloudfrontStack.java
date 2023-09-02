@@ -21,13 +21,13 @@ import software.constructs.Construct;
  * @reference
  * https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/quickref-cloudfront.html
  */
-public class CloudfrontStack {
+public class WebCloudfrontStack {
 
   public static void build(final Construct scope, final IBucket bucket) {
 
     var originAccessIdentity = OriginAccessIdentity
         .Builder
-        .create(scope, "origin-access-identity")
+        .create(scope, "origin-access-identity-for-web")
         .build();
 
     var s3Origin = S3Origin
@@ -38,7 +38,7 @@ public class CloudfrontStack {
 
     var cachePolicy = CachePolicy
         .Builder
-        .create(scope, "cache-policy")
+        .create(scope, "cache-policy-for-web")
         .queryStringBehavior(CacheQueryStringBehavior.all())
         .build();
 
@@ -93,7 +93,7 @@ public class CloudfrontStack {
 
     Distribution
         .Builder
-        .create(scope, "id-cloudfront")
+        .create(scope, "cloudfront-for-web")
         .defaultBehavior(behaviorOption)
         .enabled(true)
         .enableLogging(true)
@@ -103,7 +103,9 @@ public class CloudfrontStack {
         .logIncludesCookies(true)
         .priceClass(PriceClass.PRICE_CLASS_200)
         .geoRestriction(GeoRestriction.allowlist("AQ", "CV"))
-        .errorResponses(List.of(errorResponse400, errorResponse403, errorResponse404, errorResponse500, errorResponse503))
+        .errorResponses(
+            List.of(errorResponse400, errorResponse403, errorResponse404, errorResponse500,
+                errorResponse503))
         .build();
   }
 }
