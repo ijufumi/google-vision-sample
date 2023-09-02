@@ -162,11 +162,20 @@ public class ECSStack {
         .vpcSubnets(SubnetSelection.builder().subnets(vpc.getPrivateSubnets()).build())
         .build();
 
+    var albSecurityGroup = SecurityGroup
+        .Builder
+        .create(scope, "alb-security-group")
+        .vpc(vpc)
+        .securityGroupName("alb-security-group")
+        .build();
+    albSecurityGroup.addIngressRule(Peer.prefixList("pl-58a04531"), Port.tcp(80));
+
     var alb = ApplicationLoadBalancer
         .Builder
         .create(scope, "ecs-alb")
         .loadBalancerName(config.apiDomainName())
         .vpc(vpc)
+        .securityGroup(albSecurityGroup)
         .build();
 
     var albTargetGroup = ApplicationTargetGroup
