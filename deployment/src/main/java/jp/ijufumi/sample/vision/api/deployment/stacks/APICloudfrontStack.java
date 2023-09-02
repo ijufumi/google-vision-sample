@@ -6,7 +6,6 @@ import software.amazon.awscdk.services.cloudfront.CachePolicy;
 import software.amazon.awscdk.services.cloudfront.CacheQueryStringBehavior;
 import software.amazon.awscdk.services.cloudfront.CachedMethods;
 import software.amazon.awscdk.services.cloudfront.Distribution;
-import software.amazon.awscdk.services.cloudfront.GeoRestriction;
 import software.amazon.awscdk.services.cloudfront.PriceClass;
 import software.amazon.awscdk.services.cloudfront.ViewerProtocolPolicy;
 import software.amazon.awscdk.services.cloudfront.origins.HttpOrigin;
@@ -53,7 +52,6 @@ public class APICloudfrontStack {
         .logFilePrefix("logs/api")
         .logIncludesCookies(true)
         .priceClass(PriceClass.PRICE_CLASS_200)
-        .geoRestriction(GeoRestriction.allowlist("AQ", "CV"))
         .build();
   }
 }

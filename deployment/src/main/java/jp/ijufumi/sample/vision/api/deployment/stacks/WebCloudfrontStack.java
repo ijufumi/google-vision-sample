@@ -9,7 +9,6 @@ import software.amazon.awscdk.services.cloudfront.CacheQueryStringBehavior;
 import software.amazon.awscdk.services.cloudfront.CachedMethods;
 import software.amazon.awscdk.services.cloudfront.Distribution;
 import software.amazon.awscdk.services.cloudfront.ErrorResponse;
-import software.amazon.awscdk.services.cloudfront.GeoRestriction;
 import software.amazon.awscdk.services.cloudfront.OriginAccessIdentity;
 import software.amazon.awscdk.services.cloudfront.PriceClass;
 import software.amazon.awscdk.services.cloudfront.ViewerProtocolPolicy;
@@ -102,7 +101,6 @@ public class WebCloudfrontStack {
         .logFilePrefix("logs/web")
         .logIncludesCookies(true)
         .priceClass(PriceClass.PRICE_CLASS_200)
-        .geoRestriction(GeoRestriction.allowlist("AQ", "CV"))
         .errorResponses(
             List.of(errorResponse400, errorResponse403, errorResponse404, errorResponse500,
                 errorResponse503))
