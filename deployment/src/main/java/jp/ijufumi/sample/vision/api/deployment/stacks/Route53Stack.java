@@ -1,7 +1,7 @@
 package jp.ijufumi.sample.vision.api.deployment.stacks;
 
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
-import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationLoadBalancer;
+import software.amazon.awscdk.services.cloudfront.Distribution;
 import software.amazon.awscdk.services.route53.HostedZone;
 import software.amazon.awscdk.services.route53.HostedZoneAttributes;
 import software.amazon.awscdk.services.route53.RecordSet;
@@ -12,7 +12,7 @@ import software.constructs.Construct;
 public class Route53Stack {
 
   public static void build(final Construct scope, final Config config, final
-  ApplicationLoadBalancer alb) {
+  Distribution apiCloudFront) {
     var hostZoneAttribute = HostedZoneAttributes
         .builder()
         .hostedZoneId(config.hostZoneId())
@@ -20,7 +20,7 @@ public class Route53Stack {
         .build();
     var hostZone = HostedZone
         .fromHostedZoneAttributes(scope, "host-zone", hostZoneAttribute);
-    var recordTarget = RecordTarget.fromValues(alb.getLoadBalancerDnsName());
+    var recordTarget = RecordTarget.fromValues(apiCloudFront.getDistributionDomainName());
     RecordSet
         .Builder
         .create(scope, "record-set")

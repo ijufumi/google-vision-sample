@@ -1,6 +1,7 @@
 package jp.ijufumi.sample.vision.api.deployment;
 
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
+import jp.ijufumi.sample.vision.api.deployment.stacks.APICloudfrontStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.ECRImageStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.ECSStack;
 import jp.ijufumi.sample.vision.api.deployment.stacks.Route53Stack;
@@ -24,6 +25,7 @@ public class MainStack extends Stack {
     var dockerImage = ECRImageStack.build(this, config);
     WebCloudfrontStack.build(this, bucket);
     var alb = ECSStack.build(this, config, vpc, dockerImage, secret);
+    APICloudfrontStack.build(scope, bucket, alb);
     Route53Stack.build(this, config, alb);
   }
 }
