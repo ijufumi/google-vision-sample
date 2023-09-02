@@ -175,6 +175,8 @@ public class ECSStack {
         .loadBalancerName(config.apiDomainName())
         .vpc(vpc)
         .securityGroup(albSecurityGroup)
+        .internetFacing(true)
+        .vpcSubnets(SubnetSelection.builder().subnets(vpc.getPublicSubnets()).build())
         .build();
 
     var albTargetGroup = ApplicationTargetGroup
