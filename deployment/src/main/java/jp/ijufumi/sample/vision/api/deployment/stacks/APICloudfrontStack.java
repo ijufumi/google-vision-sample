@@ -40,6 +40,7 @@ public class APICloudfrontStack {
         .allowedMethods(AllowedMethods.ALLOW_GET_HEAD_OPTIONS)
         .viewerProtocolPolicy(ViewerProtocolPolicy.ALLOW_ALL)
         .cachePolicy(cachePolicy)
+        .compress(true)
         .build();
 
     return Distribution
@@ -52,6 +53,7 @@ public class APICloudfrontStack {
         .logFilePrefix("logs/api")
         .logIncludesCookies(true)
         .priceClass(PriceClass.PRICE_CLASS_200)
+        .defaultRootObject("/")
         .build();
   }
 }
