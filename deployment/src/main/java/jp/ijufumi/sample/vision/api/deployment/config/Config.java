@@ -40,6 +40,8 @@ public interface Config {
 
   String apiDomainName();
 
+  String webDomainName();
+
   String dbName();
 
   String dbHost();
@@ -136,6 +138,11 @@ class ConfigObj implements Config {
   @Override
   public String apiDomainName() {
     return this.getEnv("API_DOMAIN_NAME");
+  }
+
+  @Override
+  public String webDomainName() {
+    return this.getEnv("WEB_DOMAIN_NAME");
   }
 
   @Override

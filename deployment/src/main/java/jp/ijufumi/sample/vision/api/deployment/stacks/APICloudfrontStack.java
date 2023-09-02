@@ -1,5 +1,7 @@
 package jp.ijufumi.sample.vision.api.deployment.stacks;
 
+import java.util.List;
+import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.amazon.awscdk.services.cloudfront.AllowedMethods;
 import software.amazon.awscdk.services.cloudfront.BehaviorOptions;
 import software.amazon.awscdk.services.cloudfront.CachePolicy;
@@ -19,8 +21,9 @@ import software.constructs.Construct;
  */
 public class APICloudfrontStack {
 
-  public static Distribution build(final Construct scope, final IBucket bucket, final
-  ApplicationLoadBalancer alb) {
+  public static Distribution build(final Construct scope, final Config config, final IBucket bucket,
+      final
+      ApplicationLoadBalancer alb) {
     var httpOrigin = HttpOrigin
         .Builder
         .create(alb.getLoadBalancerDnsName())
@@ -53,6 +56,7 @@ public class APICloudfrontStack {
         .logFilePrefix("logs/api")
         .logIncludesCookies(true)
         .priceClass(PriceClass.PRICE_CLASS_200)
+        .domainNames(List.of(config.apiDomainName()))
         .defaultRootObject("/")
         .build();
   }

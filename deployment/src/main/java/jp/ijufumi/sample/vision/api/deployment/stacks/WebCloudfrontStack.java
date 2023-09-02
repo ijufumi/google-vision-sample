@@ -1,6 +1,7 @@
 package jp.ijufumi.sample.vision.api.deployment.stacks;
 
 import java.util.List;
+import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.services.cloudfront.AllowedMethods;
 import software.amazon.awscdk.services.cloudfront.BehaviorOptions;
@@ -22,7 +23,7 @@ import software.constructs.Construct;
  */
 public class WebCloudfrontStack {
 
-  public static void build(final Construct scope, final IBucket bucket) {
+  public static void build(final Construct scope, final Config config, final IBucket bucket) {
 
     var originAccessIdentity = OriginAccessIdentity
         .Builder
@@ -101,6 +102,7 @@ public class WebCloudfrontStack {
         .logFilePrefix("logs/web")
         .logIncludesCookies(true)
         .priceClass(PriceClass.PRICE_CLASS_200)
+        .domainNames(List.of(config.webDomainName()))
         .errorResponses(
             List.of(errorResponse400, errorResponse403, errorResponse404, errorResponse500,
                 errorResponse503))
