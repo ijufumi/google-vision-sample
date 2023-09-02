@@ -8,6 +8,7 @@ import software.amazon.awscdk.services.cloudfront.CachePolicy;
 import software.amazon.awscdk.services.cloudfront.CacheQueryStringBehavior;
 import software.amazon.awscdk.services.cloudfront.CachedMethods;
 import software.amazon.awscdk.services.cloudfront.Distribution;
+import software.amazon.awscdk.services.cloudfront.OriginProtocolPolicy;
 import software.amazon.awscdk.services.cloudfront.PriceClass;
 import software.amazon.awscdk.services.cloudfront.ViewerProtocolPolicy;
 import software.amazon.awscdk.services.cloudfront.origins.HttpOrigin;
@@ -28,6 +29,7 @@ public class APICloudfrontStack {
         .Builder
         .create(alb.getLoadBalancerDnsName())
         .httpPort(80)
+        .protocolPolicy(OriginProtocolPolicy.HTTP_ONLY)
         .build();
 
     var cachePolicy = CachePolicy
