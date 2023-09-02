@@ -99,7 +99,7 @@ public class WebCloudfrontStack {
         .enableLogging(true)
         .defaultRootObject("/index.html")
         .logBucket(bucket)
-        .logFilePrefix("logs")
+        .logFilePrefix("logs/web")
         .logIncludesCookies(true)
         .priceClass(PriceClass.PRICE_CLASS_200)
         .geoRestriction(GeoRestriction.allowlist("AQ", "CV"))
