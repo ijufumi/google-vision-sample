@@ -30,7 +30,6 @@ import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationListene
 import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationLoadBalancer;
 import software.amazon.awscdk.services.elasticloadbalancingv2.ApplicationTargetGroup;
 import software.amazon.awscdk.services.elasticloadbalancingv2.HealthCheck;
-import software.amazon.awscdk.services.elasticloadbalancingv2.ListenerCertificate;
 import software.amazon.awscdk.services.iam.Effect;
 import software.amazon.awscdk.services.iam.ManagedPolicy;
 import software.amazon.awscdk.services.iam.PolicyStatement;
@@ -187,14 +186,12 @@ public class ECSStack {
         .healthCheck(HealthCheck.builder().path("/api/health").build())
         .build();
 
-    var certification = ListenerCertificate.fromArn(config.certificationArn());
     ApplicationListener
         .Builder
         .create(scope, "ecs-alb-listener")
         .loadBalancer(alb)
         .defaultTargetGroups(List.of(albTargetGroup))
-        .port(443)
-        .certificates(List.of(certification))
+        .port(80)
         .build();
 
     var dbTaskDefinition = TaskDefinition
