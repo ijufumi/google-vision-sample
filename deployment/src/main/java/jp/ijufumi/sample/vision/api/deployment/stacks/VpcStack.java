@@ -9,7 +9,7 @@ public class VpcStack {
   public static Vpc build(final Construct scope, final Config config) {
     return Vpc
         .Builder
-        .create(scope, "id-vpc")
+        .create(scope, "vpc")
         .vpcName(config.vpcName())
         .maxAzs(2)
         .build();
