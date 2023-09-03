@@ -172,7 +172,6 @@ public class ECSStack {
     var alb = ApplicationLoadBalancer
         .Builder
         .create(scope, "ecs-alb")
-        .loadBalancerName(config.apiDomainName())
         .vpc(vpc)
         .securityGroup(albSecurityGroup)
         .internetFacing(true)
