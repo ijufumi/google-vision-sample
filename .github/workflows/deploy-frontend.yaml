@@ -7,11 +7,17 @@ on:
   workflow_dispatch:
 
 env:
-  BACKEND_URL: https://ijufumi-sample-kyxvynepda-uw.a.run.app
+  BACKEND_URL: https://vision-sample-api.ijufumi.net/
+  S3_BUCKET: vision-sample-bucket
+  CLOUDFRONT_DISTRIBUTION_ID: E2UIZOEJ8MI80H
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
     steps:
       - uses: actions/checkout@v2
 
@@ -34,14 +40,10 @@ jobs:
         env:
           REACT_APP_ENDPOINT_URL: ${{ env.BACKEND_URL }}/api/v1
 
-      - name: google auth
-        uses: 'google-github-actions/auth@v1'
+      - name: Deploy
+        uses: lbertenasco/s3-deploy@v1
         with:
-          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
-
-      - name: upload-folder
-        uses: 'google-github-actions/upload-cloud-storage@v1'
-        with:
-          path: 'frontend/build/'
-          destination: ${{ vars.STORAGE_BUCKET_NAME }}
-          parent: false
+          folder: frontend/build
+          bucket: ${{ env.S3_BUCKET }}
+          dist-id: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}
+          invalidation: / *
