@@ -23,7 +23,8 @@ import software.constructs.Construct;
  */
 public class WebCloudfrontStack {
 
-  public static void build(final Construct scope, final Config config, final IBucket bucket) {
+  public static Distribution build(final Construct scope, final Config config,
+      final IBucket bucket) {
 
     var originAccessIdentity = OriginAccessIdentity
         .Builder
@@ -91,7 +92,7 @@ public class WebCloudfrontStack {
         .ttl(Duration.millis(0))
         .build();
 
-    Distribution
+    return Distribution
         .Builder
         .create(scope, "cloudfront-for-web")
         .defaultBehavior(behaviorOption)

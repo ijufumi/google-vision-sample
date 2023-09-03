@@ -23,9 +23,9 @@ public class MainStack extends Stack {
     var secret = SecretsStack.build(this, config);
     var bucket = S3Stack.build(this, config);
     var dockerImage = ECRImageStack.build(this, config);
-    WebCloudfrontStack.build(this, config, bucket);
+    var webCloudfront = WebCloudfrontStack.build(this, config, bucket);
     var alb = ECSStack.build(this, config, vpc, dockerImage, secret);
-    var cloudfront = APICloudfrontStack.build(this, config, bucket, alb);
-    Route53Stack.build(this, config, cloudfront);
+    var apiCloudfront = APICloudfrontStack.build(this, config, bucket, alb);
+    Route53Stack.build(this, config, apiCloudfront, webCloudfront);
   }
 }
