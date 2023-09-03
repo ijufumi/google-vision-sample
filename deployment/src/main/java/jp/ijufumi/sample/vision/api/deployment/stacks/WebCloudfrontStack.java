@@ -3,6 +3,7 @@ package jp.ijufumi.sample.vision.api.deployment.stacks;
 import java.util.List;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.amazon.awscdk.Duration;
+import software.amazon.awscdk.services.certificatemanager.Certificate;
 import software.amazon.awscdk.services.cloudfront.AllowedMethods;
 import software.amazon.awscdk.services.cloudfront.BehaviorOptions;
 import software.amazon.awscdk.services.cloudfront.CachePolicy;
@@ -92,6 +93,8 @@ public class WebCloudfrontStack {
         .ttl(Duration.millis(0))
         .build();
 
+    var certificate = Certificate.fromCertificateArn(scope, "web-cloudfront-certificate",
+        config.certificationArn());
     return Distribution
         .Builder
         .create(scope, "cloudfront-for-web")
@@ -104,6 +107,7 @@ public class WebCloudfrontStack {
         .logIncludesCookies(true)
         .priceClass(PriceClass.PRICE_CLASS_200)
         .domainNames(List.of(config.webDomainName()))
+        .certificate(certificate)
         .errorResponses(
             List.of(errorResponse400, errorResponse403, errorResponse404, errorResponse500,
                 errorResponse503))
