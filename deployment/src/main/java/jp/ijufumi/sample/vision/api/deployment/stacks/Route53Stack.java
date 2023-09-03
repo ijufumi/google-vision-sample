@@ -23,7 +23,7 @@ public class Route53Stack {
     var apiRecordTarget = RecordTarget.fromValues(apiCloudFront.getDistributionDomainName());
     RecordSet
         .Builder
-        .create(scope, "record-set")
+        .create(scope, "api-record-set")
         .recordName(config.apiDomainName())
         .zone(hostZone)
         .target(apiRecordTarget)
@@ -32,7 +32,7 @@ public class Route53Stack {
     var webRecordTarget = RecordTarget.fromValues(webCloudFront.getDistributionDomainName());
     RecordSet
         .Builder
-        .create(scope, "record-set")
+        .create(scope, "web-record-set")
         .recordName(config.webDomainName())
         .zone(hostZone)
         .target(apiRecordTarget)
