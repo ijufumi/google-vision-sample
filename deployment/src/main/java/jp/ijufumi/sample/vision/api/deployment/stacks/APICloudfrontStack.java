@@ -61,7 +61,7 @@ public class APICloudfrontStack {
         .logFilePrefix("logs/api")
         .logIncludesCookies(true)
         .priceClass(PriceClass.PRICE_CLASS_200)
-        .domainNames(List.of(config.apiDomainName()))
+        .domainNames(List.of(config.apiDomainFullName()))
         .certificate(certificate)
         .defaultRootObject("/")
         .build();

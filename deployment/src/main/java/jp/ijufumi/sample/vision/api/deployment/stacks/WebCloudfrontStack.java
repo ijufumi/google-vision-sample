@@ -106,7 +106,7 @@ public class WebCloudfrontStack {
         .logFilePrefix("logs/web")
         .logIncludesCookies(true)
         .priceClass(PriceClass.PRICE_CLASS_200)
-        .domainNames(List.of(config.webDomainName()))
+        .domainNames(List.of(config.webDomainFullName()))
         .certificate(certificate)
         .errorResponses(
             List.of(errorResponse400, errorResponse403, errorResponse404, errorResponse500,
