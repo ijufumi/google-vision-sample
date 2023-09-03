@@ -35,7 +35,7 @@ public class Route53Stack {
         .create(scope, "web-record-set")
         .recordName(config.webDomainName())
         .zone(hostZone)
-        .target(apiRecordTarget)
+        .target(webRecordTarget)
         .recordType(RecordType.CNAME)
         .build();
   }
