@@ -96,6 +96,7 @@ public class ECSStack {
     var appTaskDefinition = TaskDefinition
         .Builder
         .create(scope, "app-task-definition")
+        .family("app-task-definition")
         .compatibility(Compatibility.EC2)
         .taskRole(ecsRole)
         .executionRole(ecsRole)
@@ -198,6 +199,7 @@ public class ECSStack {
     var dbTaskDefinition = TaskDefinition
         .Builder
         .create(scope, "db-task-definition")
+        .family("db-task-definition")
         .compatibility(Compatibility.EC2)
         .taskRole(ecsRole)
         .networkMode(NetworkMode.AWS_VPC)
