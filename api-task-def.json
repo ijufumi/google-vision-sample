@@ -1,0 +1,123 @@
+{
+  "taskDefinitionArn": "arn:aws:ecs:ap-northeast-1:044888744953:task-definition/visionsampledeploymentstackapptaskdefinition129FEA79:7",
+  "containerDefinitions": [
+    {
+      "name": "app",
+      "image": "044888744953.dkr.ecr.ap-northeast-1.amazonaws.com/cdk-hnb659fds-container-assets-044888744953-ap-northeast-1:b0962ffc86d319451661b46c6f73c0044212b9cf3794f0066abbd025b3111d5b",
+      "cpu": 100,
+      "memory": 256,
+      "links": [],
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "entryPoint": [],
+      "command": [],
+      "environment": [
+        {
+          "name": "DB_NAME",
+          "value": "postgres"
+        },
+        {
+          "name": "DB_PORT",
+          "value": "5432"
+        },
+        {
+          "name": "DB_HOST",
+          "value": "db.default-namespace"
+        },
+        {
+          "name": "DB_USER",
+          "value": "postgres"
+        },
+        {
+          "name": "DB_PASSWORD",
+          "value": "password"
+        }
+      ],
+      "environmentFiles": [],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "secrets": [
+        {
+          "name": "GOOGLE_CREDENTIAL",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:044888744953:secret:GOOGLE_CREDENTIAL-P7O3vX"
+        }
+      ],
+      "privileged": true,
+      "dnsServers": [],
+      "dnsSearchDomains": [],
+      "extraHosts": [],
+      "dockerSecurityOptions": [],
+      "dockerLabels": {},
+      "ulimits": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "app-container",
+          "awslogs-region": "ap-northeast-1",
+          "awslogs-stream-prefix": "app-container"
+        },
+        "secretOptions": []
+      },
+      "systemControls": []
+    }
+  ],
+  "family": "visionsampledeploymentstackapptaskdefinition129FEA79",
+  "taskRoleArn": "arn:aws:iam::044888744953:role/ecs-role",
+  "executionRoleArn": "arn:aws:iam::044888744953:role/ecs-role",
+  "networkMode": "awsvpc",
+  "revision": 7,
+  "volumes": [],
+  "status": "INACTIVE",
+  "requiresAttributes": [
+    {
+      "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+    },
+    {
+      "name": "ecs.capability.execution-role-awslogs"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.ecr-auth"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.privileged-container"
+    },
+    {
+      "name": "ecs.capability.secrets.asm.environment-variables"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.task-iam-role"
+    },
+    {
+      "name": "ecs.capability.execution-role-ecr-pull"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+    },
+    {
+      "name": "ecs.capability.task-eni"
+    }
+  ],
+  "placementConstraints": [],
+  "compatibilities": [
+    "EC2"
+  ],
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "registeredAt": "2023-09-03T21:47:20.751Z",
+  "deregisteredAt": "2023-09-03T23:21:50.410Z",
+  "registeredBy": "arn:aws:sts::044888744953:assumed-role/cdk-hnb659fds-cfn-exec-role-044888744953-ap-northeast-1/AWSCloudFormation",
+  "tags": []
+}
