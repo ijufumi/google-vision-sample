@@ -52,3 +52,5 @@ jobs:
         with:
           task-definition: ${{ steps.render-container.outputs.task-definition }}
           cluster: ecs-cluster
+          service: app
+          wait-for-service-stability: true
