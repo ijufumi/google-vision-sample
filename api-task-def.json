@@ -1,5 +1,5 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-1:044888744953:task-definition/app-task-definition:1",
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-1:044888744953:task-definition/app-task-definition:5",
     "containerDefinitions": [
         {
             "name": "app",
@@ -45,7 +45,7 @@
             "secrets": [
                 {
                     "name": "GOOGLE_CREDENTIAL",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:044888744953:secret:GOOGLE_CREDENTIAL-jAleh3"
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:044888744953:secret:GOOGLE_CREDENTIAL-c1WC3E"
                 }
             ],
             "privileged": true,
@@ -71,7 +71,6 @@
     "taskRoleArn": "arn:aws:iam::044888744953:role/ecs-role",
     "executionRoleArn": "arn:aws:iam::044888744953:role/ecs-role",
     "networkMode": "awsvpc",
-    "revision": 1,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -116,7 +115,7 @@
     "requiresCompatibilities": [
         "EC2"
     ],
-    "registeredAt": "2023-09-07T21:37:53.641Z",
+    "registeredAt": "2023-09-09T21:53:52.186Z",
     "registeredBy": "arn:aws:sts::044888744953:assumed-role/cdk-hnb659fds-cfn-exec-role-044888744953-ap-northeast-1/AWSCloudFormation",
     "tags": []
 }
