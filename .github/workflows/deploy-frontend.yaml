@@ -41,9 +41,10 @@ jobs:
           REACT_APP_ENDPOINT_URL: ${{ env.BACKEND_URL }}/api/v1
 
       - name: Deploy
-        uses: lbertenasco/s3-deploy@v1
-        with:
-          folder: frontend/build
-          bucket: ${{ env.S3_BUCKET }}
-          dist-id: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}
-          invalidation: / *
+      uses: reggionick/s3-deploy@v4
+      with:
+        folder: frontend/build
+        bucket: ${{ secrets.S3_BUCKET }}
+        bucket-region: ${{ secrets.AWS_DEFAULT_REGION }}
+        dist-id: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}
+        invalidation: / *
