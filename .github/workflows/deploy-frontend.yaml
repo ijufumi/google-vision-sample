@@ -47,4 +47,4 @@ jobs:
           bucket: ${{ secrets.S3_BUCKET }}
           bucket-region: ${{ secrets.AWS_DEFAULT_REGION }}
           dist-id: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}
-          invalidation: / *
+          invalidation: /
