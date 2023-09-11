@@ -48,3 +48,4 @@ jobs:
           bucket-region: ${{ secrets.AWS_DEFAULT_REGION }}
           dist-id: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}
           invalidation: /
+          private: true
