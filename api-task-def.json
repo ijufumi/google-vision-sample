@@ -1,5 +1,5 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-1:044888744953:task-definition/app-task-definition:8",
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-1:044888744953:task-definition/app-task-definition:10",
     "containerDefinitions": [
         {
             "name": "app",
@@ -23,12 +23,12 @@
                     "value": "postgres"
                 },
                 {
-                    "name": "DB_HOST",
-                    "value": "db.default-namespace"
-                },
-                {
                     "name": "DB_PORT",
                     "value": "5432"
+                },
+                {
+                    "name": "DB_HOST",
+                    "value": "db.default-namespace"
                 },
                 {
                     "name": "DB_USER",
@@ -45,7 +45,7 @@
             "secrets": [
                 {
                     "name": "GOOGLE_CREDENTIAL",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:044888744953:secret:GOOGLE_CREDENTIAL-5GalKd"
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:044888744953:secret:GOOGLE_CREDENTIAL-IHpMGb"
                 }
             ],
             "privileged": true,
