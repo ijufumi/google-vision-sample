@@ -115,7 +115,8 @@ public class ECSStack {
         "DB_NAME", config.dbName(),
         "DB_USER", config.dbUser(),
         "DB_PASSWORD", config.dbPassword(),
-        "DB_PORT", Integer.toString(config.dbPort())
+        "DB_PORT", Integer.toString(config.dbPort()),
+        "MIGRATION_PATH", "/app/migration"
     );
     var appLogGroup = LogGroup.Builder
         .create(scope, "app-container-log-group")
