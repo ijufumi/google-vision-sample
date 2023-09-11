@@ -37,6 +37,10 @@
                 {
                     "name": "DB_PASSWORD",
                     "value": "password"
+                },
+                {
+                    "name": "MIGRATION_PATH",
+                    "value": "/app/migration"
                 }
             ],
             "environmentFiles": [],
