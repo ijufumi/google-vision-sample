@@ -14,4 +14,7 @@ do
   fi
 done
 
+# execute migration
+/app/db up
+# launch app
 /app/app
