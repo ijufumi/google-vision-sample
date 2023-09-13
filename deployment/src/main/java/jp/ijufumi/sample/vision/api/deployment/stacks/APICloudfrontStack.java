@@ -5,6 +5,7 @@ import jp.ijufumi.sample.vision.api.deployment.config.Config;
 import software.amazon.awscdk.services.certificatemanager.Certificate;
 import software.amazon.awscdk.services.cloudfront.AllowedMethods;
 import software.amazon.awscdk.services.cloudfront.BehaviorOptions;
+import software.amazon.awscdk.services.cloudfront.CacheHeaderBehavior;
 import software.amazon.awscdk.services.cloudfront.CachePolicy;
 import software.amazon.awscdk.services.cloudfront.CacheQueryStringBehavior;
 import software.amazon.awscdk.services.cloudfront.CachedMethods;
@@ -37,6 +38,8 @@ public class APICloudfrontStack {
         .Builder
         .create(scope, "cache-policy-for-api")
         .queryStringBehavior(CacheQueryStringBehavior.all())
+        .headerBehavior(CacheHeaderBehavior.allowList("Access-Control-Request-Headers",
+            "Access-Control-Request-Method", "Origin"))
         .build();
 
     var behaviorOption = BehaviorOptions
