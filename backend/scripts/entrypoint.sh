@@ -15,6 +15,8 @@ do
 done
 
 # execute migration
+echo "Migration start"
 /app/db up
 # launch app
+echo "Launching app"
 /app/app
