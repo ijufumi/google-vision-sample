@@ -168,7 +168,6 @@ public class ECSStack {
         .create(scope, "alb-security-group")
         .vpc(vpc)
         .securityGroupName("alb-security-group")
-        .disableInlineRules(true)
         .build();
     albSecurityGroup.addIngressRule(Peer.prefixList("pl-58a04531"), Port.tcp(80));
 
