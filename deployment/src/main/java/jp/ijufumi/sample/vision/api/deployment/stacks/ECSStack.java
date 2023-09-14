@@ -177,7 +177,7 @@ public class ECSStack {
         .create(scope, "ecs-alb")
         .vpc(vpc)
         .securityGroup(albSecurityGroup)
-        .internetFacing(false)
+        .internetFacing(true)
         .vpcSubnets(SubnetSelection.builder().subnets(vpc.getPublicSubnets()).build())
         .build();
 
