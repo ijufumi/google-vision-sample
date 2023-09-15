@@ -8,7 +8,6 @@ import software.amazon.awscdk.services.cloudfront.BehaviorOptions;
 import software.amazon.awscdk.services.cloudfront.CacheHeaderBehavior;
 import software.amazon.awscdk.services.cloudfront.CachePolicy;
 import software.amazon.awscdk.services.cloudfront.CacheQueryStringBehavior;
-import software.amazon.awscdk.services.cloudfront.CachedMethods;
 import software.amazon.awscdk.services.cloudfront.Distribution;
 import software.amazon.awscdk.services.cloudfront.OriginProtocolPolicy;
 import software.amazon.awscdk.services.cloudfront.PriceClass;
@@ -45,7 +44,6 @@ public class APICloudfrontStack {
     var behaviorOption = BehaviorOptions
         .builder()
         .origin(httpOrigin)
-        .cachedMethods(CachedMethods.CACHE_GET_HEAD_OPTIONS)
         .allowedMethods(AllowedMethods.ALLOW_ALL)
         .viewerProtocolPolicy(ViewerProtocolPolicy.ALLOW_ALL)
         .cachePolicy(cachePolicy)
