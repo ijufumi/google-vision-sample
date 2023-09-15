@@ -46,7 +46,7 @@ public class APICloudfrontStack {
         .builder()
         .origin(httpOrigin)
         .cachedMethods(CachedMethods.CACHE_GET_HEAD_OPTIONS)
-        .allowedMethods(AllowedMethods.ALLOW_GET_HEAD_OPTIONS)
+        .allowedMethods(AllowedMethods.ALLOW_ALL)
         .viewerProtocolPolicy(ViewerProtocolPolicy.ALLOW_ALL)
         .cachePolicy(cachePolicy)
         .compress(true)
