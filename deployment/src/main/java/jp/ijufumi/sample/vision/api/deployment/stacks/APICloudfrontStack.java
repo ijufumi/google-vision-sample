@@ -44,6 +44,7 @@ public class APICloudfrontStack {
     var behaviorOption = BehaviorOptions
         .builder()
         .origin(httpOrigin)
+        .cachePolicy(CachePolicy.CACHING_DISABLED)
         .allowedMethods(AllowedMethods.ALLOW_ALL)
         .viewerProtocolPolicy(ViewerProtocolPolicy.ALLOW_ALL)
         .cachePolicy(cachePolicy)
