@@ -2,12 +2,14 @@ package jp.ijufumi.sample.vision.api.deployment.stacks;
 
 import java.util.List;
 import jp.ijufumi.sample.vision.api.deployment.config.Config;
+import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.services.certificatemanager.Certificate;
 import software.amazon.awscdk.services.cloudfront.AllowedMethods;
 import software.amazon.awscdk.services.cloudfront.BehaviorOptions;
 import software.amazon.awscdk.services.cloudfront.CacheHeaderBehavior;
 import software.amazon.awscdk.services.cloudfront.CachePolicy;
 import software.amazon.awscdk.services.cloudfront.CacheQueryStringBehavior;
+import software.amazon.awscdk.services.cloudfront.CachedMethods;
 import software.amazon.awscdk.services.cloudfront.Distribution;
 import software.amazon.awscdk.services.cloudfront.OriginProtocolPolicy;
 import software.amazon.awscdk.services.cloudfront.PriceClass;
@@ -37,6 +39,7 @@ public class APICloudfrontStack {
         .Builder
         .create(scope, "cache-policy-for-api")
         .queryStringBehavior(CacheQueryStringBehavior.all())
+        .defaultTtl(Duration.millis(0))
         .headerBehavior(CacheHeaderBehavior.allowList("Access-Control-Request-Headers",
             "Access-Control-Request-Method", "Origin"))
         .build();
@@ -44,7 +47,7 @@ public class APICloudfrontStack {
     var behaviorOption = BehaviorOptions
         .builder()
         .origin(httpOrigin)
-        .cachePolicy(CachePolicy.CACHING_DISABLED)
+        .cachedMethods(CachedMethods.CACHE_GET_HEAD_OPTIONS)
         .allowedMethods(AllowedMethods.ALLOW_ALL)
         .viewerProtocolPolicy(ViewerProtocolPolicy.ALLOW_ALL)
         .cachePolicy(cachePolicy)
