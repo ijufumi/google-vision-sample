@@ -1,7 +1,6 @@
 package router
 
 import (
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/ijufumi/google-vision-sample/pkg/container"
 	"github.com/ijufumi/google-vision-sample/pkg/http/handlers"
@@ -17,10 +16,7 @@ func NewRouter(c container.Container) Router {
 	r.RedirectTrailingSlash = false
 	r.RedirectFixedPath = false
 	r.Use(middlewares.ResponseHeaders())
-	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowCredentials = true
-	corsConfig.AllowAllOrigins = true
-	r.Use(cors.New(corsConfig))
+	r.Use(middlewares.CORS())
 
 	api := r.Group("api")
 	{
