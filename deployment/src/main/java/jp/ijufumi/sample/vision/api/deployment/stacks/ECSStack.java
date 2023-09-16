@@ -209,7 +209,7 @@ public class ECSStack {
         .build();
 
     var dbImage = ContainerImage
-        .fromRegistry("postgres:latest");
+        .fromRegistry("postgres:16.0-bookworm");
 
     var dbLogGroup = LogGroup.Builder
         .create(scope, "db-container-log-group")
