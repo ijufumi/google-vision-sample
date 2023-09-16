@@ -1,4 +1,4 @@
-FROM golang:1.21-bullseye as build
+FROM golang:1.21-bookworm as build
 
 RUN apt update && apt install -y libmagickwand-dev \
 && rm -rf /var/cache/apt
@@ -12,7 +12,7 @@ RUN go mod download
 RUN go build -o app /app/
 RUN go build -o db /app/cmd/db/
 
-FROM debian:bullseye-slim as deploy
+FROM debian:bookworm-slim as deploy
 
 WORKDIR /app
 
