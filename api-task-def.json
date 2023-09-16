@@ -41,6 +41,10 @@
                 {
                     "name": "DB_PASSWORD",
                     "value": "password"
+                },
+                {
+                    "name": "GOOGLE_STORAGE_BUCKET",
+                    "value": "ijufumi-sample"
                 }
             ],
             "environmentFiles": [],
