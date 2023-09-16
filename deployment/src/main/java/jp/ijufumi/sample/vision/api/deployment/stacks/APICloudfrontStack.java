@@ -39,9 +39,9 @@ public class APICloudfrontStack {
         .Builder
         .create(scope, "cache-policy-for-api")
         .queryStringBehavior(CacheQueryStringBehavior.all())
-        .defaultTtl(Duration.millis(0))
         .headerBehavior(CacheHeaderBehavior.allowList("Access-Control-Request-Headers",
             "Access-Control-Request-Method", "Origin"))
+        .maxTtl(Duration.millis(0))
         .build();
 
     var behaviorOption = BehaviorOptions
