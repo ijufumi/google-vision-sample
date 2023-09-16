@@ -117,6 +117,7 @@ public class ECSStack {
         "DB_PASSWORD", config.dbPassword(),
         "DB_PORT", Integer.toString(config.dbPort()),
         "GOOGLE_STORAGE_BUCKET", "ijufumi-sample",
+        "GIN_MOD", "release",
         "MIGRATION_PATH", "/app/migration"
     );
     var appLogGroup = LogGroup.Builder
