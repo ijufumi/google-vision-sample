@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ijufumi/google-vision-sample/pkg/container"
 	"github.com/ijufumi/google-vision-sample/pkg/http/handlers"
+	"github.com/ijufumi/google-vision-sample/pkg/http/middlewares"
 )
 
 type Router interface {
@@ -15,6 +16,7 @@ func NewRouter(c container.Container) Router {
 	r := gin.Default()
 	r.RedirectTrailingSlash = false
 	r.RedirectFixedPath = false
+	r.Use(middlewares.ResponseHeaders())
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowCredentials = true
 	corsConfig.AllowAllOrigins = true
