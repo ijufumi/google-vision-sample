@@ -35,7 +35,7 @@ func (c *visionAPIClient) DetectText(key string) (string, error) {
 
 	imageUri := MakeToGCSUri(c.config.Google.Storage.Bucket, key)
 	outputKey := fmt.Sprintf("%s-output-%d.json", key, time.Now().UTC().Unix())
-	outputUri := fmt.Sprintf("gs://%s/%s", c.config.Google.Storage.Bucket, outputKey)
+	outputUri := MakeToGCSUri(c.config.Google.Storage.Bucket, outputKey)
 
 	c.logger.Info(fmt.Sprintf("imageUri is %s", imageUri))
 	c.logger.Info(fmt.Sprintf("outputUri is %s", outputUri))
