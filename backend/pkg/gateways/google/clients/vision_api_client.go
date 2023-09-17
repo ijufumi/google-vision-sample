@@ -1,7 +1,7 @@
 package clients
 
 import (
-	vision "cloud.google.com/go/vision/v2/apiv1"
+	vision "cloud.google.com/go/vision/apiv1"
 	"cloud.google.com/go/vision/v2/apiv1/visionpb"
 	"context"
 	"fmt"
