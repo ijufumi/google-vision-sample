@@ -116,7 +116,7 @@ public class ECSStack {
         "DB_USER", config.dbUser(),
         "DB_PASSWORD", config.dbPassword(),
         "DB_PORT", Integer.toString(config.dbPort()),
-        "GOOGLE_STORAGE_BUCKET", "ijufumi-sample",
+        "GOOGLE_STORAGE_BUCKET", config.googleBucketName(),
         "GIN_MOD", "release",
         "MIGRATION_PATH", "/app/migration"
     );

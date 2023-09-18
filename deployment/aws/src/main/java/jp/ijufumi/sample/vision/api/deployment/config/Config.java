@@ -57,6 +57,8 @@ public interface Config {
   int dbPort();
 
   String route53Namespace();
+
+  String googleBucketName();
 }
 
 class ConfigObj implements Config {
@@ -187,6 +189,11 @@ class ConfigObj implements Config {
   @Override
   public String route53Namespace() {
     return this.getEnv("ROUTE53_NAMESPACE");
+  }
+
+  @Override
+  public String googleBucketName() {
+    return this.getEnv("APP_GOOGLE_STORAGE_BUCKET");
   }
 
   private final Dotenv dotenv;
