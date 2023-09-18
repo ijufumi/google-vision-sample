@@ -47,18 +47,26 @@ func (c *storageAPIClient) UploadFile(key string, file *os.File, contentType enu
 		return errors.Wrap(err, "StorageAPIClient#UploadFile")
 	}
 	defer func() {
-		_ = client.Close()
+		err := client.Close()
+		if err != nil {
+			c.logger.Error("client closing error", zap.Error(err))
+		}
 	}()
 
 	object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
 	storageWriter := object.NewWriter(context.Background())
 	storageWriter.ContentType = string(contentType)
 	defer func() {
-		_ = storageWriter.Close()
+		err := storageWriter.Close()
+		if err != nil {
+			c.logger.Error("writer closing error", zap.Error(err))
+		}
 	}()
 
-	if _, err := io.Copy(storageWriter, file); err != nil {
+	if size, err := io.Copy(storageWriter, file); err != nil {
 		return errors.Wrap(err, "StorageAPIClient#UploadFile")
+	} else if size == 0 {
+		return errors.New("written size was 0")
 	}
 	return nil
 }
