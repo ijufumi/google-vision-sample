@@ -9,7 +9,7 @@ on:
 env:
   BACKEND_URL: https://vision-sample-api.ijufumi.net
   S3_BUCKET: vision-sample-bucket
-  CLOUDFRONT_DISTRIBUTION_ID: EW7DBWRPWADAX
+  CLOUDFRONT_DISTRIBUTION_ID: ECELVR22LC9LT
 
 jobs:
   build:
