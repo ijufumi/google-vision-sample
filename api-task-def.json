@@ -1,9 +1,9 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-1:044888744953:task-definition/app-task-definition:16",
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-1:044888744953:task-definition/app-task-definition:22",
     "containerDefinitions": [
         {
             "name": "app",
-            "image": "044888744953.dkr.ecr.ap-northeast-1.amazonaws.com/cdk-hnb659fds-container-assets-044888744953-ap-northeast-1:42ee3c595242115cb3e1c506d1c93c89c5503b052e8aa29bb694db744ba831bf",
+            "image": "044888744953.dkr.ecr.ap-northeast-1.amazonaws.com/cdk-hnb659fds-container-assets-044888744953-ap-northeast-1:30d512eef5a7408d97f834d9f99ebe0ec1f58a7bb320306cb14c264fc819bf01",
             "cpu": 100,
             "memory": 256,
             "links": [],
@@ -19,6 +19,14 @@
             "command": [],
             "environment": [
                 {
+                    "name": "DB_PORT",
+                    "value": "5432"
+                },
+                {
+                    "name": "DB_USER",
+                    "value": "postgres"
+                },
+                {
                     "name": "MIGRATION_PATH",
                     "value": "/app/migration"
                 },
@@ -27,24 +35,20 @@
                     "value": "postgres"
                 },
                 {
-                    "name": "DB_PORT",
-                    "value": "5432"
+                    "name": "GIN_MOD",
+                    "value": "release"
                 },
                 {
                     "name": "DB_HOST",
                     "value": "db.default-namespace"
                 },
                 {
-                    "name": "DB_USER",
-                    "value": "postgres"
+                    "name": "GOOGLE_STORAGE_BUCKET",
+                    "value": "ijufumi-sample"
                 },
                 {
                     "name": "DB_PASSWORD",
                     "value": "password"
-                },
-                {
-                    "name": "GOOGLE_STORAGE_BUCKET",
-                    "value": "ijufumi-sample"
                 }
             ],
             "environmentFiles": [],
@@ -53,7 +57,7 @@
             "secrets": [
                 {
                     "name": "GOOGLE_CREDENTIAL",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:044888744953:secret:GOOGLE_CREDENTIAL-vz8DN3"
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:044888744953:secret:GOOGLE_CREDENTIAL-jqceis"
                 }
             ],
             "privileged": true,
