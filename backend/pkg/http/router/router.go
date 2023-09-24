@@ -17,6 +17,7 @@ func NewRouter(c container.Container) Router {
 	r.RedirectFixedPath = false
 	r.Use(middlewares.ResponseHeaders())
 	r.Use(middlewares.CORS())
+	r.Use(middlewares.Logger())
 
 	api := r.Group("api")
 	{
