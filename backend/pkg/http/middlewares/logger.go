@@ -11,6 +11,6 @@ func Logger() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		traceID := utils.NewULID()
 		l := loggers.NewLoggerWithTraceID(traceID)
-		context.SetLogger(ctx, l)
+		context.SetLoggerToGinContext(ctx, l)
 	}
 }
