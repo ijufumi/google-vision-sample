@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -20,11 +21,11 @@ import (
 )
 
 type DetectTextService interface {
-	GetResults() ([]*models.Job, error)
-	GetResultByID(id string) (*models.Job, error)
-	GetSignedURL(key string) (*models.SignedURL, error)
-	DetectTexts(file *os.File, contentType string) error
-	DeleteResult(id string) error
+	GetResults(ctx context.Context) ([]*models.Job, error)
+	GetResultByID(ctx context.Context, id string) (*models.Job, error)
+	GetSignedURL(ctx context.Context, key string) (*models.SignedURL, error)
+	DetectTexts(ctx context.Context, file *os.File, contentType string) error
+	DeleteResult(ctx context.Context, id string) error
 }
 
 func NewDetectTextService(
@@ -51,7 +52,7 @@ func NewDetectTextService(
 	}
 }
 
-func (s *detectTextService) GetResults() ([]*models.Job, error) {
+func (s *detectTextService) GetResults(ctx context.Context) ([]*models.Job, error) {
 	results, err := s.jobRepository.GetAll(s.db)
 	if err != nil {
 		return nil, err
@@ -64,7 +65,7 @@ func (s *detectTextService) GetResults() ([]*models.Job, error) {
 	return extractionResults, nil
 }
 
-func (s *detectTextService) GetResultByID(id string) (*models.Job, error) {
+func (s *detectTextService) GetResultByID(ctx context.Context, id string) (*models.Job, error) {
 	result, err := s.jobRepository.GetByID(s.db, id)
 	if err != nil {
 		return nil, err
@@ -72,7 +73,7 @@ func (s *detectTextService) GetResultByID(id string) (*models.Job, error) {
 	return s.buildExtractionResultResponse(result), nil
 }
 
-func (s *detectTextService) GetSignedURL(key string) (*models.SignedURL, error) {
+func (s *detectTextService) GetSignedURL(ctx context.Context, key string) (*models.SignedURL, error) {
 	signedURL, err := s.storageAPIClient.SignedURL(key)
 	if err != nil {
 		return nil, err
@@ -80,7 +81,7 @@ func (s *detectTextService) GetSignedURL(key string) (*models.SignedURL, error) 
 	return &models.SignedURL{URL: signedURL}, nil
 }
 
-func (s *detectTextService) DetectTexts(file *os.File, contentType string) error {
+func (s *detectTextService) DetectTexts(ctx context.Context, file *os.File, contentType string) error {
 	id := utils.NewULID()
 	key := fmt.Sprintf("%s/original/%s", id, filepath.Base(file.Name()))
 
@@ -303,7 +304,7 @@ func (s *detectTextService) processDetectTextFromImage(jobID string, contentType
 	return err
 }
 
-func (s *detectTextService) DeleteResult(id string) error {
+func (s *detectTextService) DeleteResult(ctx context.Context, id string) error {
 	return s.db.Transaction(func(tx *gorm.DB) error {
 		outputFiles, err := s.outputFileRepository.GetByJobID(tx, id)
 		if err != nil {
