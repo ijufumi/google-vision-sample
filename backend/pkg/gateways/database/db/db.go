@@ -28,3 +28,9 @@ func dsnString(config *configs.Config) string {
 	dbConfig := config.DB
 	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable", dbConfig.Host, dbConfig.User, dbConfig.Password, dbConfig.Name, dbConfig.Port)
 }
+
+func SetLogger(db *gorm.DB, zapLogger *zap.Logger) *gorm.DB {
+	logger := zapgorm2.New(zapLogger)
+	db.Logger = logger
+	return db
+}

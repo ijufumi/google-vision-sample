@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/db"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities/enums"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/repositories"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/clients"
 	googleModels "github.com/ijufumi/google-vision-sample/pkg/gateways/google/models"
+	contextManager "github.com/ijufumi/google-vision-sample/pkg/http/context"
 	"github.com/ijufumi/google-vision-sample/pkg/models"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"go.uber.org/zap"
@@ -53,11 +55,21 @@ func NewDetectTextService(
 }
 
 func (s *detectTextService) GetResults(ctx context.Context) ([]*models.Job, error) {
-	results, err := s.jobRepository.GetAll(s.db)
+	var results []*entities.Job
+	logger := contextManager.GetLogger(ctx)
+	err := s.db.Transaction(func(tx *gorm.DB) error {
+		tx = db.SetLogger(tx, logger.Logger)
+		_results, err := s.jobRepository.GetAll(tx)
+		if err != nil {
+			return err
+		}
+		results = _results
+		return nil
+	})
+
 	if err != nil {
 		return nil, err
 	}
-
 	extractionResults := make([]*models.Job, 0)
 	for _, result := range results {
 		extractionResults = append(extractionResults, s.buildExtractionResultResponse(result))
