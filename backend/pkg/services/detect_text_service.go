@@ -5,13 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/db"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities/enums"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/repositories"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/clients"
 	googleModels "github.com/ijufumi/google-vision-sample/pkg/gateways/google/models"
-	contextManager "github.com/ijufumi/google-vision-sample/pkg/http/context"
+	"github.com/ijufumi/google-vision-sample/pkg/loggers"
 	"github.com/ijufumi/google-vision-sample/pkg/models"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"go.uber.org/zap"
@@ -56,15 +55,15 @@ func NewDetectTextService(
 
 func (s *detectTextService) GetResults(ctx context.Context) ([]*models.Job, error) {
 	var results []*entities.Job
-	logger := contextManager.GetLogger(ctx)
-	err := s.db.Transaction(func(tx *gorm.DB) error {
-		tx = db.SetLogger(tx, logger.Logger)
-		_results, err := s.jobRepository.GetAll(tx)
-		if err != nil {
-			return err
-		}
-		results = _results
-		return nil
+	err := s.WithContext(ctx, s.db, func(logger *loggers.Logger, db *gorm.DB) error {
+		return db.Transaction(func(tx *gorm.DB) error {
+			_results, err := s.jobRepository.GetAll(tx)
+			if err != nil {
+				return err
+			}
+			results = _results
+			return nil
+		})
 	})
 
 	if err != nil {
@@ -420,6 +419,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 }
 
 type detectTextService struct {
+	BaseService
 	storageAPIClient        clients.StorageAPIClient
 	visionAPIClient         clients.VisionAPIClient
 	jobRepository           repositories.JobRepository
