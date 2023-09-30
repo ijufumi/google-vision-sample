@@ -1,12 +1,12 @@
 package container
 
 import (
+	"fmt"
 	"github.com/ijufumi/google-vision-sample/pkg/configs"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/db"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/repositories"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/clients"
 	"github.com/ijufumi/google-vision-sample/pkg/http/handlers"
-	"github.com/ijufumi/google-vision-sample/pkg/loggers"
 	"github.com/ijufumi/google-vision-sample/pkg/services"
 	"go.uber.org/dig"
 )
@@ -36,27 +36,70 @@ type container struct {
 
 func (c *container) provide() {
 	// config
-	_ = c.container.Provide(configs.New)
-	// logger
-	_ = c.container.Provide(loggers.NewLogger)
+	err := c.container.Provide(configs.New)
+	if err != nil {
+		fmt.Println(err)
+	}
 	// handlers
-	_ = c.container.Provide(handlers.NewHealthHandler)
-	_ = c.container.Provide(handlers.NewDetectTextHandler)
-	_ = c.container.Provide(handlers.NewSignedURL)
-	_ = c.container.Provide(handlers.NewConfigsHandler)
+	err = c.container.Provide(handlers.NewHealthHandler)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = c.container.Provide(handlers.NewDetectTextHandler)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = c.container.Provide(handlers.NewSignedURL)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = c.container.Provide(handlers.NewConfigsHandler)
+	if err != nil {
+		fmt.Println(err)
+	}
 	// services
-	_ = c.container.Provide(services.NewDetectTextService)
-	_ = c.container.Provide(services.NewConfigurationService)
-	_ = c.container.Provide(services.NewImageConversionService)
+	err = c.container.Provide(services.NewDetectTextService)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = c.container.Provide(services.NewConfigurationService)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = c.container.Provide(services.NewImageConversionService)
+	if err != nil {
+		fmt.Println(err)
+	}
 	// database
-	_ = c.container.Provide(db.NewDB)
-	_ = c.container.Provide(repositories.NewJobRepository)
-	_ = c.container.Provide(repositories.NewExtractedTextRepository)
-	_ = c.container.Provide(repositories.NewInputFileRepository)
-	_ = c.container.Provide(repositories.NewOutputFileRepository)
+	err = c.container.Provide(db.NewDB)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = c.container.Provide(repositories.NewJobRepository)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = c.container.Provide(repositories.NewExtractedTextRepository)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = c.container.Provide(repositories.NewInputFileRepository)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = c.container.Provide(repositories.NewOutputFileRepository)
+	if err != nil {
+		fmt.Println(err)
+	}
 	// google
-	_ = c.container.Provide(clients.NewStorageAPIClient)
-	_ = c.container.Provide(clients.NewVisionAPIClient)
+	err = c.container.Provide(clients.NewStorageAPIClient)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = c.container.Provide(clients.NewVisionAPIClient)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func (c *container) Container() *dig.Container {
