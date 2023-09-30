@@ -55,7 +55,7 @@ func NewDetectTextService(
 
 func (s *detectTextService) GetResults(ctx context.Context) ([]*models.Job, error) {
 	var results []*entities.Job
-	err := s.WithContext(ctx, s.db, func(logger *loggers.Logger, db *gorm.DB) error {
+	err := s.WithLogger(ctx, s.db, func(logger *loggers.Logger, db *gorm.DB) error {
 		return db.Transaction(func(tx *gorm.DB) error {
 			_results, err := s.jobRepository.GetAll(tx)
 			if err != nil {

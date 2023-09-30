@@ -11,7 +11,7 @@ import (
 type BaseService struct {
 }
 
-func (s *BaseService) WithContext(ctx context.Context, gormDB *gorm.DB, fc func(logger *loggers.Logger, tx *gorm.DB) error) error {
+func (s *BaseService) WithLogger(ctx context.Context, gormDB *gorm.DB, fc func(logger *loggers.Logger, tx *gorm.DB) error) error {
 	logger := contextManager.GetLogger(ctx)
 	db2 := db.SetLogger(gormDB, logger.Logger)
 	return fc(logger, db2)
