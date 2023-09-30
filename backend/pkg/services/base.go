@@ -8,10 +8,10 @@ import (
 	"gorm.io/gorm"
 )
 
-type BaseService struct {
+type baseService struct {
 }
 
-func (s *BaseService) WithLogger(ctx context.Context, gormDB *gorm.DB, fc func(logger *loggers.Logger, tx *gorm.DB) error) error {
+func (s *baseService) WithLogger(ctx context.Context, gormDB *gorm.DB, fc func(logger *loggers.Logger, tx *gorm.DB) error) error {
 	logger := contextManager.GetLogger(ctx)
 	db2 := db.SetLogger(gormDB, logger.Logger)
 	return fc(logger, db2)

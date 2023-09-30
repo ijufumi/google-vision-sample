@@ -419,7 +419,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 }
 
 type detectTextService struct {
-	BaseService
+	baseService
 	storageAPIClient        clients.StorageAPIClient
 	visionAPIClient         clients.VisionAPIClient
 	jobRepository           repositories.JobRepository
