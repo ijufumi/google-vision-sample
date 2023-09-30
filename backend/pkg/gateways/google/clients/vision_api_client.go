@@ -8,7 +8,6 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/configs"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/options"
 	"github.com/pkg/errors"
-	"go.uber.org/zap"
 	"time"
 )
 
@@ -16,10 +15,9 @@ type VisionAPIClient interface {
 	DetectText(key string) (string, error)
 }
 
-func NewVisionAPIClient(config *configs.Config, logger *zap.Logger) VisionAPIClient {
+func NewVisionAPIClient(config *configs.Config) VisionAPIClient {
 	return &visionAPIClient{
 		config: config,
-		logger: logger,
 	}
 }
 
@@ -37,8 +35,8 @@ func (c *visionAPIClient) DetectText(key string) (string, error) {
 	outputKey := fmt.Sprintf("%s-output-%d.json", key, time.Now().UTC().Unix())
 	outputUri := MakeToGCSUri(c.config.Google.Storage.Bucket, outputKey)
 
-	c.logger.Info(fmt.Sprintf("imageUri is %s", imageUri))
-	c.logger.Info(fmt.Sprintf("outputUri is %s", outputUri))
+	// c.logger.Info(fmt.Sprintf("imageUri is %s", imageUri))
+	// c.logger.Info(fmt.Sprintf("outputUri is %s", outputUri))
 	request := &visionpb.AsyncBatchAnnotateImagesRequest{
 		Requests: []*visionpb.AnnotateImageRequest{
 			&visionpb.AnnotateImageRequest{
@@ -68,14 +66,14 @@ func (c *visionAPIClient) DetectText(key string) (string, error) {
 		return "", errors.Wrap(err, "VisionAPIClient#DetectText")
 	}
 
-	c.logger.Info(fmt.Sprintf("%+v", response))
+	fmt.Println(response)
+	//c.logger.Info(fmt.Sprintf("%+v", response))
 
 	return outputKey, nil
 }
 
 type visionAPIClient struct {
 	config *configs.Config
-	logger *zap.Logger
 }
 
 func (c *visionAPIClient) newClient() (*vision.ImageAnnotatorClient, error) {

@@ -10,10 +10,8 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/repositories"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/clients"
 	googleModels "github.com/ijufumi/google-vision-sample/pkg/gateways/google/models"
-	"github.com/ijufumi/google-vision-sample/pkg/loggers"
 	"github.com/ijufumi/google-vision-sample/pkg/models"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
-	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"io"
 	"os"
@@ -29,17 +27,7 @@ type DetectTextService interface {
 	DeleteResult(ctx context.Context, id string) error
 }
 
-func NewDetectTextService(
-	storageAPIClient clients.StorageAPIClient,
-	visionAPIClient clients.VisionAPIClient,
-	jobRepository repositories.JobRepository,
-	extractedTextRepository repositories.ExtractedTextRepository,
-	inputFileRepository repositories.InputFileRepository,
-	outputFileRepository repositories.OutputFileRepository,
-	imageConversionService ImageConversionService,
-	logger *zap.Logger,
-	db *gorm.DB,
-) DetectTextService {
+func NewDetectTextService(storageAPIClient clients.StorageAPIClient, visionAPIClient clients.VisionAPIClient, jobRepository repositories.JobRepository, extractedTextRepository repositories.ExtractedTextRepository, inputFileRepository repositories.InputFileRepository, outputFileRepository repositories.OutputFileRepository, imageConversionService ImageConversionService, db *gorm.DB) DetectTextService {
 	return &detectTextService{
 		storageAPIClient:        storageAPIClient,
 		visionAPIClient:         visionAPIClient,
@@ -48,60 +36,50 @@ func NewDetectTextService(
 		inputFileRepository:     inputFileRepository,
 		outputFileRepository:    outputFileRepository,
 		imageConversionService:  imageConversionService,
-		logger:                  logger,
 		db:                      db,
 	}
 }
 
 func (s *detectTextService) GetResults(ctx context.Context) ([]*models.Job, error) {
 	var extractionResults []*models.Job
-	err := s.WithLogger(ctx, s.db, func(logger *loggers.Logger, db *gorm.DB) error {
-		var results []*entities.Job
-		err := db.Transaction(func(tx *gorm.DB) error {
-			_results, err := s.jobRepository.GetAll(tx)
-			if err != nil {
-				logger.Error(err.Error())
-				return err
-			}
-			results = _results
-			return nil
-		})
+	var results []*entities.Job
+	err := s.db.Transaction(func(tx *gorm.DB) error {
+		_results, err := s.jobRepository.GetAll(tx)
 		if err != nil {
+			//logger.Error(err.Error())
 			return err
 		}
-		for _, result := range results {
-			extractionResults = append(extractionResults, s.buildExtractionResultResponse(result))
-		}
+		results = _results
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
+	for _, result := range results {
+		extractionResults = append(extractionResults, s.buildExtractionResultResponse(result))
+	}
 
 	return extractionResults, err
 }
 
 func (s *detectTextService) GetResultByID(ctx context.Context, id string) (*models.Job, error) {
 	var response *models.Job
-	err := s.WithLogger(ctx, s.db, func(logger *loggers.Logger, db *gorm.DB) error {
-		result, err := s.jobRepository.GetByID(s.db, id)
-		if err != nil {
-			logger.Error(err.Error())
-			return err
-		}
-		response = s.buildExtractionResultResponse(result)
-		return nil
-	})
+	result, err := s.jobRepository.GetByID(s.db, id)
+	if err != nil {
+		// logger.Error(err.Error())
+		return nil, err
+	}
+	response = s.buildExtractionResultResponse(result)
 	return response, err
 }
 
 func (s *detectTextService) GetSignedURL(ctx context.Context, key string) (*models.SignedURL, error) {
 	var response *models.SignedURL
-	err := s.WithLogger(ctx, s.db, func(logger *loggers.Logger, db *gorm.DB) error {
-		signedURL, err := s.storageAPIClient.SignedURL(key)
-		if err != nil {
-			return err
-		}
-		response = &models.SignedURL{URL: signedURL}
-		return nil
-	})
+	signedURL, err := s.storageAPIClient.SignedURL(key)
+	if err != nil {
+		return nil, err
+	}
+	response = &models.SignedURL{URL: signedURL}
 	return response, err
 }
 
@@ -140,11 +118,11 @@ func (s *detectTextService) DetectTexts(ctx context.Context, file *os.File, cont
 	go func() {
 		job, err := s.jobRepository.GetByID(s.db, id)
 		if err != nil {
-			s.logger.Error(fmt.Sprintf("%v was occurred.", err))
+			// s.logger.Error(fmt.Sprintf("%v was occurred.", err))
 		}
 		err = s.processDetectText(id, tempFileForWork)
 		if err != nil {
-			s.logger.Error(fmt.Sprintf("%v was occurred.", err))
+			// s.logger.Error(fmt.Sprintf("%v was occurred.", err))
 			job.Status = enums.JobStatus_Failed
 		} else {
 			job.Status = enums.JobStatus_Succeeded
@@ -157,7 +135,7 @@ func (s *detectTextService) DetectTexts(ctx context.Context, file *os.File, cont
 
 func (s *detectTextService) processDetectText(id string, inputFile *os.File) error {
 	contentType := s.imageConversionService.DetectContentType(inputFile.Name())
-	s.logger.Info(fmt.Sprintf("Content-Type is %s", contentType))
+	// s.logger.Info(fmt.Sprintf("Content-Type is %s", contentType))
 	switch {
 	case contentType == enums.ContentType_Pdf:
 		imageFiles, err := s.imageConversionService.ConvertPdfToImages(inputFile.Name())
@@ -337,7 +315,8 @@ func (s *detectTextService) DeleteResult(ctx context.Context, id string) error {
 		for _, file := range outputFiles {
 			err = s.storageAPIClient.DeleteFile(file.FileKey)
 			if err != nil {
-				s.logger.Error(err.Error())
+				fmt.Println(err)
+				// s.logger.Error(err.Error())
 			}
 			err := s.extractedTextRepository.DeleteByOutputFileID(tx, file.ID)
 			if err != nil {
@@ -355,7 +334,8 @@ func (s *detectTextService) DeleteResult(ctx context.Context, id string) error {
 		for _, file := range inputFiles {
 			err = s.storageAPIClient.DeleteFile(file.FileKey)
 			if err != nil {
-				s.logger.Error(err.Error())
+				fmt.Println(err)
+				// s.logger.Error(err.Error())
 			}
 		}
 		err = s.inputFileRepository.DeleteByJobID(tx, id)
@@ -369,7 +349,8 @@ func (s *detectTextService) DeleteResult(ctx context.Context, id string) error {
 		}
 		err = s.storageAPIClient.DeleteFile(job.OriginalFileKey)
 		if err != nil {
-			s.logger.Error(err.Error())
+			fmt.Println(err)
+			// s.logger.Error(err.Error())
 		}
 		return s.jobRepository.Delete(tx, id)
 	})
@@ -432,7 +413,6 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 }
 
 type detectTextService struct {
-	baseService
 	storageAPIClient        clients.StorageAPIClient
 	visionAPIClient         clients.VisionAPIClient
 	jobRepository           repositories.JobRepository
@@ -441,5 +421,4 @@ type detectTextService struct {
 	outputFileRepository    repositories.OutputFileRepository
 	imageConversionService  ImageConversionService
 	db                      *gorm.DB
-	logger                  *zap.Logger
 }

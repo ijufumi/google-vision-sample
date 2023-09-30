@@ -9,7 +9,6 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/options"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"github.com/pkg/errors"
-	"go.uber.org/zap"
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/iterator"
 	"io"
@@ -28,15 +27,13 @@ type StorageAPIClient interface {
 	SetupCORSOnBucket() error
 }
 
-func NewStorageAPIClient(config *configs.Config, logger *zap.Logger) StorageAPIClient {
+func NewStorageAPIClient(config *configs.Config) StorageAPIClient {
 	return &storageAPIClient{
 		config: config,
-		logger: logger,
 	}
 }
 
 type storageAPIClient struct {
-	logger    *zap.Logger
 	config    *configs.Config
 	jwtConfig *jwt.Config
 }
@@ -49,7 +46,8 @@ func (c *storageAPIClient) UploadFile(key string, file *os.File, contentType enu
 	defer func() {
 		err := client.Close()
 		if err != nil {
-			c.logger.Error("client closing error", zap.Error(err))
+			fmt.Println(err)
+			//c.logger.Error("client closing error", zap.Error(err))
 		}
 	}()
 
@@ -59,7 +57,8 @@ func (c *storageAPIClient) UploadFile(key string, file *os.File, contentType enu
 	defer func() {
 		err := storageWriter.Close()
 		if err != nil {
-			c.logger.Error("writer closing error", zap.Error(err))
+			fmt.Println(err)
+			//c.logger.Error("writer closing error", zap.Error(err))
 		}
 	}()
 
@@ -120,7 +119,7 @@ func (c *storageAPIClient) SignedURL(key string) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "StorageAPIClient#SignedURL")
 	}
-	c.logger.Info(fmt.Sprintf("[%s]signed url is %s", key, signedURL))
+	//c.logger.Info(fmt.Sprintf("[%s]signed url is %s", key, signedURL))
 	return signedURL, nil
 }
 

@@ -3,7 +3,6 @@ package services
 import (
 	"fmt"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities/enums"
-	"go.uber.org/zap"
 	"gopkg.in/gographics/imagick.v2/imagick"
 	"math"
 	"net/http"
@@ -21,13 +20,10 @@ type ImageConversionService interface {
 }
 
 type imageConversionService struct {
-	logger *zap.Logger
 }
 
-func NewImageConversionService(logger *zap.Logger) ImageConversionService {
-	return &imageConversionService{
-		logger: logger,
-	}
+func NewImageConversionService() ImageConversionService {
+	return &imageConversionService{}
 }
 
 func (s *imageConversionService) DetectOrientation(filePath string) (imagick.OrientationType, error) {
@@ -39,11 +35,11 @@ func (s *imageConversionService) DetectOrientation(filePath string) (imagick.Ori
 
 	err := magickWand.ReadImage(filePath)
 	if err != nil {
-		s.logger.Error(fmt.Sprintf("error: %v", err))
+		// s.logger.Error(fmt.Sprintf("error: %v", err))
 		return imagick.ORIENTATION_UNDEFINED, err
 	}
 	orientation := magickWand.GetImageOrientation()
-	s.logger.Info(fmt.Sprintf("orientation is %v", orientation))
+	// s.logger.Info(fmt.Sprintf("orientation is %v", orientation))
 	return orientation, nil
 }
 
@@ -56,7 +52,7 @@ func (s *imageConversionService) DetectSize(filePath string) (width, height uint
 
 	err = magickWand.ReadImage(filePath)
 	if err != nil {
-		s.logger.Error(fmt.Sprintf("error: %v", err))
+		// s.logger.Error(fmt.Sprintf("error: %v", err))
 		return
 	}
 	height = magickWand.GetImageHeight()
@@ -68,7 +64,7 @@ func (s *imageConversionService) DetectSize(filePath string) (width, height uint
 func (s *imageConversionService) DetectContentType(filePath string) enums.ContentType {
 	bytes, err := os.ReadFile(filePath)
 	if err != nil {
-		s.logger.Error(fmt.Sprintf("failed detecting content-type: %v", err))
+		// s.logger.Error(fmt.Sprintf("failed detecting content-type: %v", err))
 		return enums.ContentType_OctetStream
 	}
 	return enums.ConvertToContentType(http.DetectContentType(bytes))
@@ -77,7 +73,7 @@ func (s *imageConversionService) DetectContentType(filePath string) enums.Conten
 
 func (s *imageConversionService) ConvertPoints(points [][]float64, orientation imagick.OrientationType, width, height uint) [][]float64 {
 	if len(points) != 4 {
-		s.logger.Warn("point is invalid")
+		// s.logger.Warn("point is invalid")
 		return points
 	}
 	floatWidth := float64(width)
@@ -121,18 +117,18 @@ func (s *imageConversionService) ConvertPdfToImages(pdfFilePath string) ([]*os.F
 
 	err := magickWand.ReadImage(pdfFilePath)
 	if err != nil {
-		s.logger.Error(fmt.Sprintf("error: %v", err))
+		// s.logger.Error(fmt.Sprintf("error: %v", err))
 		return nil, err
 	}
 
 	err = magickWand.SetImageFormat("png")
 	if err != nil {
-		s.logger.Error(fmt.Sprintf("error: %v", err))
+		// s.logger.Error(fmt.Sprintf("error: %v", err))
 		return nil, err
 	}
 
 	pageNo := magickWand.GetNumberImages()
-	s.logger.Info(fmt.Sprintf("The page number of %s is %d", pdfFilePath, pageNo))
+	// s.logger.Info(fmt.Sprintf("The page number of %s is %d", pdfFilePath, pageNo))
 
 	imageFiles := make([]*os.File, pageNo)
 	originalFilename := filepath.Base(pdfFilePath)
@@ -143,12 +139,12 @@ func (s *imageConversionService) ConvertPdfToImages(pdfFilePath string) ([]*os.F
 		filePaths := []string{filepath.Dir(pdfFilePath), fmt.Sprintf("%s-%d.png", originalFilename, i)}
 		imageFilePath := strings.Join(filePaths, "/")
 		if err := magickWand.WriteImage(imageFilePath); err != nil {
-			s.logger.Error(fmt.Sprintf("error: %v", err))
+			// s.logger.Error(fmt.Sprintf("error: %v", err))
 			continue
 		}
 		imageFile, err := os.Open(imageFilePath)
 		if err != nil {
-			s.logger.Error(fmt.Sprintf("error: %v", err))
+			/// s.logger.Error(fmt.Sprintf("error: %v", err))
 			return nil, err
 		}
 		imageFiles[i] = imageFile
@@ -167,8 +163,8 @@ func (s *imageConversionService) convertPoint(point []float64, sin, cos float64,
 }
 
 func (s *imageConversionService) convertToSinCos(angle float64) (sin float64, cos float64) {
-	s.logger.Debug(fmt.Sprintf("angle is %v,", angle))
+	// s.logger.Debug(fmt.Sprintf("angle is %v,", angle))
 	sin, cos = math.Sincos(angle * math.Pi / 180)
-	s.logger.Debug(fmt.Sprintf("sin is %v, cos is %v", sin, cos))
+	// s.logger.Debug(fmt.Sprintf("sin is %v, cos is %v", sin, cos))
 	return
 }
