@@ -1,12 +1,12 @@
 package container
 
 import (
-	"fmt"
 	"github.com/ijufumi/google-vision-sample/pkg/configs"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/db"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/repositories"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/clients"
 	"github.com/ijufumi/google-vision-sample/pkg/http/handlers"
+	"github.com/ijufumi/google-vision-sample/pkg/loggers"
 	"github.com/ijufumi/google-vision-sample/pkg/services"
 	"go.uber.org/dig"
 )
@@ -35,70 +35,71 @@ type container struct {
 }
 
 func (c *container) provide() {
+	logger := loggers.NewLogger()
 	// config
 	err := c.container.Provide(configs.New)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 	// handlers
 	err = c.container.Provide(handlers.NewHealthHandler)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 	err = c.container.Provide(handlers.NewDetectTextHandler)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 	err = c.container.Provide(handlers.NewSignedURL)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 	err = c.container.Provide(handlers.NewConfigsHandler)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 	// services
 	err = c.container.Provide(services.NewDetectTextService)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 	err = c.container.Provide(services.NewConfigurationService)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 	err = c.container.Provide(services.NewImageConversionService)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 	// database
 	err = c.container.Provide(db.NewDB)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 	err = c.container.Provide(repositories.NewJobRepository)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 	err = c.container.Provide(repositories.NewExtractedTextRepository)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 	err = c.container.Provide(repositories.NewInputFileRepository)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 	err = c.container.Provide(repositories.NewOutputFileRepository)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 	// google
 	err = c.container.Provide(clients.NewStorageAPIClient)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 	err = c.container.Provide(clients.NewVisionAPIClient)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error(err.Error())
 	}
 }
 
