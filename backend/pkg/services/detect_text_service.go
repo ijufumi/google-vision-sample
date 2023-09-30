@@ -54,42 +54,55 @@ func NewDetectTextService(
 }
 
 func (s *detectTextService) GetResults(ctx context.Context) ([]*models.Job, error) {
-	var results []*entities.Job
+	var extractionResults []*models.Job
 	err := s.WithLogger(ctx, s.db, func(logger *loggers.Logger, db *gorm.DB) error {
-		return db.Transaction(func(tx *gorm.DB) error {
+		var results []*entities.Job
+		err := db.Transaction(func(tx *gorm.DB) error {
 			_results, err := s.jobRepository.GetAll(tx)
 			if err != nil {
+				logger.Error(err.Error())
 				return err
 			}
 			results = _results
 			return nil
 		})
+		if err != nil {
+			return err
+		}
+		for _, result := range results {
+			extractionResults = append(extractionResults, s.buildExtractionResultResponse(result))
+		}
+		return nil
 	})
 
-	if err != nil {
-		return nil, err
-	}
-	extractionResults := make([]*models.Job, 0)
-	for _, result := range results {
-		extractionResults = append(extractionResults, s.buildExtractionResultResponse(result))
-	}
-	return extractionResults, nil
+	return extractionResults, err
 }
 
 func (s *detectTextService) GetResultByID(ctx context.Context, id string) (*models.Job, error) {
-	result, err := s.jobRepository.GetByID(s.db, id)
-	if err != nil {
-		return nil, err
-	}
-	return s.buildExtractionResultResponse(result), nil
+	var response *models.Job
+	err := s.WithLogger(ctx, s.db, func(logger *loggers.Logger, db *gorm.DB) error {
+		result, err := s.jobRepository.GetByID(s.db, id)
+		if err != nil {
+			logger.Error(err.Error())
+			return err
+		}
+		response = s.buildExtractionResultResponse(result)
+		return nil
+	})
+	return response, err
 }
 
 func (s *detectTextService) GetSignedURL(ctx context.Context, key string) (*models.SignedURL, error) {
-	signedURL, err := s.storageAPIClient.SignedURL(key)
-	if err != nil {
-		return nil, err
-	}
-	return &models.SignedURL{URL: signedURL}, nil
+	var response *models.SignedURL
+	err := s.WithLogger(ctx, s.db, func(logger *loggers.Logger, db *gorm.DB) error {
+		signedURL, err := s.storageAPIClient.SignedURL(key)
+		if err != nil {
+			return err
+		}
+		response = &models.SignedURL{URL: signedURL}
+		return nil
+	})
+	return response, err
 }
 
 func (s *detectTextService) DetectTexts(ctx context.Context, file *os.File, contentType string) error {
