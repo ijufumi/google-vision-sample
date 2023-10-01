@@ -7,12 +7,12 @@ import (
 
 var zapLogger = buildZapLogger()
 
-func NewLogger() *Logger {
-	return &Logger{zapLogger}
+func NewLogger() *zap.Logger {
+	return zapLogger
 }
 
-func NewLoggerWithTraceID(traceID string) *Logger {
-	return &Logger{zapLogger.With(zap.String("trace_id", traceID))}
+func NewLoggerWithTraceID(traceID string) *zap.Logger {
+	return zapLogger.With(zap.String("trace_id", traceID))
 }
 
 func buildZapLogger() *zap.Logger {
@@ -20,8 +20,4 @@ func buildZapLogger() *zap.Logger {
 	loggerConfig.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
 	l, _ := loggerConfig.Build()
 	return l
-}
-
-type Logger struct {
-	*zap.Logger
 }

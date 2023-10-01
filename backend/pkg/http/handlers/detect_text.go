@@ -3,7 +3,6 @@ package handlers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/ijufumi/google-vision-sample/pkg/http/context"
 	"github.com/ijufumi/google-vision-sample/pkg/models"
 	"github.com/ijufumi/google-vision-sample/pkg/services"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
@@ -29,8 +28,8 @@ type detectTextHandler struct {
 }
 
 func (h *detectTextHandler) Gets(ginCtx *gin.Context) {
-	ctx := context.GetContextWithLogger(ginCtx)
-	results, err := h.service.GetResults(ctx)
+	//ctx := context.GetContextWithLogger(ginCtx)
+	results, err := h.service.GetResults()
 	if err != nil {
 		_ = ginCtx.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -39,9 +38,9 @@ func (h *detectTextHandler) Gets(ginCtx *gin.Context) {
 }
 
 func (h *detectTextHandler) GetByID(ginCtx *gin.Context) {
-	ctx := context.GetContextWithLogger(ginCtx)
+	//ctx := context.GetContextWithLogger(ginCtx)
 	id := ginCtx.Param("id")
-	result, err := h.service.GetResultByID(ctx, id)
+	result, err := h.service.GetResultByID(id)
 	if err != nil {
 		_ = ginCtx.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -50,7 +49,7 @@ func (h *detectTextHandler) GetByID(ginCtx *gin.Context) {
 }
 
 func (h *detectTextHandler) Create(ginCtx *gin.Context) {
-	ctx := context.GetContextWithLogger(ginCtx)
+	//ctx := context.GetContextWithLogger(ginCtx)
 	inputFile, err := ginCtx.FormFile("file")
 	if err != nil {
 		fmt.Println(err)
@@ -72,7 +71,7 @@ func (h *detectTextHandler) Create(ginCtx *gin.Context) {
 		_ = ginCtx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	err = h.service.DetectTexts(ctx, tempFile, inputFile.Header.Get("Content-Type"))
+	err = h.service.DetectTexts(tempFile, inputFile.Header.Get("Content-Type"))
 	if err != nil {
 		fmt.Println(err)
 		_ = ginCtx.AbortWithError(http.StatusBadRequest, err)
@@ -82,9 +81,9 @@ func (h *detectTextHandler) Create(ginCtx *gin.Context) {
 }
 
 func (h *detectTextHandler) Delete(ginCtx *gin.Context) {
-	ctx := context.GetContextWithLogger(ginCtx)
+	//ctx := context.GetContextWithLogger(ginCtx)
 	id := ginCtx.Param("id")
-	err := h.service.DeleteResult(ctx, id)
+	err := h.service.DeleteResult(id)
 	if err != nil {
 		fmt.Println(err)
 		_ = ginCtx.AbortWithError(http.StatusInternalServerError, err)

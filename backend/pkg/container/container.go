@@ -16,10 +16,14 @@ type Container interface {
 }
 
 func Invoke[T any](container Container) T {
+	logger := loggers.NewLogger()
 	var result T
-	_ = container.Container().Invoke(func(_result T) {
+	err := container.Container().Invoke(func(_result T) {
 		result = _result
 	})
+	if err != nil {
+		logger.Error(err.Error())
+	}
 
 	return result
 }
@@ -35,72 +39,28 @@ type container struct {
 }
 
 func (c *container) provide() {
-	logger := loggers.NewLogger()
+	// logger
+	_ = c.container.Provide(loggers.NewLogger)
 	// config
-	err := c.container.Provide(configs.New)
-	if err != nil {
-		logger.Error(err.Error())
-	}
+	_ = c.container.Provide(configs.New)
 	// handlers
-	err = c.container.Provide(handlers.NewHealthHandler)
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	err = c.container.Provide(handlers.NewDetectTextHandler)
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	err = c.container.Provide(handlers.NewSignedURL)
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	err = c.container.Provide(handlers.NewConfigsHandler)
-	if err != nil {
-		logger.Error(err.Error())
-	}
+	_ = c.container.Provide(handlers.NewHealthHandler)
+	_ = c.container.Provide(handlers.NewDetectTextHandler)
+	_ = c.container.Provide(handlers.NewSignedURL)
+	_ = c.container.Provide(handlers.NewConfigsHandler)
 	// services
-	err = c.container.Provide(services.NewDetectTextService)
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	err = c.container.Provide(services.NewConfigurationService)
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	err = c.container.Provide(services.NewImageConversionService)
-	if err != nil {
-		logger.Error(err.Error())
-	}
+	_ = c.container.Provide(services.NewDetectTextService)
+	_ = c.container.Provide(services.NewConfigurationService)
+	_ = c.container.Provide(services.NewImageConversionService)
 	// database
-	err = c.container.Provide(db.NewDB)
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	err = c.container.Provide(repositories.NewJobRepository)
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	err = c.container.Provide(repositories.NewExtractedTextRepository)
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	err = c.container.Provide(repositories.NewInputFileRepository)
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	err = c.container.Provide(repositories.NewOutputFileRepository)
-	if err != nil {
-		logger.Error(err.Error())
-	}
+	_ = c.container.Provide(db.NewDB)
+	_ = c.container.Provide(repositories.NewJobRepository)
+	_ = c.container.Provide(repositories.NewExtractedTextRepository)
+	_ = c.container.Provide(repositories.NewInputFileRepository)
+	_ = c.container.Provide(repositories.NewOutputFileRepository)
 	// google
-	err = c.container.Provide(clients.NewStorageAPIClient)
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	err = c.container.Provide(clients.NewVisionAPIClient)
-	if err != nil {
-		logger.Error(err.Error())
-	}
+	_ = c.container.Provide(clients.NewStorageAPIClient)
+	_ = c.container.Provide(clients.NewVisionAPIClient)
 }
 
 func (c *container) Container() *dig.Container {

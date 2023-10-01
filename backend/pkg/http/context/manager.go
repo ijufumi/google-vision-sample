@@ -3,16 +3,16 @@ package context
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"github.com/ijufumi/google-vision-sample/pkg/loggers"
+	"go.uber.org/zap"
 )
 
-func SetLoggerToGinContext(ctx *gin.Context, logger *loggers.Logger) {
+func SetLoggerToGinContext(ctx *gin.Context, logger *zap.Logger) {
 	ctx.Set("logger", logger)
 }
 
-func GetLoggerFromGinContext(ctx *gin.Context) *loggers.Logger {
+func GetLoggerFromGinContext(ctx *gin.Context) *zap.Logger {
 	l, _ := ctx.Get("logger")
-	return l.(*loggers.Logger)
+	return l.(*zap.Logger)
 }
 
 func GetContextWithLogger(ctx *gin.Context) context.Context {
@@ -20,7 +20,7 @@ func GetContextWithLogger(ctx *gin.Context) context.Context {
 	return context.WithValue(ctx.Request.Context(), "logger", l)
 }
 
-func GetLogger(ctx context.Context) *loggers.Logger {
+func GetLogger(ctx context.Context) *zap.Logger {
 	l := ctx.Value("logger")
-	return l.(*loggers.Logger)
+	return l.(*zap.Logger)
 }

@@ -2,13 +2,12 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/ijufumi/google-vision-sample/pkg/http/context"
 	"github.com/ijufumi/google-vision-sample/pkg/services"
 	"net/http"
 )
 
 type SignedURLHandler interface {
-	GetByKey(ctx *gin.Context)
+	GetByKey(ginCtx *gin.Context)
 }
 
 type signedURLHandler struct {
@@ -22,9 +21,9 @@ func NewSignedURL(detectTextService services.DetectTextService) SignedURLHandler
 }
 
 func (h *signedURLHandler) GetByKey(ginCtx *gin.Context) {
-	ctx := context.GetContextWithLogger(ginCtx)
+	//ctx := context.GetContextWithLogger(ginCtx)
 	key := ginCtx.Query("key")
-	signedURL, err := h.detectTextService.GetSignedURL(ctx, key)
+	signedURL, err := h.detectTextService.GetSignedURL(key)
 	if err != nil {
 		_ = ginCtx.AbortWithError(http.StatusBadRequest, err)
 		return
