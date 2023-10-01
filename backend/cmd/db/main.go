@@ -19,7 +19,7 @@ func main() {
 	config := configs.New()
 	logger := loggers.NewLogger()
 	sourcePath := fmt.Sprintf("file://%s", config.Migration.Path)
-	database := db.NewDB(config, logger)
+	database := db.NewDB(config, logger.Logger)
 	sqlDB, err := database.DB()
 	if err != nil {
 		panic(err)
