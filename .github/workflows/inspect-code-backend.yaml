@@ -1,0 +1,23 @@
+name: Inspect codes of backend
+
+on:
+  push:
+    paths:
+      - backend/
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Initial setup
+      - name: checkout
+        uses: actions/checkout@v2
+
+      # build a image
+      - name: build a image
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          cd backend
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
