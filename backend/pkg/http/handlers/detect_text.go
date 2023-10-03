@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/ijufumi/google-vision-sample/pkg/models"
 	"github.com/ijufumi/google-vision-sample/pkg/services"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
+	"go.uber.org/zap"
 	"net/http"
 	"os"
 )
@@ -24,17 +26,20 @@ func NewDetectTextHandler(service services.DetectTextService) DetectTextHandler 
 }
 
 type detectTextHandler struct {
+	baseHandler
 	service services.DetectTextService
 }
 
 func (h *detectTextHandler) Gets(ginCtx *gin.Context) {
-	//ctx := context.GetContextWithLogger(ginCtx)
-	results, err := h.service.GetResults()
-	if err != nil {
-		_ = ginCtx.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	ginCtx.JSON(http.StatusOK, results)
+	_ = h.Process(ginCtx, func(ctx context.Context, logger *zap.Logger) error {
+		results, err := h.service.GetResults(ctx)
+		if err != nil {
+			_ = ginCtx.AbortWithError(http.StatusInternalServerError, err)
+			return nil
+		}
+		ginCtx.JSON(http.StatusOK, results)
+		return nil
+	})
 }
 
 func (h *detectTextHandler) GetByID(ginCtx *gin.Context) {
