@@ -3,7 +3,7 @@ name: Inspect codes of backend
 on:
   push:
     paths:
-      - backend/
+      - 'backend/**'
   workflow_dispatch:
 
 jobs:
