@@ -32,7 +32,7 @@ type detectTextHandler struct {
 
 func (h *detectTextHandler) Gets(ginCtx *gin.Context) {
 	_ = h.Process(ginCtx, func(ctx context.Context, logger *zap.Logger) error {
-		results, err := h.service.GetResults(ctx)
+		results, err := h.service.GetResults(ctx, logger)
 		if err != nil {
 			_ = ginCtx.AbortWithError(http.StatusInternalServerError, err)
 			return nil
@@ -43,56 +43,58 @@ func (h *detectTextHandler) Gets(ginCtx *gin.Context) {
 }
 
 func (h *detectTextHandler) GetByID(ginCtx *gin.Context) {
-	//ctx := context.GetContextWithLogger(ginCtx)
-	id := ginCtx.Param("id")
-	result, err := h.service.GetResultByID(id)
-	if err != nil {
-		_ = ginCtx.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	ginCtx.JSON(http.StatusOK, result)
+	_ = h.Process(ginCtx, func(ctx context.Context, logger *zap.Logger) error {
+		id := ginCtx.Param("id")
+		result, err := h.service.GetResultByID(ctx, logger, id)
+		if err != nil {
+			_ = ginCtx.AbortWithError(http.StatusInternalServerError, err)
+			return nil
+		}
+		ginCtx.JSON(http.StatusOK, result)
+
+		return nil
+	})
 }
 
 func (h *detectTextHandler) Create(ginCtx *gin.Context) {
-	//ctx := context.GetContextWithLogger(ginCtx)
-	inputFile, err := ginCtx.FormFile("file")
-	if err != nil {
-		fmt.Println(err)
-		_ = ginCtx.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-	tempFile, err := utils.NewTempFileWithName(inputFile.Filename)
-	if err != nil {
-		fmt.Println(err)
-		_ = ginCtx.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	defer func() {
-		_ = os.Remove(tempFile.Name())
-	}()
-	err = ginCtx.SaveUploadedFile(inputFile, tempFile.Name())
-	if err != nil {
-		fmt.Println(err)
-		_ = ginCtx.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	err = h.service.DetectTexts(tempFile, inputFile.Header.Get("Content-Type"))
-	if err != nil {
-		fmt.Println(err)
-		_ = ginCtx.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-	ginCtx.JSON(http.StatusOK, models.Status{Status: true})
+	_ = h.Process(ginCtx, func(ctx context.Context, logger *zap.Logger) error {
+		inputFile, err := ginCtx.FormFile("file")
+		if err != nil {
+			fmt.Println(err)
+			return ginCtx.AbortWithError(http.StatusBadRequest, err)
+		}
+		tempFile, err := utils.NewTempFileWithName(inputFile.Filename)
+		if err != nil {
+			fmt.Println(err)
+			return ginCtx.AbortWithError(http.StatusInternalServerError, err)
+		}
+		defer func() {
+			_ = os.Remove(tempFile.Name())
+		}()
+		err = ginCtx.SaveUploadedFile(inputFile, tempFile.Name())
+		if err != nil {
+			fmt.Println(err)
+			return ginCtx.AbortWithError(http.StatusInternalServerError, err)
+		}
+		err = h.service.DetectTexts(ctx, logger, tempFile, inputFile.Header.Get("Content-Type"))
+		if err != nil {
+			fmt.Println(err)
+			return ginCtx.AbortWithError(http.StatusBadRequest, err)
+		}
+		ginCtx.JSON(http.StatusOK, models.Status{Status: true})
+		return nil
+	})
 }
 
 func (h *detectTextHandler) Delete(ginCtx *gin.Context) {
-	//ctx := context.GetContextWithLogger(ginCtx)
-	id := ginCtx.Param("id")
-	err := h.service.DeleteResult(id)
-	if err != nil {
-		fmt.Println(err)
-		_ = ginCtx.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	ginCtx.JSON(http.StatusOK, models.Status{Status: true})
+	_ = h.Process(ginCtx, func(ctx context.Context, logger *zap.Logger) error {
+		id := ginCtx.Param("id")
+		err := h.service.DeleteResult(ctx, logger, id)
+		if err != nil {
+			fmt.Println(err)
+			return ginCtx.AbortWithError(http.StatusInternalServerError, err)
+		}
+		ginCtx.JSON(http.StatusOK, models.Status{Status: true})
+		return nil
+	})
 }
