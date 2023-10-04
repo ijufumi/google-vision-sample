@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/db"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities/enums"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/repositories"
@@ -45,9 +46,10 @@ func (s *detectTextService) GetResults(ctx context.Context, logger *zap.Logger) 
 	var extractionResults []*models.Job
 	var results []*entities.Job
 	err := s.db.Transaction(func(tx *gorm.DB) error {
+		db.SetLogger(tx, logger)
 		_results, err := s.jobRepository.GetAll(tx)
 		if err != nil {
-			//logger.Error(err.Error())
+			logger.Error(err.Error())
 			return err
 		}
 		results = _results
@@ -65,12 +67,16 @@ func (s *detectTextService) GetResults(ctx context.Context, logger *zap.Logger) 
 
 func (s *detectTextService) GetResultByID(ctx context.Context, logger *zap.Logger, id string) (*models.Job, error) {
 	var response *models.Job
-	result, err := s.jobRepository.GetByID(s.db, id)
-	if err != nil {
-		// logger.Error(err.Error())
-		return nil, err
-	}
-	response = s.buildExtractionResultResponse(result)
+	err := s.db.Transaction(func(tx *gorm.DB) error {
+		db.SetLogger(tx, logger)
+		result, err := s.jobRepository.GetByID(tx, id)
+		if err != nil {
+			logger.Error(err.Error())
+			return err
+		}
+		response = s.buildExtractionResultResponse(result)
+		return nil
+	})
 	return response, err
 }
 
