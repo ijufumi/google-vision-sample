@@ -331,8 +331,7 @@ func (s *detectTextService) DeleteResult(ctx context.Context, logger *zap.Logger
 		for _, file := range outputFiles {
 			err = s.storageAPIClient.DeleteFile(file.FileKey)
 			if err != nil {
-				fmt.Println(err)
-				// s.logger.Error(err.Error())
+				logger.Error(err.Error())
 			}
 			err := s.extractedTextRepository.DeleteByOutputFileID(tx, file.ID)
 			if err != nil {
@@ -350,8 +349,7 @@ func (s *detectTextService) DeleteResult(ctx context.Context, logger *zap.Logger
 		for _, file := range inputFiles {
 			err = s.storageAPIClient.DeleteFile(file.FileKey)
 			if err != nil {
-				fmt.Println(err)
-				// s.logger.Error(err.Error())
+				logger.Error(err.Error())
 			}
 		}
 		err = s.inputFileRepository.DeleteByJobID(tx, id)
