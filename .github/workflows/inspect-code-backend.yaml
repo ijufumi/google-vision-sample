@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'backend/**'
+      - '.github/workflows/inspect-code-backend.yaml'
   workflow_dispatch:
 
 jobs:
