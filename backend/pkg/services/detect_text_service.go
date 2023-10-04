@@ -29,7 +29,16 @@ type DetectTextService interface {
 	DeleteResult(ctx context.Context, logger *zap.Logger, id string) error
 }
 
-func NewDetectTextService(storageAPIClient clients.StorageAPIClient, visionAPIClient clients.VisionAPIClient, jobRepository repositories.JobRepository, extractedTextRepository repositories.ExtractedTextRepository, inputFileRepository repositories.InputFileRepository, outputFileRepository repositories.OutputFileRepository, imageConversionService ImageConversionService, db *gorm.DB) DetectTextService {
+func NewDetectTextService(
+	storageAPIClient clients.StorageAPIClient,
+	visionAPIClient clients.VisionAPIClient,
+	jobRepository repositories.JobRepository,
+	extractedTextRepository repositories.ExtractedTextRepository,
+	inputFileRepository repositories.InputFileRepository,
+	outputFileRepository repositories.OutputFileRepository,
+	imageConversionService ImageConversionService,
+	db *gorm.DB,
+) DetectTextService {
 	return &detectTextService{
 		storageAPIClient:        storageAPIClient,
 		visionAPIClient:         visionAPIClient,
@@ -420,7 +429,6 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 }
 
 type detectTextService struct {
-	DetectTextService
 	storageAPIClient        clients.StorageAPIClient
 	visionAPIClient         clients.VisionAPIClient
 	jobRepository           repositories.JobRepository
