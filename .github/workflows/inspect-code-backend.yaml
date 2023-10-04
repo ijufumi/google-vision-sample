@@ -20,4 +20,4 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           cd backend
-          docker build -t $IMAGE_TAG .
+          docker build .
