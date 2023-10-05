@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/ijufumi/google-vision-sample/pkg/models"
 	"github.com/ijufumi/google-vision-sample/pkg/services"
@@ -34,8 +33,8 @@ func (h *detectTextHandler) Gets(ginCtx *gin.Context) {
 	_ = h.Process(ginCtx, func(ctx context.Context, logger *zap.Logger) error {
 		results, err := h.service.GetResults(ctx, logger)
 		if err != nil {
-			_ = ginCtx.AbortWithError(http.StatusInternalServerError, err)
-			return nil
+			logger.Error(err.Error())
+			return ginCtx.AbortWithError(http.StatusInternalServerError, err)
 		}
 		ginCtx.JSON(http.StatusOK, results)
 		return nil
@@ -47,8 +46,8 @@ func (h *detectTextHandler) GetByID(ginCtx *gin.Context) {
 		id := ginCtx.Param("id")
 		result, err := h.service.GetResultByID(ctx, logger, id)
 		if err != nil {
-			_ = ginCtx.AbortWithError(http.StatusInternalServerError, err)
-			return nil
+			logger.Error(err.Error())
+			return ginCtx.AbortWithError(http.StatusInternalServerError, err)
 		}
 		ginCtx.JSON(http.StatusOK, result)
 
@@ -60,25 +59,28 @@ func (h *detectTextHandler) Create(ginCtx *gin.Context) {
 	_ = h.Process(ginCtx, func(ctx context.Context, logger *zap.Logger) error {
 		inputFile, err := ginCtx.FormFile("file")
 		if err != nil {
-			fmt.Println(err)
+			logger.Error(err.Error())
 			return ginCtx.AbortWithError(http.StatusBadRequest, err)
 		}
 		tempFile, err := utils.NewTempFileWithName(inputFile.Filename)
 		if err != nil {
-			fmt.Println(err)
+			logger.Error(err.Error())
 			return ginCtx.AbortWithError(http.StatusInternalServerError, err)
 		}
 		defer func() {
-			_ = os.Remove(tempFile.Name())
+			err := os.Remove(tempFile.Name())
+			if err != nil {
+				logger.Error(err.Error())
+			}
 		}()
 		err = ginCtx.SaveUploadedFile(inputFile, tempFile.Name())
 		if err != nil {
-			fmt.Println(err)
+			logger.Error(err.Error())
 			return ginCtx.AbortWithError(http.StatusInternalServerError, err)
 		}
 		err = h.service.DetectTexts(ctx, logger, tempFile, inputFile.Header.Get("Content-Type"))
 		if err != nil {
-			fmt.Println(err)
+			logger.Error(err.Error())
 			return ginCtx.AbortWithError(http.StatusBadRequest, err)
 		}
 		ginCtx.JSON(http.StatusOK, models.Status{Status: true})
@@ -91,7 +93,7 @@ func (h *detectTextHandler) Delete(ginCtx *gin.Context) {
 		id := ginCtx.Param("id")
 		err := h.service.DeleteResult(ctx, logger, id)
 		if err != nil {
-			fmt.Println(err)
+			logger.Error(err.Error())
 			return ginCtx.AbortWithError(http.StatusInternalServerError, err)
 		}
 		ginCtx.JSON(http.StatusOK, models.Status{Status: true})
