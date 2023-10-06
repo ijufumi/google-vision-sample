@@ -11,7 +11,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/repositories"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/clients"
 	googleModels "github.com/ijufumi/google-vision-sample/pkg/gateways/google/models"
-	"github.com/ijufumi/google-vision-sample/pkg/models/entity"
+	domainEntity "github.com/ijufumi/google-vision-sample/pkg/models/entity"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -22,9 +22,9 @@ import (
 )
 
 type DetectTextService interface {
-	GetResults(ctx context.Context, logger *zap.Logger) ([]*entity.Job, error)
-	GetResultByID(ctx context.Context, logger *zap.Logger, id string) (*entity.Job, error)
-	GetSignedURL(ctx context.Context, logger *zap.Logger, key string) (*entity.SignedURL, error)
+	GetResults(ctx context.Context, logger *zap.Logger) ([]*domainEntity.Job, error)
+	GetResultByID(ctx context.Context, logger *zap.Logger, id string) (*domainEntity.Job, error)
+	GetSignedURL(ctx context.Context, logger *zap.Logger, key string) (*domainEntity.SignedURL, error)
 	DetectTexts(ctx context.Context, logger *zap.Logger, file *os.File, contentType string) error
 	DeleteResult(ctx context.Context, logger *zap.Logger, id string) error
 }
@@ -39,7 +39,7 @@ func NewDetectTextService(
 	imageConversionService ImageConversionService,
 	db *gorm.DB,
 ) DetectTextService {
-	return &detectTextService{
+	return &detectTextServiceImpl{
 		storageAPIClient:        storageAPIClient,
 		visionAPIClient:         visionAPIClient,
 		jobRepository:           jobRepository,
@@ -51,8 +51,8 @@ func NewDetectTextService(
 	}
 }
 
-func (s *detectTextService) GetResults(ctx context.Context, logger *zap.Logger) ([]*entity.Job, error) {
-	var extractionResults []*entity.Job
+func (s *detectTextServiceImpl) GetResults(ctx context.Context, logger *zap.Logger) ([]*domainEntity.Job, error) {
+	var extractionResults []*domainEntity.Job
 	var results []*entities.Job
 	err := s.db.Transaction(func(tx *gorm.DB) error {
 		db.SetLogger(tx, logger)
@@ -74,8 +74,8 @@ func (s *detectTextService) GetResults(ctx context.Context, logger *zap.Logger) 
 	return extractionResults, err
 }
 
-func (s *detectTextService) GetResultByID(ctx context.Context, logger *zap.Logger, id string) (*entity.Job, error) {
-	var response *entity.Job
+func (s *detectTextServiceImpl) GetResultByID(ctx context.Context, logger *zap.Logger, id string) (*domainEntity.Job, error) {
+	var response *domainEntity.Job
 	err := s.db.Transaction(func(tx *gorm.DB) error {
 		db.SetLogger(tx, logger)
 		result, err := s.jobRepository.GetByID(tx, id)
@@ -89,17 +89,17 @@ func (s *detectTextService) GetResultByID(ctx context.Context, logger *zap.Logge
 	return response, err
 }
 
-func (s *detectTextService) GetSignedURL(ctx context.Context, logger *zap.Logger, key string) (*entity.SignedURL, error) {
-	var response *entity.SignedURL
+func (s *detectTextServiceImpl) GetSignedURL(ctx context.Context, logger *zap.Logger, key string) (*domainEntity.SignedURL, error) {
+	var response *domainEntity.SignedURL
 	signedURL, err := s.storageAPIClient.SignedURL(key)
 	if err != nil {
 		return nil, err
 	}
-	response = &entity.SignedURL{URL: signedURL}
+	response = &domainEntity.SignedURL{URL: signedURL}
 	return response, err
 }
 
-func (s *detectTextService) DetectTexts(ctx context.Context, logger *zap.Logger, file *os.File, contentType string) error {
+func (s *detectTextServiceImpl) DetectTexts(ctx context.Context, logger *zap.Logger, file *os.File, contentType string) error {
 	id := utils.NewULID()
 	key := fmt.Sprintf("%s/original/%s", id, filepath.Base(file.Name()))
 
@@ -149,7 +149,7 @@ func (s *detectTextService) DetectTexts(ctx context.Context, logger *zap.Logger,
 	return nil
 }
 
-func (s *detectTextService) processDetectText(id string, inputFile *os.File) error {
+func (s *detectTextServiceImpl) processDetectText(id string, inputFile *os.File) error {
 	contentType := s.imageConversionService.DetectContentType(inputFile.Name())
 	// s.logger.Info(fmt.Sprintf("Content-Type is %s", contentType))
 	switch {
@@ -178,7 +178,7 @@ func (s *detectTextService) processDetectText(id string, inputFile *os.File) err
 	return errors.New(fmt.Sprintf("unsupported content-type : %s", contentType))
 }
 
-func (s *detectTextService) processDetectTextFromImage(jobID string, contentType enums.ContentType, file *os.File, pageNo uint) error {
+func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, contentType enums.ContentType, file *os.File, pageNo uint) error {
 	width, height, err := s.imageConversionService.DetectSize(file.Name())
 	if err != nil {
 		return err
@@ -322,7 +322,7 @@ func (s *detectTextService) processDetectTextFromImage(jobID string, contentType
 	return err
 }
 
-func (s *detectTextService) DeleteResult(ctx context.Context, logger *zap.Logger, id string) error {
+func (s *detectTextServiceImpl) DeleteResult(ctx context.Context, logger *zap.Logger, id string) error {
 	return s.db.Transaction(func(tx *gorm.DB) error {
 		outputFiles, err := s.outputFileRepository.GetByJobID(tx, id)
 		if err != nil {
@@ -370,15 +370,15 @@ func (s *detectTextService) DeleteResult(ctx context.Context, logger *zap.Logger
 	})
 }
 
-func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) *entity.Job {
-	inputFiles := make([]entity.InputFile, 0)
+func (s *detectTextServiceImpl) buildExtractionResultResponse(entity *entities.Job) *domainEntity.Job {
+	inputFiles := make([]domainEntity.InputFile, 0)
 
 	for _, inputFile := range entity.InputFiles {
-		outputFiles := make([]*entity.OutputFile, 0)
+		outputFiles := make([]*domainEntity.OutputFile, 0)
 		for _, outputFile := range inputFile.OutputFiles {
-			extractedTexts := make([]*entity.ExtractedText, 0)
+			extractedTexts := make([]*domainEntity.ExtractedText, 0)
 			for _, extractedText := range outputFile.ExtractedTexts {
-				extractedTexts = append(extractedTexts, &entity.ExtractedText{
+				extractedTexts = append(extractedTexts, &domainEntity.ExtractedText{
 					ID:           extractedText.ID,
 					InputFileID:  extractedText.ID,
 					OutputFileID: extractedText.ID,
@@ -391,7 +391,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 					UpdatedAt:    extractedText.UpdatedAt.Unix(),
 				})
 			}
-			outputFiles = append(outputFiles, &entity.OutputFile{
+			outputFiles = append(outputFiles, &domainEntity.OutputFile{
 				ID:             outputFile.ID,
 				JobID:          outputFile.JobID,
 				InputFileID:    outputFile.InputFileID,
@@ -404,7 +404,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 				ExtractedTexts: extractedTexts,
 			})
 		}
-		inputFiles = append(inputFiles, entity.InputFile{
+		inputFiles = append(inputFiles, domainEntity.InputFile{
 			ID:          inputFile.ID,
 			JobID:       inputFile.JobID,
 			FileKey:     inputFile.FileKey,
@@ -416,7 +416,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 			OutputFiles: outputFiles,
 		})
 	}
-	return &entity.Job{
+	return &domainEntity.Job{
 		ID:         entity.ID,
 		Name:       entity.Name,
 		Status:     entity.Status,
@@ -426,7 +426,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 	}
 }
 
-type detectTextService struct {
+type detectTextServiceImpl struct {
 	storageAPIClient        clients.StorageAPIClient
 	visionAPIClient         clients.VisionAPIClient
 	jobRepository           repositories.JobRepository
