@@ -1,4 +1,4 @@
-package models
+package entity
 
 import "github.com/ijufumi/google-vision-sample/pkg/gateways/database/entities/enums"
 

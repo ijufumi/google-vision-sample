@@ -11,7 +11,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/database/repositories"
 	"github.com/ijufumi/google-vision-sample/pkg/gateways/google/clients"
 	googleModels "github.com/ijufumi/google-vision-sample/pkg/gateways/google/models"
-	"github.com/ijufumi/google-vision-sample/pkg/models"
+	"github.com/ijufumi/google-vision-sample/pkg/models/entity"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -22,9 +22,9 @@ import (
 )
 
 type DetectTextService interface {
-	GetResults(ctx context.Context, logger *zap.Logger) ([]*models.Job, error)
-	GetResultByID(ctx context.Context, logger *zap.Logger, id string) (*models.Job, error)
-	GetSignedURL(ctx context.Context, logger *zap.Logger, key string) (*models.SignedURL, error)
+	GetResults(ctx context.Context, logger *zap.Logger) ([]*entity.Job, error)
+	GetResultByID(ctx context.Context, logger *zap.Logger, id string) (*entity.Job, error)
+	GetSignedURL(ctx context.Context, logger *zap.Logger, key string) (*entity.SignedURL, error)
 	DetectTexts(ctx context.Context, logger *zap.Logger, file *os.File, contentType string) error
 	DeleteResult(ctx context.Context, logger *zap.Logger, id string) error
 }
@@ -51,8 +51,8 @@ func NewDetectTextService(
 	}
 }
 
-func (s *detectTextService) GetResults(ctx context.Context, logger *zap.Logger) ([]*models.Job, error) {
-	var extractionResults []*models.Job
+func (s *detectTextService) GetResults(ctx context.Context, logger *zap.Logger) ([]*entity.Job, error) {
+	var extractionResults []*entity.Job
 	var results []*entities.Job
 	err := s.db.Transaction(func(tx *gorm.DB) error {
 		db.SetLogger(tx, logger)
@@ -74,8 +74,8 @@ func (s *detectTextService) GetResults(ctx context.Context, logger *zap.Logger) 
 	return extractionResults, err
 }
 
-func (s *detectTextService) GetResultByID(ctx context.Context, logger *zap.Logger, id string) (*models.Job, error) {
-	var response *models.Job
+func (s *detectTextService) GetResultByID(ctx context.Context, logger *zap.Logger, id string) (*entity.Job, error) {
+	var response *entity.Job
 	err := s.db.Transaction(func(tx *gorm.DB) error {
 		db.SetLogger(tx, logger)
 		result, err := s.jobRepository.GetByID(tx, id)
@@ -89,13 +89,13 @@ func (s *detectTextService) GetResultByID(ctx context.Context, logger *zap.Logge
 	return response, err
 }
 
-func (s *detectTextService) GetSignedURL(ctx context.Context, logger *zap.Logger, key string) (*models.SignedURL, error) {
-	var response *models.SignedURL
+func (s *detectTextService) GetSignedURL(ctx context.Context, logger *zap.Logger, key string) (*entity.SignedURL, error) {
+	var response *entity.SignedURL
 	signedURL, err := s.storageAPIClient.SignedURL(key)
 	if err != nil {
 		return nil, err
 	}
-	response = &models.SignedURL{URL: signedURL}
+	response = &entity.SignedURL{URL: signedURL}
 	return response, err
 }
 
@@ -370,15 +370,15 @@ func (s *detectTextService) DeleteResult(ctx context.Context, logger *zap.Logger
 	})
 }
 
-func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) *models.Job {
-	inputFiles := make([]models.InputFile, 0)
+func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) *entity.Job {
+	inputFiles := make([]entity.InputFile, 0)
 
 	for _, inputFile := range entity.InputFiles {
-		outputFiles := make([]*models.OutputFile, 0)
+		outputFiles := make([]*entity.OutputFile, 0)
 		for _, outputFile := range inputFile.OutputFiles {
-			extractedTexts := make([]*models.ExtractedText, 0)
+			extractedTexts := make([]*entity.ExtractedText, 0)
 			for _, extractedText := range outputFile.ExtractedTexts {
-				extractedTexts = append(extractedTexts, &models.ExtractedText{
+				extractedTexts = append(extractedTexts, &entity.ExtractedText{
 					ID:           extractedText.ID,
 					InputFileID:  extractedText.ID,
 					OutputFileID: extractedText.ID,
@@ -391,7 +391,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 					UpdatedAt:    extractedText.UpdatedAt.Unix(),
 				})
 			}
-			outputFiles = append(outputFiles, &models.OutputFile{
+			outputFiles = append(outputFiles, &entity.OutputFile{
 				ID:             outputFile.ID,
 				JobID:          outputFile.JobID,
 				InputFileID:    outputFile.InputFileID,
@@ -404,7 +404,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 				ExtractedTexts: extractedTexts,
 			})
 		}
-		inputFiles = append(inputFiles, models.InputFile{
+		inputFiles = append(inputFiles, entity.InputFile{
 			ID:          inputFile.ID,
 			JobID:       inputFile.JobID,
 			FileKey:     inputFile.FileKey,
@@ -416,7 +416,7 @@ func (s *detectTextService) buildExtractionResultResponse(entity *entities.Job) 
 			OutputFiles: outputFiles,
 		})
 	}
-	return &models.Job{
+	return &entity.Job{
 		ID:         entity.ID,
 		Name:       entity.Name,
 		Status:     entity.Status,

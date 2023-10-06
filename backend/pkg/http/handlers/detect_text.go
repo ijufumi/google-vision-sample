@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"github.com/ijufumi/google-vision-sample/pkg/models"
+	"github.com/ijufumi/google-vision-sample/pkg/models/entity"
 	"github.com/ijufumi/google-vision-sample/pkg/services"
 	"github.com/ijufumi/google-vision-sample/pkg/utils"
 	"go.uber.org/zap"
@@ -83,7 +83,7 @@ func (h *detectTextHandler) Create(ginCtx *gin.Context) {
 			logger.Error(err.Error())
 			return ginCtx.AbortWithError(http.StatusBadRequest, err)
 		}
-		ginCtx.JSON(http.StatusOK, models.Status{Status: true})
+		ginCtx.JSON(http.StatusOK, entity.Status{Status: true})
 		return nil
 	})
 }
@@ -96,7 +96,7 @@ func (h *detectTextHandler) Delete(ginCtx *gin.Context) {
 			logger.Error(err.Error())
 			return ginCtx.AbortWithError(http.StatusInternalServerError, err)
 		}
-		ginCtx.JSON(http.StatusOK, models.Status{Status: true})
+		ginCtx.JSON(http.StatusOK, entity.Status{Status: true})
 		return nil
 	})
 }

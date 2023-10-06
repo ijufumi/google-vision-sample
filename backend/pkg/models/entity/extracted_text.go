@@ -1,4 +1,4 @@
-package models
+package entity
 
 type ExtractedText struct {
 	ID           string  `json:"id"`

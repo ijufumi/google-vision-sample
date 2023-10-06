@@ -3,7 +3,7 @@ package handlers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/ijufumi/google-vision-sample/pkg/models"
+	"github.com/ijufumi/google-vision-sample/pkg/models/entity"
 	"github.com/ijufumi/google-vision-sample/pkg/services"
 	"net/http"
 )
@@ -29,5 +29,5 @@ func (h *configsHandler) SetupCORS(ctx *gin.Context) {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, models.Status{Status: true})
+	ctx.JSON(http.StatusOK, entity.Status{Status: true})
 }
