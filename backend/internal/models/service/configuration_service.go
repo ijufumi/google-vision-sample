@@ -1,4 +1,4 @@
-package services
+package service
 
 import "github.com/ijufumi/google-vision-sample/internal/gateways/google/clients"
 

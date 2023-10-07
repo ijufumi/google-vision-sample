@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ijufumi/google-vision-sample/internal/common/utils"
 	"github.com/ijufumi/google-vision-sample/internal/models/entity"
-	"github.com/ijufumi/google-vision-sample/internal/services"
+	"github.com/ijufumi/google-vision-sample/internal/models/service"
 	"go.uber.org/zap"
 	"net/http"
 	"os"
@@ -18,7 +18,7 @@ type DetectTextHandler interface {
 	Delete(ginCtx *gin.Context)
 }
 
-func NewDetectTextHandler(service services.DetectTextService) DetectTextHandler {
+func NewDetectTextHandler(service service.DetectTextService) DetectTextHandler {
 	return &detectTextHandler{
 		service: service,
 	}
@@ -26,7 +26,7 @@ func NewDetectTextHandler(service services.DetectTextService) DetectTextHandler 
 
 type detectTextHandler struct {
 	baseHandler
-	service services.DetectTextService
+	service service.DetectTextService
 }
 
 func (h *detectTextHandler) Gets(ginCtx *gin.Context) {

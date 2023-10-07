@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"github.com/ijufumi/google-vision-sample/internal/services"
+	"github.com/ijufumi/google-vision-sample/internal/models/service"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -14,10 +14,10 @@ type SignedURLHandler interface {
 
 type signedURLHandler struct {
 	baseHandler
-	detectTextService services.DetectTextService
+	detectTextService service.DetectTextService
 }
 
-func NewSignedURL(detectTextService services.DetectTextService) SignedURLHandler {
+func NewSignedURL(detectTextService service.DetectTextService) SignedURLHandler {
 	return &signedURLHandler{
 		detectTextService: detectTextService,
 	}

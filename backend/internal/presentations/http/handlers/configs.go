@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/ijufumi/google-vision-sample/internal/models/entity"
-	"github.com/ijufumi/google-vision-sample/internal/services"
+	"github.com/ijufumi/google-vision-sample/internal/models/service"
 	"net/http"
 )
 
@@ -13,10 +13,10 @@ type ConfigsHandler interface {
 }
 
 type configsHandler struct {
-	configurationService services.ConfigurationService
+	configurationService service.ConfigurationService
 }
 
-func NewConfigsHandler(configurationService services.ConfigurationService) ConfigsHandler {
+func NewConfigsHandler(configurationService service.ConfigurationService) ConfigsHandler {
 	return &configsHandler{
 		configurationService: configurationService,
 	}
