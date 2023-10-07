@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"github.com/ijufumi/google-vision-sample/internal/gateways/database/entities"
+	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )

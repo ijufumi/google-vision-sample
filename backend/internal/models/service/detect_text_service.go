@@ -6,12 +6,12 @@ import (
 	"errors"
 	"fmt"
 	utils2 "github.com/ijufumi/google-vision-sample/internal/common/utils"
-	"github.com/ijufumi/google-vision-sample/internal/gateways/database/db"
-	"github.com/ijufumi/google-vision-sample/internal/gateways/database/entities"
-	"github.com/ijufumi/google-vision-sample/internal/gateways/database/entities/enums"
-	"github.com/ijufumi/google-vision-sample/internal/gateways/database/repositories"
-	"github.com/ijufumi/google-vision-sample/internal/gateways/google/clients"
-	googleModels "github.com/ijufumi/google-vision-sample/internal/gateways/google/models"
+	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/db"
+	entities2 "github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities"
+	enums2 "github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities/enums"
+	repositories2 "github.com/ijufumi/google-vision-sample/internal/infrastructures/database/repositories"
+	clients2 "github.com/ijufumi/google-vision-sample/internal/infrastructures/google/clients"
+	googleModels "github.com/ijufumi/google-vision-sample/internal/infrastructures/google/models"
 	domainEntity "github.com/ijufumi/google-vision-sample/internal/models/entity"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -30,12 +30,12 @@ type DetectTextService interface {
 }
 
 func NewDetectTextService(
-	storageAPIClient clients.StorageAPIClient,
-	visionAPIClient clients.VisionAPIClient,
-	jobRepository repositories.JobRepository,
-	extractedTextRepository repositories.ExtractedTextRepository,
-	inputFileRepository repositories.InputFileRepository,
-	outputFileRepository repositories.OutputFileRepository,
+	storageAPIClient clients2.StorageAPIClient,
+	visionAPIClient clients2.VisionAPIClient,
+	jobRepository repositories2.JobRepository,
+	extractedTextRepository repositories2.ExtractedTextRepository,
+	inputFileRepository repositories2.InputFileRepository,
+	outputFileRepository repositories2.OutputFileRepository,
 	imageConversionService ImageConversionService,
 	db *gorm.DB,
 ) DetectTextService {
@@ -53,7 +53,7 @@ func NewDetectTextService(
 
 func (s *detectTextServiceImpl) GetResults(ctx context.Context, logger *zap.Logger) ([]*domainEntity.Job, error) {
 	var extractionResults []*domainEntity.Job
-	var results []*entities.Job
+	var results []*entities2.Job
 	err := s.db.Transaction(func(tx *gorm.DB) error {
 		db.SetLogger(tx, logger)
 		_results, err := s.jobRepository.GetAll(tx)
@@ -103,7 +103,7 @@ func (s *detectTextServiceImpl) DetectTexts(ctx context.Context, logger *zap.Log
 	id := utils2.NewULID()
 	key := fmt.Sprintf("%s/original/%s", id, filepath.Base(file.Name()))
 
-	err := s.storageAPIClient.UploadFile(key, file, enums.ConvertToContentType(contentType))
+	err := s.storageAPIClient.UploadFile(key, file, enums2.ConvertToContentType(contentType))
 	if err != nil {
 		return err
 	}
@@ -111,11 +111,11 @@ func (s *detectTextServiceImpl) DetectTexts(ctx context.Context, logger *zap.Log
 	splitFileName := strings.Split(file.Name(), "/")
 	fileName := splitFileName[len(splitFileName)-1]
 
-	job := &entities.Job{
+	job := &entities2.Job{
 		ID:              id,
 		Name:            fileName,
 		OriginalFileKey: key,
-		Status:          enums.JobStatus_Runing,
+		Status:          enums2.JobStatus_Runing,
 	}
 	err = s.jobRepository.Create(s.db, job)
 	if err != nil {
@@ -139,9 +139,9 @@ func (s *detectTextServiceImpl) DetectTexts(ctx context.Context, logger *zap.Log
 		err = s.processDetectText(id, tempFileForWork)
 		if err != nil {
 			// s.logger.Error(fmt.Sprintf("%v was occurred.", err))
-			job.Status = enums.JobStatus_Failed
+			job.Status = enums2.JobStatus_Failed
 		} else {
-			job.Status = enums.JobStatus_Succeeded
+			job.Status = enums2.JobStatus_Succeeded
 		}
 		_ = s.jobRepository.Update(s.db, job)
 		_ = os.Remove(tempFileForWork.Name())
@@ -153,7 +153,7 @@ func (s *detectTextServiceImpl) processDetectText(id string, inputFile *os.File)
 	contentType := s.imageConversionService.DetectContentType(inputFile.Name())
 	// s.logger.Info(fmt.Sprintf("Content-Type is %s", contentType))
 	switch {
-	case contentType == enums.ContentType_Pdf:
+	case contentType == enums2.ContentType_Pdf:
 		imageFiles, err := s.imageConversionService.ConvertPdfToImages(inputFile.Name())
 		if err != nil {
 			return err
@@ -163,7 +163,7 @@ func (s *detectTextServiceImpl) processDetectText(id string, inputFile *os.File)
 			if inputFile == nil {
 				continue
 			}
-			err := s.processDetectTextFromImage(id, enums.ContentType_Png, inputFile, uint(idx+1))
+			err := s.processDetectTextFromImage(id, enums2.ContentType_Png, inputFile, uint(idx+1))
 			if err != nil {
 				errs = append(errs, err)
 			}
@@ -172,13 +172,13 @@ func (s *detectTextServiceImpl) processDetectText(id string, inputFile *os.File)
 			return errors.Join(errs...)
 		}
 		return nil
-	case enums.IsImage(contentType):
+	case enums2.IsImage(contentType):
 		return s.processDetectTextFromImage(id, contentType, inputFile, 1)
 	}
 	return errors.New(fmt.Sprintf("unsupported content-type : %s", contentType))
 }
 
-func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, contentType enums.ContentType, file *os.File, pageNo uint) error {
+func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, contentType enums2.ContentType, file *os.File, pageNo uint) error {
 	width, height, err := s.imageConversionService.DetectSize(file.Name())
 	if err != nil {
 		return err
@@ -194,7 +194,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, content
 	}
 
 	fileInfo, _ := file.Stat()
-	err = s.inputFileRepository.Create(s.db, &entities.InputFile{
+	err = s.inputFileRepository.Create(s.db, &entities2.InputFile{
 		ID:          inputFileID,
 		JobID:       jobID,
 		PageNo:      pageNo,
@@ -204,7 +204,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, content
 		Size:        uint(fileInfo.Size()),
 		Width:       width,
 		Height:      height,
-		Status:      enums.InputFileStatus_Runing,
+		Status:      enums2.InputFileStatus_Runing,
 	})
 	if err != nil {
 		return err
@@ -238,7 +238,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, content
 		outputFileKey := queryFiles[0]
 		splitOutputFileKey := strings.Split(outputFileKey, "/")
 		outputFileID := utils2.NewULID()
-		err = s.outputFileRepository.Create(tx, &entities.OutputFile{
+		err = s.outputFileRepository.Create(tx, &entities2.OutputFile{
 			ID:          outputFileID,
 			JobID:       jobID,
 			InputFileID: inputFileID,
@@ -270,7 +270,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, content
 			return errors.New(response.Error.String())
 		}
 
-		extractedTexts := make([]*entities.ExtractedText, 0)
+		extractedTexts := make([]*entities2.ExtractedText, 0)
 		orientation, err := s.imageConversionService.DetectOrientation(file.Name())
 		if err != nil {
 			return err
@@ -295,7 +295,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, content
 					}
 					bottom, top := utils2.MaxMinInArray(yArray...)
 					right, left := utils2.MaxMinInArray(xArray...)
-					extractedText := &entities.ExtractedText{
+					extractedText := &entities2.ExtractedText{
 						ID:           utils2.NewULID(),
 						JobID:        jobID,
 						InputFileID:  inputFileID,
@@ -313,9 +313,9 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, content
 		}
 		return s.extractedTextRepository.Create(tx, extractedTexts...)
 	})
-	status := enums.InputFileStatus_Succeeded
+	status := enums2.InputFileStatus_Succeeded
 	if err != nil {
-		status = enums.InputFileStatus_Failed
+		status = enums2.InputFileStatus_Failed
 	}
 	inputFile.Status = status
 	_ = s.inputFileRepository.Update(s.db, inputFile)
@@ -370,7 +370,7 @@ func (s *detectTextServiceImpl) DeleteResult(ctx context.Context, logger *zap.Lo
 	})
 }
 
-func (s *detectTextServiceImpl) buildExtractionResultResponse(entity *entities.Job) *domainEntity.Job {
+func (s *detectTextServiceImpl) buildExtractionResultResponse(entity *entities2.Job) *domainEntity.Job {
 	inputFiles := make([]domainEntity.InputFile, 0)
 
 	for _, inputFile := range entity.InputFiles {
@@ -427,12 +427,12 @@ func (s *detectTextServiceImpl) buildExtractionResultResponse(entity *entities.J
 }
 
 type detectTextServiceImpl struct {
-	storageAPIClient        clients.StorageAPIClient
-	visionAPIClient         clients.VisionAPIClient
-	jobRepository           repositories.JobRepository
-	extractedTextRepository repositories.ExtractedTextRepository
-	inputFileRepository     repositories.InputFileRepository
-	outputFileRepository    repositories.OutputFileRepository
+	storageAPIClient        clients2.StorageAPIClient
+	visionAPIClient         clients2.VisionAPIClient
+	jobRepository           repositories2.JobRepository
+	extractedTextRepository repositories2.ExtractedTextRepository
+	inputFileRepository     repositories2.InputFileRepository
+	outputFileRepository    repositories2.OutputFileRepository
 	imageConversionService  ImageConversionService
 	db                      *gorm.DB
 }

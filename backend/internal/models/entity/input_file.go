@@ -1,6 +1,8 @@
 package entity
 
-import "github.com/ijufumi/google-vision-sample/internal/gateways/database/entities/enums"
+import (
+	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities/enums"
+)
 
 type InputFile struct {
 	ID          string            `json:"id"`

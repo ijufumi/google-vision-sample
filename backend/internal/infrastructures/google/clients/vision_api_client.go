@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/ijufumi/google-vision-sample/internal/common/configs"
-	"github.com/ijufumi/google-vision-sample/internal/gateways/google/options"
+	"github.com/ijufumi/google-vision-sample/internal/infrastructures/google/options"
 	"github.com/pkg/errors"
 	"time"
 )

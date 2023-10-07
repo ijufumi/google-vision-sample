@@ -1,6 +1,8 @@
 package service
 
-import "github.com/ijufumi/google-vision-sample/internal/gateways/google/clients"
+import (
+	"github.com/ijufumi/google-vision-sample/internal/infrastructures/google/clients"
+)
 
 type ConfigurationService interface {
 	SetupCORS() error

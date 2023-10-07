@@ -7,7 +7,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/ijufumi/google-vision-sample/internal/common/configs"
 	"github.com/ijufumi/google-vision-sample/internal/common/loggers"
-	"github.com/ijufumi/google-vision-sample/internal/gateways/database/db"
+	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/db"
 	"github.com/spf13/cobra"
 	"log"
 	"os"

@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"github.com/ijufumi/google-vision-sample/internal/gateways/database/entities/enums"
+	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities/enums"
 	"gorm.io/gorm"
 )
 
