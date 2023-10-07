@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	contextManager "github.com/ijufumi/google-vision-sample/internal/http/context"
+	contextManager "github.com/ijufumi/google-vision-sample/internal/presentations/http/context"
 	"go.uber.org/zap"
 )
 

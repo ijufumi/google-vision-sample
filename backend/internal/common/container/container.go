@@ -6,7 +6,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/internal/gateways/database/db"
 	"github.com/ijufumi/google-vision-sample/internal/gateways/database/repositories"
 	"github.com/ijufumi/google-vision-sample/internal/gateways/google/clients"
-	"github.com/ijufumi/google-vision-sample/internal/http/handlers"
+	handlers2 "github.com/ijufumi/google-vision-sample/internal/presentations/http/handlers"
 	"github.com/ijufumi/google-vision-sample/internal/services"
 	"go.uber.org/dig"
 )
@@ -44,10 +44,10 @@ func (c *container) provide() {
 	// config
 	_ = c.container.Provide(configs.New)
 	// handlers
-	_ = c.container.Provide(handlers.NewHealthHandler)
-	_ = c.container.Provide(handlers.NewDetectTextHandler)
-	_ = c.container.Provide(handlers.NewSignedURL)
-	_ = c.container.Provide(handlers.NewConfigsHandler)
+	_ = c.container.Provide(handlers2.NewHealthHandler)
+	_ = c.container.Provide(handlers2.NewDetectTextHandler)
+	_ = c.container.Provide(handlers2.NewSignedURL)
+	_ = c.container.Provide(handlers2.NewConfigsHandler)
 	// services
 	_ = c.container.Provide(services.NewDetectTextService)
 	_ = c.container.Provide(services.NewConfigurationService)
