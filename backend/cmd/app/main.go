@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/ijufumi/google-vision-sample/pkg/container"
-	"github.com/ijufumi/google-vision-sample/pkg/http/router"
+	"github.com/ijufumi/google-vision-sample/internal/container"
+	"github.com/ijufumi/google-vision-sample/internal/http/router"
 )
 
 func RunApp() error {
