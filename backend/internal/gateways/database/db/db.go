@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"github.com/ijufumi/google-vision-sample/internal/configs"
+	"github.com/ijufumi/google-vision-sample/internal/common/configs"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

@@ -1,12 +1,12 @@
 package container
 
 import (
-	"github.com/ijufumi/google-vision-sample/internal/configs"
+	"github.com/ijufumi/google-vision-sample/internal/common/configs"
+	"github.com/ijufumi/google-vision-sample/internal/common/loggers"
 	"github.com/ijufumi/google-vision-sample/internal/gateways/database/db"
 	"github.com/ijufumi/google-vision-sample/internal/gateways/database/repositories"
 	"github.com/ijufumi/google-vision-sample/internal/gateways/google/clients"
 	"github.com/ijufumi/google-vision-sample/internal/http/handlers"
-	"github.com/ijufumi/google-vision-sample/internal/loggers"
 	"github.com/ijufumi/google-vision-sample/internal/services"
 	"go.uber.org/dig"
 )

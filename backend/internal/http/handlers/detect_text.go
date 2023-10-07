@@ -3,9 +3,9 @@ package handlers
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/ijufumi/google-vision-sample/internal/common/utils"
 	"github.com/ijufumi/google-vision-sample/internal/models/entity"
 	"github.com/ijufumi/google-vision-sample/internal/services"
-	"github.com/ijufumi/google-vision-sample/internal/utils"
 	"go.uber.org/zap"
 	"net/http"
 	"os"

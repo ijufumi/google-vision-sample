@@ -1,7 +1,7 @@
 package options
 
 import (
-	"github.com/ijufumi/google-vision-sample/internal/configs"
+	"github.com/ijufumi/google-vision-sample/internal/common/configs"
 	"golang.org/x/oauth2/google"
 	"golang.org/x/oauth2/jwt"
 	"io"

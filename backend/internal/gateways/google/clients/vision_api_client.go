@@ -5,7 +5,7 @@ import (
 	"cloud.google.com/go/vision/v2/apiv1/visionpb"
 	"context"
 	"fmt"
-	"github.com/ijufumi/google-vision-sample/internal/configs"
+	"github.com/ijufumi/google-vision-sample/internal/common/configs"
 	"github.com/ijufumi/google-vision-sample/internal/gateways/google/options"
 	"github.com/pkg/errors"
 	"time"

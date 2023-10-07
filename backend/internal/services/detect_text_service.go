@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	utils2 "github.com/ijufumi/google-vision-sample/internal/common/utils"
 	"github.com/ijufumi/google-vision-sample/internal/gateways/database/db"
 	"github.com/ijufumi/google-vision-sample/internal/gateways/database/entities"
 	"github.com/ijufumi/google-vision-sample/internal/gateways/database/entities/enums"
@@ -12,7 +13,6 @@ import (
 	"github.com/ijufumi/google-vision-sample/internal/gateways/google/clients"
 	googleModels "github.com/ijufumi/google-vision-sample/internal/gateways/google/models"
 	domainEntity "github.com/ijufumi/google-vision-sample/internal/models/entity"
-	"github.com/ijufumi/google-vision-sample/internal/utils"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"io"
@@ -100,7 +100,7 @@ func (s *detectTextServiceImpl) GetSignedURL(ctx context.Context, logger *zap.Lo
 }
 
 func (s *detectTextServiceImpl) DetectTexts(ctx context.Context, logger *zap.Logger, file *os.File, contentType string) error {
-	id := utils.NewULID()
+	id := utils2.NewULID()
 	key := fmt.Sprintf("%s/original/%s", id, filepath.Base(file.Name()))
 
 	err := s.storageAPIClient.UploadFile(key, file, enums.ConvertToContentType(contentType))
@@ -122,11 +122,11 @@ func (s *detectTextServiceImpl) DetectTexts(ctx context.Context, logger *zap.Log
 		return err
 	}
 
-	tempFileForWork, err := utils.NewTempFileWithName(fileName)
+	tempFileForWork, err := utils2.NewTempFileWithName(fileName)
 	if err != nil {
 		return err
 	}
-	err = utils.Copy(file, tempFileForWork)
+	err = utils2.Copy(file, tempFileForWork)
 	if err != nil {
 		return err
 	}
@@ -183,7 +183,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, content
 	if err != nil {
 		return err
 	}
-	inputFileID := utils.NewULID()
+	inputFileID := utils2.NewULID()
 
 	fileName := filepath.Base(file.Name())
 	key := fmt.Sprintf("%s/%s/%s", jobID, inputFileID, filepath.Base(file.Name()))
@@ -237,7 +237,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, content
 		fileStat, _ := outputFile.Stat()
 		outputFileKey := queryFiles[0]
 		splitOutputFileKey := strings.Split(outputFileKey, "/")
-		outputFileID := utils.NewULID()
+		outputFileID := utils2.NewULID()
 		err = s.outputFileRepository.Create(tx, &entities.OutputFile{
 			ID:          outputFileID,
 			JobID:       jobID,
@@ -293,10 +293,10 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, content
 						xArray = append(xArray, point[0])
 						yArray = append(yArray, point[1])
 					}
-					bottom, top := utils.MaxMinInArray(yArray...)
-					right, left := utils.MaxMinInArray(xArray...)
+					bottom, top := utils2.MaxMinInArray(yArray...)
+					right, left := utils2.MaxMinInArray(xArray...)
 					extractedText := &entities.ExtractedText{
-						ID:           utils.NewULID(),
+						ID:           utils2.NewULID(),
 						JobID:        jobID,
 						InputFileID:  inputFileID,
 						OutputFileID: outputFileID,

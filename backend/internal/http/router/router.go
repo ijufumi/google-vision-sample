@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/ijufumi/google-vision-sample/internal/container"
+	"github.com/ijufumi/google-vision-sample/internal/common/container"
 	"github.com/ijufumi/google-vision-sample/internal/http/handlers"
 	"github.com/ijufumi/google-vision-sample/internal/http/middlewares"
 )
