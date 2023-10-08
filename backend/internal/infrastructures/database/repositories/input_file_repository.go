@@ -2,19 +2,12 @@ package repositories
 
 import (
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities"
+	repositoryInterface "github.com/ijufumi/google-vision-sample/internal/usecases/repositories"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
 
-type InputFileRepository interface {
-	GetByID(db *gorm.DB, iD string) (*entities.InputFile, error)
-	GetByJobID(db *gorm.DB, jobID string) ([]*entities.InputFile, error)
-	Create(db *gorm.DB, entity ...*entities.InputFile) error
-	Update(db *gorm.DB, entity *entities.InputFile) error
-	DeleteByJobID(db *gorm.DB, jobID string) error
-}
-
-func NewInputFileRepository() InputFileRepository {
+func NewInputFileRepository() repositoryInterface.InputFileRepository {
 	return &inputFileRepository{}
 }
 
