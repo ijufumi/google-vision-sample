@@ -22,7 +22,7 @@ func Invoke[T any](container Container) T {
 		result = _result
 	})
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Panic(err.Error())
 	}
 
 	return result
