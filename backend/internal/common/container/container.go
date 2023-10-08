@@ -4,8 +4,8 @@ import (
 	"github.com/ijufumi/google-vision-sample/internal/common/configs"
 	"github.com/ijufumi/google-vision-sample/internal/common/loggers"
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/db"
-	repositories2 "github.com/ijufumi/google-vision-sample/internal/infrastructures/database/repositories"
-	clients2 "github.com/ijufumi/google-vision-sample/internal/infrastructures/google/clients"
+	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/repositories"
+	"github.com/ijufumi/google-vision-sample/internal/infrastructures/google/clients"
 	"github.com/ijufumi/google-vision-sample/internal/models/service"
 	"github.com/ijufumi/google-vision-sample/internal/presentations/handlers"
 	"go.uber.org/dig"
@@ -54,13 +54,13 @@ func (c *container) provide() {
 	_ = c.container.Provide(service.NewImageConversionService)
 	// database
 	_ = c.container.Provide(db.NewDB)
-	_ = c.container.Provide(repositories2.NewJobRepository)
-	_ = c.container.Provide(repositories2.NewExtractedTextRepository)
-	_ = c.container.Provide(repositories2.NewInputFileRepository)
-	_ = c.container.Provide(repositories2.NewOutputFileRepository)
+	_ = c.container.Provide(repositories.NewJobRepository)
+	_ = c.container.Provide(repositories.NewExtractedTextRepository)
+	_ = c.container.Provide(repositories.NewInputFileRepository)
+	_ = c.container.Provide(repositories.NewOutputFileRepository)
 	// google
-	_ = c.container.Provide(clients2.NewStorageAPIClient)
-	_ = c.container.Provide(clients2.NewVisionAPIClient)
+	_ = c.container.Provide(clients.NewStorageAPIClient)
+	_ = c.container.Provide(clients.NewVisionAPIClient)
 }
 
 func (c *container) Container() *dig.Container {
