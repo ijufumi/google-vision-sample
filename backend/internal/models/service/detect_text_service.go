@@ -134,11 +134,11 @@ func (s *detectTextServiceImpl) DetectTexts(ctx context.Context, logger *zap.Log
 	go func() {
 		job, err := s.jobRepository.GetByID(s.db, id)
 		if err != nil {
-			// s.logger.Error(fmt.Sprintf("%v was occurred.", err))
+			logger.Error(fmt.Sprintf("%v was occurred.", err))
 		}
-		err = s.processDetectText(id, tempFileForWork)
+		err = s.processDetectText(logger, id, tempFileForWork)
 		if err != nil {
-			// s.logger.Error(fmt.Sprintf("%v was occurred.", err))
+			logger.Error(fmt.Sprintf("%v was occurred.", err))
 			job.Status = enums.JobStatus_Failed
 		} else {
 			job.Status = enums.JobStatus_Succeeded
@@ -149,7 +149,7 @@ func (s *detectTextServiceImpl) DetectTexts(ctx context.Context, logger *zap.Log
 	return nil
 }
 
-func (s *detectTextServiceImpl) processDetectText(id string, inputFile *os.File) error {
+func (s *detectTextServiceImpl) processDetectText(logger *zap.Logger, id string, inputFile *os.File) error {
 	contentType := s.imageConversionService.DetectContentType(inputFile.Name())
 	// s.logger.Info(fmt.Sprintf("Content-Type is %s", contentType))
 	switch {
@@ -163,7 +163,7 @@ func (s *detectTextServiceImpl) processDetectText(id string, inputFile *os.File)
 			if inputFile == nil {
 				continue
 			}
-			err := s.processDetectTextFromImage(id, enums.ContentType_Png, inputFile, uint(idx+1))
+			err := s.processDetectTextFromImage(logger, id, enums.ContentType_Png, inputFile, uint(idx+1))
 			if err != nil {
 				errs = append(errs, err)
 			}
@@ -173,12 +173,12 @@ func (s *detectTextServiceImpl) processDetectText(id string, inputFile *os.File)
 		}
 		return nil
 	case enums.IsImage(contentType):
-		return s.processDetectTextFromImage(id, contentType, inputFile, 1)
+		return s.processDetectTextFromImage(logger, id, contentType, inputFile, 1)
 	}
 	return errors.New(fmt.Sprintf("unsupported content-type : %s", contentType))
 }
 
-func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, contentType enums.ContentType, file *os.File, pageNo uint) error {
+func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, jobID string, contentType enums.ContentType, file *os.File, pageNo uint) error {
 	width, height, err := s.imageConversionService.DetectSize(file.Name())
 	if err != nil {
 		return err
@@ -207,30 +207,37 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, content
 		Status:      enums.InputFileStatus_Runing,
 	})
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 	inputFile, err := s.inputFileRepository.GetByID(s.db, inputFileID)
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 
 	err = s.db.Transaction(func(tx *gorm.DB) error {
 		outputKey, err := s.visionAPIClient.DetectText(key)
 		if err != nil {
+			logger.Error(err.Error())
 			return err
 		}
 
 		queryFiles, err := s.storageAPIClient.QueryFiles(outputKey)
 		if err != nil {
+			logger.Error(err.Error())
 			return err
 		}
 
 		if len(queryFiles) == 0 {
-			return errors.New("output does not exist")
+			err = errors.New("output does not exist")
+			logger.Error(err.Error())
+			return err
 		}
 
 		outputFile, err := s.storageAPIClient.DownloadFile(queryFiles[0])
 		if err != nil {
+			logger.Error(err.Error())
 			return err
 		}
 
@@ -250,29 +257,36 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, content
 			Height:      0,
 		})
 		if err != nil {
+			logger.Error(err.Error())
 			return err
 		}
 
 		bytes, err := io.ReadAll(outputFile)
 		if err != nil {
+			logger.Error(err.Error())
 			return err
 		}
 
 		var detectResponse googleModels.DetectTextResponses
 		if err = json.Unmarshal(bytes, &detectResponse); err != nil {
+			logger.Error(err.Error())
 			return err
 		}
 		if len(detectResponse.Responses) == 0 {
-			return errors.New("response notfound")
+			err = errors.New("response notfound")
+			logger.Error(err.Error())
+			return err
 		}
 		response := detectResponse.Responses[0]
 		if response.Error != nil {
-			return errors.New(response.Error.String())
+			err = errors.New(response.Error.String())
+			return err
 		}
 
 		extractedTexts := make([]*entities.ExtractedText, 0)
 		orientation, err := s.imageConversionService.DetectOrientation(file.Name())
 		if err != nil {
+			logger.Error(err.Error())
 			return err
 		}
 		for _, page := range response.FullTextAnnotation.Pages {
@@ -315,6 +329,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(jobID string, content
 	})
 	status := enums.InputFileStatus_Succeeded
 	if err != nil {
+		logger.Error(err.Error())
 		status = enums.InputFileStatus_Failed
 	}
 	inputFile.Status = status
@@ -354,17 +369,18 @@ func (s *detectTextServiceImpl) DeleteResult(ctx context.Context, logger *zap.Lo
 		}
 		err = s.inputFileRepository.DeleteByJobID(tx, id)
 		if err != nil {
+			logger.Error(err.Error())
 			return err
 		}
 
 		job, err := s.jobRepository.GetByID(tx, id)
 		if err != nil {
+			logger.Error(err.Error())
 			return err
 		}
 		err = s.storageAPIClient.DeleteFile(job.OriginalFileKey)
 		if err != nil {
-			fmt.Println(err)
-			// s.logger.Error(err.Error())
+			logger.Error(err.Error())
 		}
 		return s.jobRepository.Delete(tx, id)
 	})
