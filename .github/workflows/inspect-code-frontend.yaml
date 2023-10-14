@@ -1,0 +1,28 @@
+name: Inspect codes of frontend
+
+on:
+  push:
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/inspect-code-frontend.yaml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Initial setup
+      - name: checkout
+        uses: actions/checkout@v2
+
+      # build a image
+      - name: Set Node.js 20.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+
+      - name: Run install
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install
+          dir: 'frontend'
