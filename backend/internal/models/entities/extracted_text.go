@@ -1,4 +1,4 @@
-package entity
+package entities
 
 type ExtractedText struct {
 	ID           string  `json:"id"`

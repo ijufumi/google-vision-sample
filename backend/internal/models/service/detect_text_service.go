@@ -7,11 +7,10 @@ import (
 	"fmt"
 	"github.com/ijufumi/google-vision-sample/internal/common/utils"
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/db"
-	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities"
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities/enums"
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/google/clients"
 	googleModels "github.com/ijufumi/google-vision-sample/internal/infrastructures/google/models"
-	domainEntity "github.com/ijufumi/google-vision-sample/internal/models/entity"
+	"github.com/ijufumi/google-vision-sample/internal/models/entities"
 	"github.com/ijufumi/google-vision-sample/internal/usecases/repositories"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -22,9 +21,9 @@ import (
 )
 
 type DetectTextService interface {
-	GetResults(ctx context.Context, logger *zap.Logger) ([]*domainEntity.Job, error)
-	GetResultByID(ctx context.Context, logger *zap.Logger, id string) (*domainEntity.Job, error)
-	GetSignedURL(ctx context.Context, logger *zap.Logger, key string) (*domainEntity.SignedURL, error)
+	GetResults(ctx context.Context, logger *zap.Logger) ([]*entities.Job, error)
+	GetResultByID(ctx context.Context, logger *zap.Logger, id string) (*entities.Job, error)
+	GetSignedURL(ctx context.Context, logger *zap.Logger, key string) (*entities.SignedURL, error)
 	DetectTexts(ctx context.Context, logger *zap.Logger, file *os.File, contentType string) error
 	DeleteResult(ctx context.Context, logger *zap.Logger, id string) error
 }
@@ -51,8 +50,8 @@ func NewDetectTextService(
 	}
 }
 
-func (s *detectTextServiceImpl) GetResults(ctx context.Context, logger *zap.Logger) ([]*domainEntity.Job, error) {
-	var extractionResults []*domainEntity.Job
+func (s *detectTextServiceImpl) GetResults(ctx context.Context, logger *zap.Logger) ([]*entities.Job, error) {
+	var extractionResults []*entities.Job
 	var results []*entities.Job
 	err := s.db.Transaction(func(tx *gorm.DB) error {
 		db.SetLogger(tx, logger)
@@ -74,8 +73,8 @@ func (s *detectTextServiceImpl) GetResults(ctx context.Context, logger *zap.Logg
 	return extractionResults, err
 }
 
-func (s *detectTextServiceImpl) GetResultByID(ctx context.Context, logger *zap.Logger, id string) (*domainEntity.Job, error) {
-	var response *domainEntity.Job
+func (s *detectTextServiceImpl) GetResultByID(ctx context.Context, logger *zap.Logger, id string) (*entities.Job, error) {
+	var response *entities.Job
 	err := s.db.Transaction(func(tx *gorm.DB) error {
 		db.SetLogger(tx, logger)
 		result, err := s.jobRepository.GetByID(tx, id)
@@ -89,13 +88,13 @@ func (s *detectTextServiceImpl) GetResultByID(ctx context.Context, logger *zap.L
 	return response, err
 }
 
-func (s *detectTextServiceImpl) GetSignedURL(ctx context.Context, logger *zap.Logger, key string) (*domainEntity.SignedURL, error) {
-	var response *domainEntity.SignedURL
+func (s *detectTextServiceImpl) GetSignedURL(ctx context.Context, logger *zap.Logger, key string) (*entities.SignedURL, error) {
+	var response *entities.SignedURL
 	signedURL, err := s.storageAPIClient.SignedURL(key)
 	if err != nil {
 		return nil, err
 	}
-	response = &domainEntity.SignedURL{URL: signedURL}
+	response = &entities.SignedURL{URL: signedURL}
 	return response, err
 }
 

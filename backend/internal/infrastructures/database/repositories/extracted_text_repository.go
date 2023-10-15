@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities"
+	models "github.com/ijufumi/google-vision-sample/internal/models/entities"
 	repositoryInterface "github.com/ijufumi/google-vision-sample/internal/usecases/repositories"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
@@ -14,15 +15,16 @@ func NewExtractedTextRepository() repositoryInterface.ExtractedTextRepository {
 type extractedTextRepository struct {
 }
 
-func (r *extractedTextRepository) GetByID(db *gorm.DB, id string) (*entities.ExtractedText, error) {
+func (r *extractedTextRepository) GetByID(db *gorm.DB, id string) (*models.ExtractedText, error) {
 	var result *entities.ExtractedText
 	if err := db.Where("id = ?", id).Find(result).Error; err != nil {
 		return nil, errors.Wrap(err, "ExtractedTextRepository#GetByJobID")
 	}
-	return result, nil
+	entity := &models.ExtractedText{}
+	return entity, nil
 }
 
-func (r *extractedTextRepository) Create(db *gorm.DB, entity ...*entities.ExtractedText) error {
+func (r *extractedTextRepository) Create(db *gorm.DB, entity ...*models.ExtractedText) error {
 	if len(entity) == 0 {
 		return nil
 	}

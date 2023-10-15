@@ -1,4 +1,4 @@
-package entity
+package entities
 
 import (
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities/enums"
