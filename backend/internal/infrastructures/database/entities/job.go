@@ -12,7 +12,7 @@ type Job struct {
 	Name            string
 	OriginalFileKey string
 	Status          enums.JobStatus
-	InputFiles      []InputFile
+	InputFiles      []*InputFile
 }
 
 func (e *Job) ToModel() *models.Job {
@@ -36,4 +36,17 @@ func (e *Jobs) ToModel() models.Jobs {
 	}
 
 	return jobs
+}
+
+func FromJobModel(job *models.Job) *Job {
+	inputFiles := make([]*InputFile, 0)
+	for _, inputFile := range job.InputFiles {
+		inputFiles = append(inputFiles, FromInputFileModel(inputFile))
+	}
+	return &Job{
+		ID:         job.ID,
+		Name:       job.Name,
+		Status:     job.Status,
+		InputFiles: inputFiles,
+	}
 }

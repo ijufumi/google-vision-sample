@@ -1,7 +1,8 @@
 package entities
 
 import (
-	enums2 "github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities/enums"
+	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities/enums"
+	models "github.com/ijufumi/google-vision-sample/internal/models/entities"
 	"gorm.io/gorm"
 )
 
@@ -12,10 +13,26 @@ type InputFile struct {
 	PageNo      uint
 	FileKey     string
 	FileName    string
-	ContentType enums2.ContentType
+	ContentType enums.ContentType
 	Size        uint
 	Width       uint
 	Height      uint
-	Status      enums2.InputFileStatus
+	Status      enums.InputFileStatus
 	OutputFiles []*OutputFile
+}
+
+func FromInputFileModel(inputFile *models.InputFile) *InputFile {
+	return &InputFile{
+		ID:          inputFile.ID,
+		JobID:       inputFile.JobID,
+		PageNo:      0, // fixme: set correct number
+		FileKey:     inputFile.FileKey,
+		FileName:    inputFile.FileName,
+		ContentType: inputFile.ContentType,
+		Size:        inputFile.Size,
+		Width:       0,  // fixme: set correct number
+		Height:      0,  // fixme: set correct number
+		Status:      "", // fixme: set correct status
+		OutputFiles: nil,
+	}
 }

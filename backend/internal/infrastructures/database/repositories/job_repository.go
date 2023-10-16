@@ -36,7 +36,8 @@ func (r *jobRepository) GetByID(db *gorm.DB, id string) (*models.Job, error) {
 	return job.ToModel(), nil
 }
 
-func (r *jobRepository) Create(db *gorm.DB, entity *models.Job) error {
+func (r *jobRepository) Create(db *gorm.DB, model *models.Job) error {
+	entity := entities.FromJobModel(model)
 	if err := db.Create(entity).Error; err != nil {
 		return errors.Wrap(err, "JobRepository#Create")
 	}
