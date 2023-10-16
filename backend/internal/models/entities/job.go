@@ -12,3 +12,5 @@ type Job struct {
 	UpdatedAt  int64           `json:"updatedAt"`
 	InputFiles []InputFile     `json:"inputFiles"`
 }
+
+type Jobs []*Job

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities"
+	models "github.com/ijufumi/google-vision-sample/internal/models/entities"
 	repositoryInterface "github.com/ijufumi/google-vision-sample/internal/usecases/repositories"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
@@ -14,35 +15,35 @@ func NewJobRepository() repositoryInterface.JobRepository {
 type jobRepository struct {
 }
 
-func (r *jobRepository) GetAll(db *gorm.DB) ([]*entities.Job, error) {
-	var results []*entities.Job
+func (r *jobRepository) GetAll(db *gorm.DB) ([]*models.Job, error) {
+	var jobs *entities.Jobs
 	if err := db.
-		Find(&results).Error; err != nil {
+		Find(&jobs).Error; err != nil {
 		return nil, errors.Wrap(err, "JobRepository#GetAll")
 	}
-	return results, nil
+	return jobs.ToModel(), nil
 }
 
-func (r *jobRepository) GetByID(db *gorm.DB, id string) (*entities.Job, error) {
-	var result entities.Job
+func (r *jobRepository) GetByID(db *gorm.DB, id string) (*models.Job, error) {
+	var job entities.Job
 	if err := db.
 		Preload("InputFiles").
 		Preload("InputFiles.OutputFiles").
 		Preload("InputFiles.OutputFiles.ExtractedTexts").
-		Where("id = ?", id).First(&result).Error; err != nil {
+		Where("id = ?", id).First(&job).Error; err != nil {
 		return nil, errors.Wrap(err, "JobRepository#GetByID")
 	}
-	return &result, nil
+	return job.ToModel(), nil
 }
 
-func (r *jobRepository) Create(db *gorm.DB, entity *entities.Job) error {
+func (r *jobRepository) Create(db *gorm.DB, entity *models.Job) error {
 	if err := db.Create(entity).Error; err != nil {
 		return errors.Wrap(err, "JobRepository#Create")
 	}
 	return nil
 }
 
-func (r *jobRepository) Update(db *gorm.DB, entity *entities.Job) error {
+func (r *jobRepository) Update(db *gorm.DB, entity *models.Job) error {
 	if err := db.Save(entity).Error; err != nil {
 		return errors.Wrap(err, "JobRepository#Update")
 	}
