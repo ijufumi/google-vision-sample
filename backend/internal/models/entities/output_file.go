@@ -16,3 +16,5 @@ type OutputFile struct {
 	UpdatedAt      int64             `json:"updatedAt"`
 	ExtractedTexts []*ExtractedText  `json:"extractedTexts"`
 }
+
+type OutputFiles []*OutputFile

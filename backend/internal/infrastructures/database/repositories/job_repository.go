@@ -44,7 +44,8 @@ func (r *jobRepository) Create(db *gorm.DB, model *models.Job) error {
 	return nil
 }
 
-func (r *jobRepository) Update(db *gorm.DB, entity *models.Job) error {
+func (r *jobRepository) Update(db *gorm.DB, model *models.Job) error {
+	entity := entities.FromJobModel(model)
 	if err := db.Save(entity).Error; err != nil {
 		return errors.Wrap(err, "JobRepository#Update")
 	}
