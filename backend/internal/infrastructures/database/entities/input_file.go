@@ -21,6 +21,8 @@ type InputFile struct {
 	OutputFiles []*OutputFile
 }
 
+type InputFiles []*InputFile
+
 func FromInputFileModel(inputFile *models.InputFile) *InputFile {
 	return &InputFile{
 		ID:          inputFile.ID,
@@ -30,9 +32,31 @@ func FromInputFileModel(inputFile *models.InputFile) *InputFile {
 		FileName:    inputFile.FileName,
 		ContentType: inputFile.ContentType,
 		Size:        inputFile.Size,
-		Width:       0,  // fixme: set correct number
-		Height:      0,  // fixme: set correct number
-		Status:      "", // fixme: set correct status
-		OutputFiles: nil,
+		Width:       0,   // fixme: set correct number
+		Height:      0,   // fixme: set correct number
+		Status:      "",  // fixme: set correct status
+		OutputFiles: nil, // fixme: set correct value
 	}
+}
+
+func (e *InputFile) ToModel() *models.InputFile {
+	return &models.InputFile{
+		ID:          e.ID,
+		JobID:       e.JobID,
+		FileKey:     e.FileKey,
+		FileName:    e.FileName,
+		ContentType: e.ContentType,
+		Size:        e.Size,
+		CreatedAt:   e.CreatedAt.Unix(),
+		UpdatedAt:   e.UpdatedAt.Unix(),
+		OutputFiles: nil, // fixme: set correct value
+	}
+}
+
+func (e *InputFiles) ToModel() models.InputFiles {
+	var inputFiles models.InputFiles
+	for _, inputFile := range *e {
+		inputFiles = append(inputFiles, inputFile.ToModel())
+	}
+	return inputFiles
 }

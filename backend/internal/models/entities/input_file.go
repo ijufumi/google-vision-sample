@@ -15,3 +15,5 @@ type InputFile struct {
 	UpdatedAt   int64             `json:"updatedAt"`
 	OutputFiles []*OutputFile     `json:"outputFiles"`
 }
+
+type InputFiles []*InputFile
