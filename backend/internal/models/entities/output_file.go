@@ -14,7 +14,7 @@ type OutputFile struct {
 	Size           uint              `json:"size"`
 	CreatedAt      int64             `json:"createdAt"`
 	UpdatedAt      int64             `json:"updatedAt"`
-	ExtractedTexts []*ExtractedText  `json:"extractedTexts"`
+	ExtractedTexts ExtractedTexts    `json:"extractedTexts"`
 }
 
 type OutputFiles []*OutputFile

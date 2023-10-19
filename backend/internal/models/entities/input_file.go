@@ -13,7 +13,7 @@ type InputFile struct {
 	Size        uint              `json:"size"`
 	CreatedAt   int64             `json:"createdAt"`
 	UpdatedAt   int64             `json:"updatedAt"`
-	OutputFiles []*OutputFile     `json:"outputFiles"`
+	OutputFiles OutputFiles       `json:"outputFiles"`
 }
 
 type InputFiles []*InputFile

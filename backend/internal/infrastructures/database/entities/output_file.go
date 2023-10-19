@@ -17,7 +17,7 @@ type OutputFile struct {
 	Size           uint
 	Width          uint
 	Height         uint
-	ExtractedTexts []*ExtractedText
+	ExtractedTexts ExtractedTexts
 }
 
 type OutputFiles []*OutputFile
@@ -33,7 +33,7 @@ func (e *OutputFile) ToModel() *models.OutputFile {
 		Size:           e.Size,
 		CreatedAt:      e.CreatedAt.Unix(),
 		UpdatedAt:      e.UpdatedAt.Unix(),
-		ExtractedTexts: nil, // fixme:
+		ExtractedTexts: e.ExtractedTexts.ToModel(),
 	}
 }
 
