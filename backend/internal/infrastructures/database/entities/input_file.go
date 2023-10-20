@@ -18,7 +18,7 @@ type InputFile struct {
 	Width       uint
 	Height      uint
 	Status      enums.InputFileStatus
-	OutputFiles []*OutputFile
+	OutputFiles OutputFiles
 }
 
 type InputFiles []*InputFile
@@ -27,14 +27,14 @@ func FromInputFileModel(inputFile *models.InputFile) *InputFile {
 	return &InputFile{
 		ID:          inputFile.ID,
 		JobID:       inputFile.JobID,
-		PageNo:      0, // fixme: set correct number
+		PageNo:      inputFile.PageNo,
 		FileKey:     inputFile.FileKey,
 		FileName:    inputFile.FileName,
 		ContentType: inputFile.ContentType,
 		Size:        inputFile.Size,
-		Width:       0,   // fixme: set correct number
-		Height:      0,   // fixme: set correct number
-		Status:      "",  // fixme: set correct status
+		Width:       inputFile.Width,
+		Height:      inputFile.Height,
+		Status:      inputFile.Status,
 		OutputFiles: nil, // fixme: set correct value
 	}
 }
