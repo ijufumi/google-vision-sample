@@ -23,19 +23,27 @@ type InputFile struct {
 
 type InputFiles []*InputFile
 
-func FromInputFileModel(inputFile *models.InputFile) *InputFile {
+func FromInputFilesModel(inputFilesModel models.InputFiles) InputFiles {
+	var inputFiles InputFiles
+	for _, inputFile := range inputFilesModel {
+		inputFiles = append(inputFiles, FromInputFileModel(inputFile))
+	}
+	return inputFiles
+}
+
+func FromInputFileModel(inputFileModel *models.InputFile) *InputFile {
 	return &InputFile{
-		ID:          inputFile.ID,
-		JobID:       inputFile.JobID,
-		PageNo:      inputFile.PageNo,
-		FileKey:     inputFile.FileKey,
-		FileName:    inputFile.FileName,
-		ContentType: inputFile.ContentType,
-		Size:        inputFile.Size,
-		Width:       inputFile.Width,
-		Height:      inputFile.Height,
-		Status:      inputFile.Status,
-		OutputFiles: nil, // fixme: set correct value
+		ID:          inputFileModel.ID,
+		JobID:       inputFileModel.JobID,
+		PageNo:      inputFileModel.PageNo,
+		FileKey:     inputFileModel.FileKey,
+		FileName:    inputFileModel.FileName,
+		ContentType: inputFileModel.ContentType,
+		Size:        inputFileModel.Size,
+		Width:       inputFileModel.Width,
+		Height:      inputFileModel.Height,
+		Status:      inputFileModel.Status,
+		OutputFiles: FromOutputFilesModel(inputFileModel.OutputFiles),
 	}
 }
 

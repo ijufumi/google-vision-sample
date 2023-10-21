@@ -2,6 +2,7 @@ package entities
 
 type ExtractedText struct {
 	ID           string  `json:"id"`
+	JobID        string  `json:"jobID"`
 	InputFileID  string  `json:"inputFileID"`
 	OutputFileID string  `json:"outputFileID"`
 	Text         string  `json:"text"`

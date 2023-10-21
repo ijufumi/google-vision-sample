@@ -38,15 +38,11 @@ func (e *Jobs) ToModel() models.Jobs {
 	return jobs
 }
 
-func FromJobModel(job *models.Job) *Job {
-	inputFiles := make([]*InputFile, 0)
-	for _, inputFile := range job.InputFiles {
-		inputFiles = append(inputFiles, FromInputFileModel(inputFile))
-	}
+func FromJobModel(jobModel *models.Job) *Job {
 	return &Job{
-		ID:         job.ID,
-		Name:       job.Name,
-		Status:     job.Status,
-		InputFiles: inputFiles,
+		ID:         jobModel.ID,
+		Name:       jobModel.Name,
+		Status:     jobModel.Status,
+		InputFiles: FromInputFilesModel(jobModel.InputFiles),
 	}
 }

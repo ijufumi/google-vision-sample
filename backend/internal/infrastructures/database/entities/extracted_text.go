@@ -42,3 +42,26 @@ func (e *ExtractedTexts) ToModel() models.ExtractedTexts {
 	}
 	return extractedTexts
 }
+
+func FromExtractedTextsModel(extractedTextsModel models.ExtractedTexts) ExtractedTexts {
+	var extractedTexts ExtractedTexts
+	for _, extractedText := range extractedTextsModel {
+		extractedTexts = append(extractedTexts, FromExtractedTextModel(extractedText))
+	}
+
+	return extractedTexts
+}
+
+func FromExtractedTextModel(extractedTextModel *models.ExtractedText) *ExtractedText {
+	return &ExtractedText{
+		ID:           extractedTextModel.ID,
+		JobID:        extractedTextModel.JobID,
+		InputFileID:  extractedTextModel.InputFileID,
+		OutputFileID: extractedTextModel.OutputFileID,
+		Text:         extractedTextModel.Text,
+		Top:          extractedTextModel.Top,
+		Bottom:       extractedTextModel.Bottom,
+		Left:         extractedTextModel.Left,
+		Right:        extractedTextModel.Right,
+	}
+}

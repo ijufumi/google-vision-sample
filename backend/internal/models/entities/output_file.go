@@ -12,6 +12,8 @@ type OutputFile struct {
 	FileName       string            `json:"fileName"`
 	ContentType    enums.ContentType `json:"contentType"`
 	Size           uint              `json:"size"`
+	Width          uint              `json:"width"`
+	Height         uint              `json:"height"`
 	CreatedAt      int64             `json:"createdAt"`
 	UpdatedAt      int64             `json:"updatedAt"`
 	ExtractedTexts ExtractedTexts    `json:"extractedTexts"`

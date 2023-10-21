@@ -45,3 +45,26 @@ func (e *OutputFiles) ToModel() models.OutputFiles {
 	}
 	return outputFiles
 }
+
+func FromOutputFilesModel(outputFilesModel models.OutputFiles) OutputFiles {
+	var outputFiles OutputFiles
+	for _, outputFile := range outputFilesModel {
+		outputFiles = append(outputFiles, FromOutputFileModel(outputFile))
+	}
+	return outputFiles
+}
+
+func FromOutputFileModel(outputFileModel *models.OutputFile) *OutputFile {
+	return &OutputFile{
+		ID:             outputFileModel.ID,
+		JobID:          outputFileModel.JobID,
+		InputFileID:    outputFileModel.InputFileID,
+		FileKey:        outputFileModel.FileKey,
+		FileName:       outputFileModel.FileName,
+		ContentType:    outputFileModel.ContentType,
+		Size:           outputFileModel.Size,
+		Width:          outputFileModel.Width,
+		Height:         outputFileModel.Height,
+		ExtractedTexts: FromExtractedTextsModel(outputFileModel.ExtractedTexts),
+	}
+}
