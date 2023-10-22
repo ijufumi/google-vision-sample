@@ -5,12 +5,13 @@ import (
 )
 
 type Job struct {
-	ID         string          `json:"id"`
-	Name       string          `json:"name"`
-	Status     enums.JobStatus `json:"status"`
-	CreatedAt  int64           `json:"createdAt"`
-	UpdatedAt  int64           `json:"updatedAt"`
-	InputFiles InputFiles      `json:"inputFiles"`
+	ID              string          `json:"id"`
+	Name            string          `json:"name"`
+	Status          enums.JobStatus `json:"status"`
+	OriginalFileKey string          `json:"OriginalFileKey"`
+	CreatedAt       int64           `json:"createdAt"`
+	UpdatedAt       int64           `json:"updatedAt"`
+	InputFiles      InputFiles      `json:"inputFiles"`
 }
 
 type Jobs []*Job

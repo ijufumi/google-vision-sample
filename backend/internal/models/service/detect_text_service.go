@@ -51,7 +51,6 @@ func NewDetectTextService(
 }
 
 func (s *detectTextServiceImpl) GetResults(ctx context.Context, logger *zap.Logger) ([]*entities.Job, error) {
-	var extractionResults []*entities.Job
 	var results []*entities.Job
 	err := s.db.Transaction(func(tx *gorm.DB) error {
 		db.SetLogger(tx, logger)
@@ -66,11 +65,8 @@ func (s *detectTextServiceImpl) GetResults(ctx context.Context, logger *zap.Logg
 	if err != nil {
 		return nil, err
 	}
-	for _, result := range results {
-		extractionResults = append(extractionResults, s.buildExtractionResultResponse(result))
-	}
 
-	return extractionResults, err
+	return results, err
 }
 
 func (s *detectTextServiceImpl) GetResultByID(ctx context.Context, logger *zap.Logger, id string) (*entities.Job, error) {
@@ -82,7 +78,7 @@ func (s *detectTextServiceImpl) GetResultByID(ctx context.Context, logger *zap.L
 			logger.Error(err.Error())
 			return err
 		}
-		response = s.buildExtractionResultResponse(result)
+		response = result
 		return nil
 	})
 	return response, err
@@ -383,62 +379,6 @@ func (s *detectTextServiceImpl) DeleteResult(ctx context.Context, logger *zap.Lo
 		}
 		return s.jobRepository.Delete(tx, id)
 	})
-}
-
-func (s *detectTextServiceImpl) buildExtractionResultResponse(entity *entities.Job) *domainEntity.Job {
-	inputFiles := make([]domainEntity.InputFile, 0)
-
-	for _, inputFile := range entity.InputFiles {
-		outputFiles := make([]*domainEntity.OutputFile, 0)
-		for _, outputFile := range inputFile.OutputFiles {
-			extractedTexts := make([]*domainEntity.ExtractedText, 0)
-			for _, extractedText := range outputFile.ExtractedTexts {
-				extractedTexts = append(extractedTexts, &domainEntity.ExtractedText{
-					ID:           extractedText.ID,
-					InputFileID:  extractedText.ID,
-					OutputFileID: extractedText.ID,
-					Text:         extractedText.Text,
-					Top:          extractedText.Top,
-					Bottom:       extractedText.Bottom,
-					Left:         extractedText.Left,
-					Right:        extractedText.Right,
-					CreatedAt:    extractedText.CreatedAt.Unix(),
-					UpdatedAt:    extractedText.UpdatedAt.Unix(),
-				})
-			}
-			outputFiles = append(outputFiles, &domainEntity.OutputFile{
-				ID:             outputFile.ID,
-				JobID:          outputFile.JobID,
-				InputFileID:    outputFile.InputFileID,
-				FileKey:        outputFile.FileKey,
-				FileName:       outputFile.FileName,
-				ContentType:    outputFile.ContentType,
-				Size:           outputFile.Size,
-				CreatedAt:      outputFile.CreatedAt.Unix(),
-				UpdatedAt:      outputFile.UpdatedAt.Unix(),
-				ExtractedTexts: extractedTexts,
-			})
-		}
-		inputFiles = append(inputFiles, domainEntity.InputFile{
-			ID:          inputFile.ID,
-			JobID:       inputFile.JobID,
-			FileKey:     inputFile.FileKey,
-			FileName:    inputFile.FileName,
-			ContentType: inputFile.ContentType,
-			Size:        inputFile.Size,
-			CreatedAt:   inputFile.CreatedAt.Unix(),
-			UpdatedAt:   inputFile.UpdatedAt.Unix(),
-			OutputFiles: outputFiles,
-		})
-	}
-	return &domainEntity.Job{
-		ID:         entity.ID,
-		Name:       entity.Name,
-		Status:     entity.Status,
-		CreatedAt:  entity.CreatedAt.Unix(),
-		UpdatedAt:  entity.UpdatedAt.Unix(),
-		InputFiles: inputFiles,
-	}
 }
 
 type detectTextServiceImpl struct {

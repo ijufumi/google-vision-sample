@@ -17,12 +17,13 @@ type Job struct {
 
 func (e *Job) ToModel() *models.Job {
 	return &models.Job{
-		ID:         e.ID,
-		Name:       e.Name,
-		Status:     e.Status,
-		CreatedAt:  e.CreatedAt.Unix(),
-		UpdatedAt:  e.UpdatedAt.Unix(),
-		InputFiles: nil,
+		ID:              e.ID,
+		Name:            e.Name,
+		Status:          e.Status,
+		OriginalFileKey: e.OriginalFileKey,
+		CreatedAt:       e.CreatedAt.Unix(),
+		UpdatedAt:       e.UpdatedAt.Unix(),
+		InputFiles:      nil,
 	}
 }
 
@@ -40,9 +41,10 @@ func (e *Jobs) ToModel() models.Jobs {
 
 func FromJobModel(jobModel *models.Job) *Job {
 	return &Job{
-		ID:         jobModel.ID,
-		Name:       jobModel.Name,
-		Status:     jobModel.Status,
-		InputFiles: FromInputFilesModel(jobModel.InputFiles),
+		ID:              jobModel.ID,
+		Name:            jobModel.Name,
+		Status:          jobModel.Status,
+		OriginalFileKey: jobModel.OriginalFileKey,
+		InputFiles:      FromInputFilesModel(jobModel.InputFiles),
 	}
 }
