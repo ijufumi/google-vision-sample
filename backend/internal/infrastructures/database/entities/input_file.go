@@ -57,7 +57,7 @@ func (e *InputFile) ToModel() *models.InputFile {
 		Size:        e.Size,
 		CreatedAt:   e.CreatedAt.Unix(),
 		UpdatedAt:   e.UpdatedAt.Unix(),
-		OutputFiles: nil, // fixme: set correct value
+		OutputFiles: e.OutputFiles.ToModel(),
 	}
 }
 

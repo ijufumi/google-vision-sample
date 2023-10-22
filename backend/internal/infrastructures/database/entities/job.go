@@ -12,7 +12,7 @@ type Job struct {
 	Name            string
 	OriginalFileKey string
 	Status          enums.JobStatus
-	InputFiles      []*InputFile
+	InputFiles      InputFiles
 }
 
 func (e *Job) ToModel() *models.Job {
@@ -23,7 +23,7 @@ func (e *Job) ToModel() *models.Job {
 		OriginalFileKey: e.OriginalFileKey,
 		CreatedAt:       e.CreatedAt.Unix(),
 		UpdatedAt:       e.UpdatedAt.Unix(),
-		InputFiles:      nil,
+		InputFiles:      e.InputFiles.ToModel(),
 	}
 }
 
