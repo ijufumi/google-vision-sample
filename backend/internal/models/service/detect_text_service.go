@@ -12,6 +12,7 @@ import (
 	googleModels "github.com/ijufumi/google-vision-sample/internal/infrastructures/google/models"
 	"github.com/ijufumi/google-vision-sample/internal/models/entities"
 	"github.com/ijufumi/google-vision-sample/internal/usecases/repositories"
+	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"io"
@@ -310,10 +311,10 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 						InputFileID:  inputFileID,
 						OutputFileID: outputFileID,
 						Text:         texts,
-						Top:          top,
-						Bottom:       bottom,
-						Left:         left,
-						Right:        right,
+						Top:          decimal.NewFromFloat(top),
+						Bottom:       decimal.NewFromFloat(bottom),
+						Left:         decimal.NewFromFloat(left),
+						Right:        decimal.NewFromFloat(right),
 					}
 
 					extractedTexts = append(extractedTexts, extractedText)
