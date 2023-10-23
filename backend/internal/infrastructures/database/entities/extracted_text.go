@@ -2,6 +2,7 @@ package entities
 
 import (
 	models "github.com/ijufumi/google-vision-sample/internal/models/entities"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
 
@@ -12,10 +13,10 @@ type ExtractedText struct {
 	InputFileID  string
 	OutputFileID string
 	Text         string
-	Top          float64
-	Bottom       float64
-	Left         float64
-	Right        float64
+	Top          decimal.Decimal
+	Bottom       decimal.Decimal
+	Left         decimal.Decimal
+	Right        decimal.Decimal
 }
 
 type ExtractedTexts []*ExtractedText
