@@ -7,7 +7,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/internal/common/configs"
 	"github.com/ijufumi/google-vision-sample/internal/common/utils"
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities/enums"
-	options2 "github.com/ijufumi/google-vision-sample/internal/infrastructures/google/options"
+	"github.com/ijufumi/google-vision-sample/internal/infrastructures/google/models/services"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/iterator"
@@ -207,12 +207,12 @@ func (c *storageAPIClient) SetupCORSOnBucket() error {
 }
 
 func (c *storageAPIClient) newClient() (*storage.Client, error) {
-	option := options2.GetCredentialOption(c.config)
+	option := services.GetCredentialOption(c.config)
 	service, err := storage.NewClient(context.Background(), option)
 	if err != nil {
 		return nil, errors.Wrap(err, "StorageAPIClient#newClient")
 	}
-	jwtConfig, err := options2.GetJWTConfig(c.config)
+	jwtConfig, err := services.GetJWTConfig(c.config)
 	if err != nil {
 		return nil, errors.Wrap(err, "StorageAPIClient#GetJWTConfig")
 	}

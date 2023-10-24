@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/ijufumi/google-vision-sample/internal/common/configs"
-	"github.com/ijufumi/google-vision-sample/internal/infrastructures/google/options"
+	"github.com/ijufumi/google-vision-sample/internal/infrastructures/google/models/services"
 	"github.com/pkg/errors"
 	"time"
 )
@@ -77,7 +77,7 @@ type visionAPIClient struct {
 }
 
 func (c *visionAPIClient) newClient() (*vision.ImageAnnotatorClient, error) {
-	option := options.GetCredentialOption(c.config)
+	option := services.GetCredentialOption(c.config)
 	service, err := vision.NewImageAnnotatorClient(context.Background(), option)
 	if err != nil {
 		return nil, errors.Wrap(err, "VisionAPIClient#newClient")

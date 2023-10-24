@@ -1,4 +1,4 @@
-package options
+package services
 
 import (
 	"github.com/ijufumi/google-vision-sample/internal/common/configs"

@@ -9,7 +9,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/db"
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities/enums"
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/google/clients"
-	googleModels "github.com/ijufumi/google-vision-sample/internal/infrastructures/google/models"
+	google "github.com/ijufumi/google-vision-sample/internal/infrastructures/google/models/entities"
 	"github.com/ijufumi/google-vision-sample/internal/models/entities"
 	"github.com/ijufumi/google-vision-sample/internal/usecases/repositories"
 	"github.com/shopspring/decimal"
@@ -263,7 +263,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 			return err
 		}
 
-		var detectResponse googleModels.DetectTextResponses
+		var detectResponse google.DetectTextResponses
 		if err = json.Unmarshal(bytes, &detectResponse); err != nil {
 			logger.Error(err.Error())
 			return err
