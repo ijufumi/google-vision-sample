@@ -28,6 +28,7 @@ func (h *signedURLHandler) GetByKey(ginCtx *gin.Context) {
 		key := ginCtx.Query("key")
 		signedURL, err := h.detectTextService.GetSignedURL(ctx, logger, key)
 		if err != nil {
+			logger.Error(err.Error())
 			return ginCtx.AbortWithError(http.StatusBadRequest, err)
 		}
 		ginCtx.JSON(http.StatusOK, signedURL)
