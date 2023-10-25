@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities/enums"
+	"github.com/shopspring/decimal"
 	"gopkg.in/gographics/imagick.v2/imagick"
 	"math"
 	"net/http"
@@ -15,7 +16,7 @@ type ImageConversionService interface {
 	DetectOrientation(filePath string) (imagick.OrientationType, error)
 	DetectSize(filePath string) (width, height uint, err error)
 	DetectContentType(filePath string) enums.ContentType
-	ConvertPoints(points [][]float64, orientation imagick.OrientationType, width, height uint) [][]float64
+	ConvertPoints(points [][]decimal.Decimal, orientation imagick.OrientationType, width, height uint) [][]decimal.Decimal
 	ConvertPdfToImages(pdfFilePath string) ([]*os.File, error)
 }
 
@@ -71,27 +72,27 @@ func (s *imageConversionService) DetectContentType(filePath string) enums.Conten
 
 }
 
-func (s *imageConversionService) ConvertPoints(points [][]float64, orientation imagick.OrientationType, width, height uint) [][]float64 {
+func (s *imageConversionService) ConvertPoints(points [][]decimal.Decimal, orientation imagick.OrientationType, width, height uint) [][]decimal.Decimal {
 	if len(points) != 4 {
 		// s.logger.Warn("point is invalid")
 		return points
 	}
-	floatWidth := float64(width)
-	floatHeight := float64(height)
-	p1 := []float64{floatWidth - points[0][0], floatHeight - points[0][1]}
-	p2 := []float64{floatWidth - points[1][0], floatHeight - points[1][1]}
-	p3 := []float64{floatWidth - points[2][0], floatHeight - points[2][1]}
-	p4 := []float64{floatWidth - points[3][0], floatHeight - points[3][1]}
-	m := []float64{floatWidth / 2, floatHeight / 2}
+	floatWidth := decimal.NewFromFloat(float64(width))
+	floatHeight := decimal.NewFromFloat(float64(height))
+	p1 := []decimal.Decimal{floatWidth.Sub(points[0][0]), floatHeight.Sub(points[0][1])}
+	p2 := []decimal.Decimal{floatWidth.Sub(points[1][0]), floatHeight.Sub(points[1][1])}
+	p3 := []decimal.Decimal{floatWidth.Sub(points[2][0]), floatHeight.Sub(points[2][1])}
+	p4 := []decimal.Decimal{floatWidth.Sub(points[3][0]), floatHeight.Sub(points[3][1])}
+	m := []decimal.Decimal{floatWidth.Div(decimal.NewFromFloat(float64(2))), floatHeight.Div(decimal.NewFromFloat(float64(2)))}
 	afterM := m
 	angle := float64(0)
 	switch orientation {
 	case imagick.ORIENTATION_BOTTOM_LEFT:
 		angle = 90
-		afterM = []float64{afterM[1], afterM[0]}
+		afterM = []decimal.Decimal{afterM[1], afterM[0]}
 	case imagick.ORIENTATION_RIGHT_TOP:
 		angle = 270
-		afterM = []float64{afterM[1], afterM[0]}
+		afterM = []decimal.Decimal{afterM[1], afterM[0]}
 	case imagick.ORIENTATION_LEFT_BOTTOM:
 		angle = 180
 	default:
@@ -99,13 +100,13 @@ func (s *imageConversionService) ConvertPoints(points [][]float64, orientation i
 		return points
 	}
 
-	sin, cos := s.convertToSinCos(angle)
+	sin, cos := s.convertToSinCos(decimal.NewFromFloat(angle))
 	p1 = s.convertPoint(p1, sin, cos, m, afterM)
 	p2 = s.convertPoint(p2, sin, cos, m, afterM)
 	p3 = s.convertPoint(p3, sin, cos, m, afterM)
 	p4 = s.convertPoint(p4, sin, cos, m, afterM)
 
-	return [][]float64{p1, p2, p3, p4}
+	return [][]decimal.Decimal{p1, p2, p3, p4}
 }
 
 func (s *imageConversionService) ConvertPdfToImages(pdfFilePath string) ([]*os.File, error) {
@@ -152,19 +153,19 @@ func (s *imageConversionService) ConvertPdfToImages(pdfFilePath string) ([]*os.F
 	return imageFiles, nil
 }
 
-func (s *imageConversionService) convertPoint(point []float64, sin, cos float64, beforeMiddlePoint, afterMiddlePoint []float64) []float64 {
-	x := point[0] - beforeMiddlePoint[0]
-	y := point[1] - beforeMiddlePoint[1]
-	adjustPoint := make([]float64, 2)
-	adjustPoint[0] = x*cos - y*sin
-	adjustPoint[1] = x*sin + y*cos
+func (s *imageConversionService) convertPoint(point []decimal.Decimal, sin, cos decimal.Decimal, beforeMiddlePoint, afterMiddlePoint []decimal.Decimal) []decimal.Decimal {
+	x := point[0].Sub(beforeMiddlePoint[0])
+	y := point[1].Sub(beforeMiddlePoint[1])
+	adjustPoint := make([]decimal.Decimal, 2)
+	adjustPoint[0] = x.Mul(cos).Sub(y.Mul(sin))
+	adjustPoint[1] = x.Mul(sin).Add(y.Mul(cos))
 
-	return []float64{adjustPoint[0] + afterMiddlePoint[0], adjustPoint[1] + afterMiddlePoint[1]}
+	return []decimal.Decimal{adjustPoint[0].Add(afterMiddlePoint[0]), adjustPoint[1].Add(afterMiddlePoint[1])}
 }
 
-func (s *imageConversionService) convertToSinCos(angle float64) (sin float64, cos float64) {
+func (s *imageConversionService) convertToSinCos(angle decimal.Decimal) (decimal.Decimal, decimal.Decimal) {
 	// s.logger.Debug(fmt.Sprintf("angle is %v,", angle))
-	sin, cos = math.Sincos(angle * math.Pi / 180)
+	sinFloat, cosFloat := math.Sincos(angle.Mul(decimal.NewFromFloat(math.Pi)).Div(decimal.New(180, 32)).InexactFloat64())
 	// s.logger.Debug(fmt.Sprintf("sin is %v, cos is %v", sin, cos))
-	return
+	return decimal.NewFromFloat(sinFloat), decimal.NewFromFloat(cosFloat)
 }

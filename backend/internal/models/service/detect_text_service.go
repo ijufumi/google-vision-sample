@@ -294,11 +294,11 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 							texts += symbol.Text
 						}
 					}
-					points := paragraph.BoundingBox.Vertices.ToFloat()
+					points := paragraph.BoundingBox.Vertices.ToDecimal()
 					points = s.imageConversionService.ConvertPoints(points, orientation, width, height)
 
-					xArray := make([]float64, 0)
-					yArray := make([]float64, 0)
+					xArray := make([]decimal.Decimal, 0)
+					yArray := make([]decimal.Decimal, 0)
 					for _, point := range points {
 						xArray = append(xArray, point[0])
 						yArray = append(yArray, point[1])
