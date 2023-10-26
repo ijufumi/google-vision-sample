@@ -303,18 +303,18 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 						xArray = append(xArray, point[0])
 						yArray = append(yArray, point[1])
 					}
-					bottom, top := utils.MaxMinInArray(yArray...)
-					right, left := utils.MaxMinInArray(xArray...)
+					bottom, top := utils.MaxMinInDecimalArray(yArray...)
+					right, left := utils.MaxMinInDecimalArray(xArray...)
 					extractedText := &entities.ExtractedText{
 						ID:           utils.NewULID(),
 						JobID:        jobID,
 						InputFileID:  inputFileID,
 						OutputFileID: outputFileID,
 						Text:         texts,
-						Top:          decimal.NewFromFloat(top),
-						Bottom:       decimal.NewFromFloat(bottom),
-						Left:         decimal.NewFromFloat(left),
-						Right:        decimal.NewFromFloat(right),
+						Top:          top,
+						Bottom:       bottom,
+						Left:         left,
+						Right:        right,
 					}
 
 					extractedTexts = append(extractedTexts, extractedText)
