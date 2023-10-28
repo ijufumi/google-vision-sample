@@ -175,45 +175,14 @@ func (s *detectTextServiceImpl) processDetectText(logger *zap.Logger, id string,
 }
 
 func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, jobID string, contentType enums.ContentType, file *os.File, pageNo uint) error {
-	width, height, err := s.imageConversionService.DetectSize(file.Name())
-	if err != nil {
-		return err
-	}
-	inputFileID := utils.NewULID()
-
-	fileName := filepath.Base(file.Name())
-	key := fmt.Sprintf("%s/%s/%s", jobID, inputFileID, filepath.Base(file.Name()))
-
-	err = s.storageAPIClient.UploadFile(key, file, contentType)
-	if err != nil {
-		return err
-	}
-
-	fileInfo, _ := file.Stat()
-	err = s.inputFileRepository.Create(s.db, &entities.InputFile{
-		ID:          inputFileID,
-		JobID:       jobID,
-		PageNo:      pageNo,
-		FileKey:     key,
-		FileName:    fileName,
-		ContentType: contentType,
-		Size:        uint(fileInfo.Size()),
-		Width:       width,
-		Height:      height,
-		Status:      enums.InputFileStatus_Runing,
-	})
-	if err != nil {
-		logger.Error(err.Error())
-		return err
-	}
-	inputFile, err := s.inputFileRepository.GetByID(s.db, inputFileID)
+	inputFile, err := s.createInputFile(logger, jobID, contentType, file, pageNo)
 	if err != nil {
 		logger.Error(err.Error())
 		return err
 	}
 
 	err = s.db.Transaction(func(tx *gorm.DB) error {
-		outputKey, err := s.visionAPIClient.DetectText(logger, key)
+		outputKey, err := s.visionAPIClient.DetectText(logger, inputFile.FileKey)
 		if err != nil {
 			logger.Error(err.Error())
 			return err
@@ -244,7 +213,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 		err = s.outputFileRepository.Create(tx, &entities.OutputFile{
 			ID:          outputFileID,
 			JobID:       jobID,
-			InputFileID: inputFileID,
+			InputFileID: inputFile.ID,
 			FileKey:     outputFileKey,
 			FileName:    splitOutputFileKey[len(splitOutputFileKey)-1],
 			ContentType: "application/json",
@@ -295,7 +264,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 						}
 					}
 					points := paragraph.BoundingBox.Vertices.ToDecimal()
-					points = s.imageConversionService.ConvertPoints(points, orientation, width, height)
+					points = s.imageConversionService.ConvertPoints(points, orientation, inputFile.Width, inputFile.Height)
 
 					xArray := make([]decimal.Decimal, 0)
 					yArray := make([]decimal.Decimal, 0)
@@ -308,7 +277,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 					extractedText := &entities.ExtractedText{
 						ID:           utils.NewULID(),
 						JobID:        jobID,
-						InputFileID:  inputFileID,
+						InputFileID:  inputFile.ID,
 						OutputFileID: outputFileID,
 						Text:         texts,
 						Top:          top,
@@ -331,6 +300,46 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 	inputFile.Status = status
 	_ = s.inputFileRepository.Update(s.db, inputFile)
 	return err
+}
+
+func (s *detectTextServiceImpl) createInputFile(logger *zap.Logger, jobID string, contentType enums.ContentType, file *os.File, pageNo uint) (*entities.InputFile, error) {
+	width, height, err := s.imageConversionService.DetectSize(file.Name())
+	if err != nil {
+		return nil, err
+	}
+	inputFileID := utils.NewULID()
+
+	fileName := filepath.Base(file.Name())
+	key := fmt.Sprintf("%s/%s/%s", jobID, inputFileID, filepath.Base(file.Name()))
+
+	err = s.storageAPIClient.UploadFile(key, file, contentType)
+	if err != nil {
+		return nil, err
+	}
+
+	fileInfo, _ := file.Stat()
+	err = s.inputFileRepository.Create(s.db, &entities.InputFile{
+		ID:          inputFileID,
+		JobID:       jobID,
+		PageNo:      pageNo,
+		FileKey:     key,
+		FileName:    fileName,
+		ContentType: contentType,
+		Size:        uint(fileInfo.Size()),
+		Width:       width,
+		Height:      height,
+		Status:      enums.InputFileStatus_Runing,
+	})
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+	inputFile, err := s.inputFileRepository.GetByID(s.db, inputFileID)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+	return inputFile, nil
 }
 
 func (s *detectTextServiceImpl) DeleteResult(ctx context.Context, logger *zap.Logger, id string) error {
