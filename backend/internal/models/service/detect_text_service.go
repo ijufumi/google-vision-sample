@@ -14,6 +14,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/internal/usecases/repositories"
 	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
+	"gopkg.in/gographics/imagick.v2/imagick"
 	"gorm.io/gorm"
 	"io"
 	"os"
@@ -182,32 +183,13 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 	}
 
 	err = s.db.Transaction(func(tx *gorm.DB) error {
-		outputKey, err := s.visionAPIClient.DetectText(logger, inputFile.FileKey)
-		if err != nil {
-			logger.Error(err.Error())
-			return err
-		}
-
-		queryFiles, err := s.storageAPIClient.QueryFiles(outputKey)
-		if err != nil {
-			logger.Error(err.Error())
-			return err
-		}
-
-		if len(queryFiles) == 0 {
-			err = errors.New("output does not exist")
-			logger.Error(err.Error())
-			return err
-		}
-
-		outputFile, err := s.storageAPIClient.DownloadFile(queryFiles[0])
+		outputFileKey, outputFile, err := s.detectText(logger, inputFile.FileKey)
 		if err != nil {
 			logger.Error(err.Error())
 			return err
 		}
 
 		fileStat, _ := outputFile.Stat()
-		outputFileKey := queryFiles[0]
 		splitOutputFileKey := strings.Split(outputFileKey, "/")
 		outputFileID := utils.NewULID()
 		err = s.outputFileRepository.Create(tx, &entities.OutputFile{
@@ -226,72 +208,21 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 			return err
 		}
 
-		bytes, err := io.ReadAll(outputFile)
-		if err != nil {
-			logger.Error(err.Error())
-			return err
-		}
-
-		var detectResponse google.DetectTextResponses
-		if err = json.Unmarshal(bytes, &detectResponse); err != nil {
-			logger.Error(err.Error())
-			return err
-		}
-		if len(detectResponse.Responses) == 0 {
-			err = errors.New("response notfound")
-			logger.Error(err.Error())
-			return err
-		}
-		response := detectResponse.Responses[0]
-		if response.Error != nil {
-			err = errors.New(response.Error.String())
-			return err
-		}
-
-		extractedTexts := make([]*entities.ExtractedText, 0)
 		orientation, err := s.imageConversionService.DetectOrientation(file.Name())
 		if err != nil {
 			logger.Error(err.Error())
 			return err
 		}
-		for _, page := range response.FullTextAnnotation.Pages {
-			for _, block := range page.Blocks {
-				for _, paragraph := range block.Paragraphs {
-					texts := ""
-					for _, word := range paragraph.Words {
-						for _, symbol := range word.Symbols {
-							texts += symbol.Text
-						}
-					}
-					points := paragraph.BoundingBox.Vertices.ToDecimal()
-					points = s.imageConversionService.ConvertPoints(points, orientation, inputFile.Width, inputFile.Height)
 
-					xArray := make([]decimal.Decimal, 0)
-					yArray := make([]decimal.Decimal, 0)
-					for _, point := range points {
-						xArray = append(xArray, point[0])
-						yArray = append(yArray, point[1])
-					}
-					bottom, top := utils.MaxMinInDecimalArray(yArray...)
-					right, left := utils.MaxMinInDecimalArray(xArray...)
-					extractedText := &entities.ExtractedText{
-						ID:           utils.NewULID(),
-						JobID:        jobID,
-						InputFileID:  inputFile.ID,
-						OutputFileID: outputFileID,
-						Text:         texts,
-						Top:          top,
-						Bottom:       bottom,
-						Left:         left,
-						Right:        right,
-					}
-
-					extractedTexts = append(extractedTexts, extractedText)
-				}
-			}
+		extractedTexts, err := s.convertToExtractedTexts(logger, jobID, inputFile, outputFileID, outputFile, orientation)
+		if err != nil {
+			logger.Error(err.Error())
+			return err
 		}
+
 		return s.extractedTextRepository.Create(tx, extractedTexts...)
 	})
+
 	status := enums.InputFileStatus_Succeeded
 	if err != nil {
 		logger.Error(err.Error())
@@ -299,6 +230,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 	}
 	inputFile.Status = status
 	_ = s.inputFileRepository.Update(s.db, inputFile)
+
 	return err
 }
 
@@ -340,6 +272,96 @@ func (s *detectTextServiceImpl) createInputFile(logger *zap.Logger, jobID string
 		return nil, err
 	}
 	return inputFile, nil
+}
+
+func (s *detectTextServiceImpl) detectText(logger *zap.Logger, inputFileKey string) (string, *os.File, error) {
+	outputKey, err := s.visionAPIClient.DetectText(logger, inputFileKey)
+	if err != nil {
+		logger.Error(err.Error())
+		return "", nil, err
+	}
+
+	queryFiles, err := s.storageAPIClient.QueryFiles(outputKey)
+	if err != nil {
+		logger.Error(err.Error())
+		return "", nil, err
+	}
+
+	if len(queryFiles) == 0 {
+		err = errors.New("output does not exist")
+		logger.Error(err.Error())
+		return "", nil, err
+	}
+
+	outputFile, err := s.storageAPIClient.DownloadFile(queryFiles[0])
+	if err != nil {
+		logger.Error(err.Error())
+		return "", nil, err
+	}
+	return queryFiles[0], outputFile, nil
+}
+
+func (s *detectTextServiceImpl) convertToExtractedTexts(logger *zap.Logger, jobID string, inputFile *entities.InputFile, outputFileID string, outputFile *os.File, orientation imagick.OrientationType) (entities.ExtractedTexts, error) {
+	bytes, err := io.ReadAll(outputFile)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	var detectResponse google.DetectTextResponses
+	if err = json.Unmarshal(bytes, &detectResponse); err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+	if len(detectResponse.Responses) == 0 {
+		err = errors.New("response notfound")
+		logger.Error(err.Error())
+		return nil, err
+	}
+	response := detectResponse.Responses[0]
+	if response.Error != nil {
+		err = errors.New(response.Error.String())
+		return nil, err
+	}
+
+	extractedTexts := make([]*entities.ExtractedText, 0)
+	for _, page := range response.FullTextAnnotation.Pages {
+		for _, block := range page.Blocks {
+			for _, paragraph := range block.Paragraphs {
+				texts := ""
+				for _, word := range paragraph.Words {
+					for _, symbol := range word.Symbols {
+						texts += symbol.Text
+					}
+				}
+				points := paragraph.BoundingBox.Vertices.ToDecimal()
+				points = s.imageConversionService.ConvertPoints(points, orientation, inputFile.Width, inputFile.Height)
+
+				xArray := make([]decimal.Decimal, 0)
+				yArray := make([]decimal.Decimal, 0)
+				for _, point := range points {
+					xArray = append(xArray, point[0])
+					yArray = append(yArray, point[1])
+				}
+				bottom, top := utils.MaxMinInDecimalArray(yArray...)
+				right, left := utils.MaxMinInDecimalArray(xArray...)
+				extractedText := &entities.ExtractedText{
+					ID:           utils.NewULID(),
+					JobID:        jobID,
+					InputFileID:  inputFile.ID,
+					OutputFileID: outputFileID,
+					Text:         texts,
+					Top:          top,
+					Bottom:       bottom,
+					Left:         left,
+					Right:        right,
+				}
+
+				extractedTexts = append(extractedTexts, extractedText)
+			}
+		}
+	}
+	return extractedTexts, nil
 }
 
 func (s *detectTextServiceImpl) DeleteResult(ctx context.Context, logger *zap.Logger, id string) error {
