@@ -213,7 +213,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 	}
 
 	err = s.db.Transaction(func(tx *gorm.DB) error {
-		outputKey, err := s.visionAPIClient.DetectText(key)
+		outputKey, err := s.visionAPIClient.DetectText(logger, key)
 		if err != nil {
 			logger.Error(err.Error())
 			return err
