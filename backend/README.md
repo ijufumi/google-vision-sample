@@ -6,6 +6,8 @@ T.B.D
 
 ### How to generage mock
 
+First, install `gomock`.
+
 ```bash
 go install go.uber.org/mock/mockgen@latest
 ```
