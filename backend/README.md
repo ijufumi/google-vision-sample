@@ -6,12 +6,14 @@ T.B.D
 
 ### How to generage mock
 
-First, install `gomock`.
+First, install `mockery`.
 
 ```bash
-go install go.uber.org/mock/mockgen@latest
+go install github.com/vektra/mockery/v2@latest
 ```
 
+Then, generate `mock`.
+
 ```bash
-WIP
+T.B.D
 ```
