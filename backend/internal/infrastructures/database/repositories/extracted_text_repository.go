@@ -20,8 +20,7 @@ func (r *extractedTextRepository) GetByID(db *gorm.DB, id string) (*models.Extra
 	if err := db.Where("id = ?", id).Find(result).Error; err != nil {
 		return nil, errors.Wrap(err, "ExtractedTextRepository#GetByJobID")
 	}
-	entity := &models.ExtractedText{}
-	return entity, nil
+	return result.ToModel(), nil
 }
 
 func (r *extractedTextRepository) Create(db *gorm.DB, entity ...*models.ExtractedText) error {
