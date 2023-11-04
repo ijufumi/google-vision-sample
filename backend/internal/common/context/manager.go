@@ -4,7 +4,12 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
+
+func SetDBToGinContext(ctx *gin.Context, db *gorm.DB) {
+	ctx.Set("db", db)
+}
 
 func SetLoggerToGinContext(ctx *gin.Context, logger *zap.Logger) {
 	ctx.Set("logger", logger)

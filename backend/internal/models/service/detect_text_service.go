@@ -54,8 +54,7 @@ func NewDetectTextService(
 
 func (s *detectTextServiceImpl) GetResults(ctx context.Context, logger *zap.Logger) ([]*entities.Job, error) {
 	var results []*entities.Job
-	err := s.db.Transaction(func(tx *gorm.DB) error {
-		db.SetLogger(tx, logger)
+	err := s.Transaction(s.db, logger, func(tx *gorm.DB) error {
 		_results, err := s.jobRepository.GetAll(tx)
 		if err != nil {
 			logger.Error(err.Error())
@@ -414,6 +413,7 @@ func (s *detectTextServiceImpl) DeleteResult(ctx context.Context, logger *zap.Lo
 }
 
 type detectTextServiceImpl struct {
+	baseService
 	storageAPIClient        clients.StorageAPIClient
 	visionAPIClient         clients.VisionAPIClient
 	jobRepository           repositories.JobRepository
