@@ -2,15 +2,15 @@ package middlewares
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/ijufumi/google-vision-sample/internal/common/configs"
 	"github.com/ijufumi/google-vision-sample/internal/common/context"
-	"github.com/ijufumi/google-vision-sample/internal/common/loggers"
-	"github.com/ijufumi/google-vision-sample/internal/common/utils"
+	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/db"
 )
 
-func DB() gin.HandlerFunc {
+func DB(config *configs.Config) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		traceID := utils.NewULID()
-		l := loggers.NewLoggerWithTraceID(traceID)
-		context.SetLoggerToGinContext(ctx, l)
+		l := context.GetLoggerFromGinContext(ctx)
+		newDB := db.NewDB(config, l)
+		context.SetDBToGinContext(ctx, newDB)
 	}
 }
