@@ -27,7 +27,7 @@ func GetDBFromGinContext(ctx *gin.Context) *gorm.DB {
 
 func GetContext(ctx *gin.Context) context.Context {
 	l := GetLoggerFromGinContext(ctx)
-	d := GetLoggerFromGinContext(ctx)
+	d := GetDBFromGinContext(ctx)
 	_ctx := context.WithValue(ctx.Request.Context(), "logger", l)
 	return context.WithValue(_ctx, "db", d)
 }
