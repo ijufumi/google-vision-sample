@@ -20,12 +20,24 @@ func GetLoggerFromGinContext(ctx *gin.Context) *zap.Logger {
 	return l.(*zap.Logger)
 }
 
-func GetContextWithLogger(ctx *gin.Context) context.Context {
+func GetDBFromGinContext(ctx *gin.Context) *gorm.DB {
+	d, _ := ctx.Get("db")
+	return d.(*gorm.DB)
+}
+
+func GetContext(ctx *gin.Context) context.Context {
 	l := GetLoggerFromGinContext(ctx)
-	return context.WithValue(ctx.Request.Context(), "logger", l)
+	d := GetLoggerFromGinContext(ctx)
+	_ctx := context.WithValue(ctx.Request.Context(), "logger", l)
+	return context.WithValue(_ctx, "db", d)
 }
 
 func GetLogger(ctx context.Context) *zap.Logger {
 	l := ctx.Value("logger")
 	return l.(*zap.Logger)
+}
+
+func GetDB(ctx context.Context) *gorm.DB {
+	d := ctx.Value("db")
+	return d.(*gorm.DB)
 }
