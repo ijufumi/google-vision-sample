@@ -41,3 +41,7 @@ func GetDB(ctx context.Context) *gorm.DB {
 	d := ctx.Value("db")
 	return d.(*gorm.DB)
 }
+
+func SetTx(ctx context.Context, tx *gorm.DB) context.Context {
+	return context.WithValue(ctx, "tx", tx)
+}
