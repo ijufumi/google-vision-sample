@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"context"
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities"
 	models "github.com/ijufumi/google-vision-sample/internal/models/entities"
 	repositoryInterface "github.com/ijufumi/google-vision-sample/internal/usecases/repositories"
@@ -13,13 +14,21 @@ func NewExtractedTextRepository() repositoryInterface.ExtractedTextRepository {
 }
 
 type extractedTextRepository struct {
+	baseRepository
 }
 
-func (r *extractedTextRepository) GetByID(db *gorm.DB, id string) (*models.ExtractedText, error) {
+func (r *extractedTextRepository) GetByID(ctx context.Context, id string) (*models.ExtractedText, error) {
 	var result *entities.ExtractedText
-	if err := db.Where("id = ?", id).Find(result).Error; err != nil {
-		return nil, errors.Wrap(err, "ExtractedTextRepository#GetByJobID")
+	err := r.Transaction(ctx, func(tx *gorm.DB) error {
+		if err := tx.Where("id = ?", id).Find(result).Error; err != nil {
+			return errors.Wrap(err, "ExtractedTextRepository#GetByJobID")
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
+
 	return result.ToModel(), nil
 }
 
