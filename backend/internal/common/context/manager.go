@@ -38,7 +38,11 @@ func GetLogger(ctx context.Context) *zap.Logger {
 }
 
 func GetDB(ctx context.Context) *gorm.DB {
-	d := ctx.Value("db")
+	d := ctx.Value("tx")
+	if d != nil {
+		return d.(*gorm.DB)
+	}
+	d = ctx.Value("db")
 	return d.(*gorm.DB)
 }
 
