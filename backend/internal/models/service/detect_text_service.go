@@ -219,7 +219,8 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 			return err
 		}
 
-		return s.extractedTextRepository.Create(tx, extractedTexts...)
+		// TODO: set actual context value
+		return s.extractedTextRepository.Create(nil, extractedTexts...)
 	})
 
 	status := enums.InputFileStatus_Succeeded
@@ -374,7 +375,7 @@ func (s *detectTextServiceImpl) DeleteResult(ctx context.Context, logger *zap.Lo
 			if err != nil {
 				logger.Error(err.Error())
 			}
-			err := s.extractedTextRepository.DeleteByOutputFileID(tx, file.ID)
+			err := s.extractedTextRepository.DeleteByOutputFileID(ctx, file.ID)
 			if err != nil {
 				return err
 			}
