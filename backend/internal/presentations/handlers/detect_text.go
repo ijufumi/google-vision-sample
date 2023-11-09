@@ -31,7 +31,7 @@ type detectTextHandler struct {
 
 func (h *detectTextHandler) Gets(ginCtx *gin.Context) {
 	_ = h.Process(ginCtx, func(ctx context.Context, logger *zap.Logger) error {
-		results, err := h.service.GetResults(ctx, logger)
+		results, err := h.service.GetResults(ctx)
 		if err != nil {
 			logger.Error(err.Error())
 			return ginCtx.AbortWithError(http.StatusInternalServerError, err)
@@ -44,7 +44,7 @@ func (h *detectTextHandler) Gets(ginCtx *gin.Context) {
 func (h *detectTextHandler) GetByID(ginCtx *gin.Context) {
 	_ = h.Process(ginCtx, func(ctx context.Context, logger *zap.Logger) error {
 		id := ginCtx.Param("id")
-		result, err := h.service.GetResultByID(ctx, logger, id)
+		result, err := h.service.GetResultByID(ctx, id)
 		if err != nil {
 			logger.Error(err.Error())
 			return ginCtx.AbortWithError(http.StatusInternalServerError, err)
@@ -78,7 +78,7 @@ func (h *detectTextHandler) Create(ginCtx *gin.Context) {
 			logger.Error(err.Error())
 			return ginCtx.AbortWithError(http.StatusInternalServerError, err)
 		}
-		err = h.service.DetectTexts(ctx, logger, tempFile, inputFile.Header.Get("Content-Type"))
+		err = h.service.DetectTexts(ctx, tempFile, inputFile.Header.Get("Content-Type"))
 		if err != nil {
 			logger.Error(err.Error())
 			return ginCtx.AbortWithError(http.StatusBadRequest, err)
@@ -91,7 +91,7 @@ func (h *detectTextHandler) Create(ginCtx *gin.Context) {
 func (h *detectTextHandler) Delete(ginCtx *gin.Context) {
 	_ = h.Process(ginCtx, func(ctx context.Context, logger *zap.Logger) error {
 		id := ginCtx.Param("id")
-		err := h.service.DeleteResult(ctx, logger, id)
+		err := h.service.DeleteResult(ctx, id)
 		if err != nil {
 			logger.Error(err.Error())
 			return ginCtx.AbortWithError(http.StatusInternalServerError, err)
