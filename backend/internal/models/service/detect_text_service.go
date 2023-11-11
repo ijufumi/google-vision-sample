@@ -135,7 +135,7 @@ func (s *detectTextServiceImpl) DetectTexts(ctx context.Context, file *os.File, 
 			if err != nil {
 				logger.Error(fmt.Sprintf("%v was occurred.", err))
 			}
-			err = s.processDetectText(logger, id, tempFileForWork)
+			err = s.processDetectText(ctx, logger, id, tempFileForWork)
 			if err != nil {
 				logger.Error(fmt.Sprintf("%v was occurred.", err))
 				job.Status = enums.JobStatus_Failed
@@ -150,7 +150,7 @@ func (s *detectTextServiceImpl) DetectTexts(ctx context.Context, file *os.File, 
 	return nil
 }
 
-func (s *detectTextServiceImpl) processDetectText(logger *zap.Logger, id string, inputFile *os.File) error {
+func (s *detectTextServiceImpl) processDetectText(ctx context.Context, logger *zap.Logger, id string, inputFile *os.File) error {
 	contentType := s.imageConversionService.DetectContentType(inputFile.Name())
 	// s.logger.Info(fmt.Sprintf("Content-Type is %s", contentType))
 	switch {
@@ -164,7 +164,7 @@ func (s *detectTextServiceImpl) processDetectText(logger *zap.Logger, id string,
 			if inputFile == nil {
 				continue
 			}
-			err := s.processDetectTextFromImage(logger, id, enums.ContentType_Png, inputFile, uint(idx+1))
+			err := s.processDetectTextFromImage(ctx, logger, id, enums.ContentType_Png, inputFile, uint(idx+1))
 			if err != nil {
 				errs = append(errs, err)
 			}
@@ -174,19 +174,19 @@ func (s *detectTextServiceImpl) processDetectText(logger *zap.Logger, id string,
 		}
 		return nil
 	case enums.IsImage(contentType):
-		return s.processDetectTextFromImage(logger, id, contentType, inputFile, 1)
+		return s.processDetectTextFromImage(ctx, logger, id, contentType, inputFile, 1)
 	}
 	return errors.New(fmt.Sprintf("unsupported content-type : %s", contentType))
 }
 
-func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, jobID string, contentType enums.ContentType, file *os.File, pageNo uint) error {
-	inputFile, err := s.createInputFile(logger, jobID, contentType, file, pageNo)
+func (s *detectTextServiceImpl) processDetectTextFromImage(ctx context.Context, logger *zap.Logger, jobID string, contentType enums.ContentType, file *os.File, pageNo uint) error {
+	inputFile, err := s.createInputFile(ctx, logger, jobID, contentType, file, pageNo)
 	if err != nil {
 		logger.Error(err.Error())
 		return err
 	}
 
-	err = s.db.Transaction(func(tx *gorm.DB) error {
+	err = s.Transaction(ctx, func(ctx2 context.Context) error {
 		outputFileKey, outputFile, err := s.detectText(logger, inputFile.FileKey)
 		if err != nil {
 			logger.Error(err.Error())
@@ -196,7 +196,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 		fileStat, _ := outputFile.Stat()
 		splitOutputFileKey := strings.Split(outputFileKey, "/")
 		outputFileID := utils.NewULID()
-		err = s.outputFileRepository.Create(tx, &entities.OutputFile{
+		err = s.outputFileRepository.Create(ctx2, &entities.OutputFile{
 			ID:          outputFileID,
 			JobID:       jobID,
 			InputFileID: inputFile.ID,
@@ -224,8 +224,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 			return err
 		}
 
-		// TODO: set actual context value
-		return s.extractedTextRepository.Create(nil, extractedTexts...)
+		return s.extractedTextRepository.Create(ctx2, extractedTexts...)
 	})
 
 	status := enums.InputFileStatus_Succeeded
@@ -234,12 +233,12 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(logger *zap.Logger, j
 		status = enums.InputFileStatus_Failed
 	}
 	inputFile.Status = status
-	_ = s.inputFileRepository.Update(s.db, inputFile)
+	_ = s.inputFileRepository.Update(ctx, inputFile)
 
 	return err
 }
 
-func (s *detectTextServiceImpl) createInputFile(logger *zap.Logger, jobID string, contentType enums.ContentType, file *os.File, pageNo uint) (*entities.InputFile, error) {
+func (s *detectTextServiceImpl) createInputFile(ctx context.Context, logger *zap.Logger, jobID string, contentType enums.ContentType, file *os.File, pageNo uint) (*entities.InputFile, error) {
 	width, height, err := s.imageConversionService.DetectSize(file.Name())
 	if err != nil {
 		return nil, err
@@ -255,7 +254,7 @@ func (s *detectTextServiceImpl) createInputFile(logger *zap.Logger, jobID string
 	}
 
 	fileInfo, _ := file.Stat()
-	err = s.inputFileRepository.Create(s.db, &entities.InputFile{
+	err = s.inputFileRepository.Create(ctx, &entities.InputFile{
 		ID:          inputFileID,
 		JobID:       jobID,
 		PageNo:      pageNo,
@@ -271,7 +270,7 @@ func (s *detectTextServiceImpl) createInputFile(logger *zap.Logger, jobID string
 		logger.Error(err.Error())
 		return nil, err
 	}
-	inputFile, err := s.inputFileRepository.GetByID(s.db, inputFileID)
+	inputFile, err := s.inputFileRepository.GetByID(ctx, inputFileID)
 	if err != nil {
 		logger.Error(err.Error())
 		return nil, err
@@ -370,51 +369,53 @@ func (s *detectTextServiceImpl) convertToExtractedTexts(logger *zap.Logger, jobI
 }
 
 func (s *detectTextServiceImpl) DeleteResult(ctx context.Context, id string) error {
-	return s.db.Transaction(func(tx *gorm.DB) error {
-		outputFiles, err := s.outputFileRepository.GetByJobID(tx, id)
-		if err != nil {
-			return err
-		}
-		for _, file := range outputFiles {
-			err = s.storageAPIClient.DeleteFile(file.FileKey)
-			if err != nil {
-				// logger.Error(err.Error())
-			}
-			err := s.extractedTextRepository.DeleteByOutputFileID(ctx, file.ID)
+	return s.Transaction(ctx, func(ctx2 context.Context) error {
+		return s.Process(ctx2, func(logger *zap.Logger) error {
+			outputFiles, err := s.outputFileRepository.GetByJobID(ctx2, id)
 			if err != nil {
 				return err
 			}
-		}
-		err = s.outputFileRepository.DeleteByJobID(tx, id)
-		if err != nil {
-			return err
-		}
-		inputFiles, err := s.inputFileRepository.GetByJobID(tx, id)
-		if err != nil {
-			return err
-		}
-		for _, file := range inputFiles {
-			err = s.storageAPIClient.DeleteFile(file.FileKey)
+			for _, file := range outputFiles {
+				err = s.storageAPIClient.DeleteFile(file.FileKey)
+				if err != nil {
+					logger.Error(err.Error())
+				}
+				err := s.extractedTextRepository.DeleteByOutputFileID(ctx, file.ID)
+				if err != nil {
+					return err
+				}
+			}
+			err = s.outputFileRepository.DeleteByJobID(ctx2, id)
+			if err != nil {
+				return err
+			}
+			inputFiles, err := s.inputFileRepository.GetByJobID(ctx2, id)
+			if err != nil {
+				return err
+			}
+			for _, file := range inputFiles {
+				err = s.storageAPIClient.DeleteFile(file.FileKey)
+				if err != nil {
+					logger.Error(err.Error())
+				}
+			}
+			err = s.inputFileRepository.DeleteByJobID(ctx2, id)
 			if err != nil {
 				// logger.Error(err.Error())
+				return err
 			}
-		}
-		err = s.inputFileRepository.DeleteByJobID(tx, id)
-		if err != nil {
-			// logger.Error(err.Error())
-			return err
-		}
 
-		job, err := s.jobRepository.GetByID(ctx, id) // TODO: set correct context
-		if err != nil {
-			// logger.Error(err.Error())
-			return err
-		}
-		err = s.storageAPIClient.DeleteFile(job.OriginalFileKey)
-		if err != nil {
-			// logger.Error(err.Error())
-		}
-		return s.jobRepository.Delete(ctx, id) // TODO: set correct context
+			job, err := s.jobRepository.GetByID(ctx2, id)
+			if err != nil {
+				// logger.Error(err.Error())
+				return err
+			}
+			err = s.storageAPIClient.DeleteFile(job.OriginalFileKey)
+			if err != nil {
+				logger.Error(err.Error())
+			}
+			return s.jobRepository.Delete(ctx2, id)
+		})
 	})
 }
 
