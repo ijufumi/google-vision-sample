@@ -86,7 +86,7 @@ func (s *detectTextServiceImpl) GetResultByID(ctx context.Context, id string) (*
 
 func (s *detectTextServiceImpl) GetSignedURL(ctx context.Context, key string) (*entities.SignedURL, error) {
 	var response *entities.SignedURL
-	signedURL, err := s.storageAPIClient.SignedURL(key)
+	signedURL, err := s.storageAPIClient.SignedURL(ctx, key)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (s *detectTextServiceImpl) DetectTexts(ctx context.Context, file *os.File, 
 	id := utils.NewULID()
 	key := fmt.Sprintf("%s/original/%s", id, filepath.Base(file.Name()))
 
-	err := s.storageAPIClient.UploadFile(key, file, enums.ConvertToContentType(contentType))
+	err := s.storageAPIClient.UploadFile(ctx, key, file, enums.ConvertToContentType(contentType))
 	if err != nil {
 		return err
 	}
@@ -184,7 +184,7 @@ func (s *detectTextServiceImpl) processDetectTextFromImage(ctx context.Context, 
 	}
 
 	err = s.Transaction(ctx, func(ctx2 context.Context) error {
-		outputFileKey, outputFile, err := s.detectText(logger, inputFile.FileKey)
+		outputFileKey, outputFile, err := s.detectText(ctx2, logger, inputFile.FileKey)
 		if err != nil {
 			logger.Error(err.Error())
 			return err
@@ -245,7 +245,7 @@ func (s *detectTextServiceImpl) createInputFile(ctx context.Context, logger *zap
 	fileName := filepath.Base(file.Name())
 	key := fmt.Sprintf("%s/%s/%s", jobID, inputFileID, filepath.Base(file.Name()))
 
-	err = s.storageAPIClient.UploadFile(key, file, contentType)
+	err = s.storageAPIClient.UploadFile(ctx, key, file, contentType)
 	if err != nil {
 		return nil, err
 	}
@@ -275,14 +275,14 @@ func (s *detectTextServiceImpl) createInputFile(ctx context.Context, logger *zap
 	return inputFile, nil
 }
 
-func (s *detectTextServiceImpl) detectText(logger *zap.Logger, inputFileKey string) (string, *os.File, error) {
+func (s *detectTextServiceImpl) detectText(ctx context.Context, logger *zap.Logger, inputFileKey string) (string, *os.File, error) {
 	outputKey, err := s.visionAPIClient.DetectText(logger, inputFileKey)
 	if err != nil {
 		logger.Error(err.Error())
 		return "", nil, err
 	}
 
-	queryFiles, err := s.storageAPIClient.QueryFiles(outputKey)
+	queryFiles, err := s.storageAPIClient.QueryFiles(ctx, outputKey)
 	if err != nil {
 		logger.Error(err.Error())
 		return "", nil, err
@@ -294,7 +294,7 @@ func (s *detectTextServiceImpl) detectText(logger *zap.Logger, inputFileKey stri
 		return "", nil, err
 	}
 
-	outputFile, err := s.storageAPIClient.DownloadFile(queryFiles[0])
+	outputFile, err := s.storageAPIClient.DownloadFile(ctx, queryFiles[0])
 	if err != nil {
 		logger.Error(err.Error())
 		return "", nil, err
@@ -373,7 +373,7 @@ func (s *detectTextServiceImpl) DeleteResult(ctx context.Context, id string) err
 				return err
 			}
 			for _, file := range outputFiles {
-				err = s.storageAPIClient.DeleteFile(file.FileKey)
+				err = s.storageAPIClient.DeleteFile(ctx, file.FileKey)
 				if err != nil {
 					logger.Error(err.Error())
 				}
@@ -391,7 +391,7 @@ func (s *detectTextServiceImpl) DeleteResult(ctx context.Context, id string) err
 				return err
 			}
 			for _, file := range inputFiles {
-				err = s.storageAPIClient.DeleteFile(file.FileKey)
+				err = s.storageAPIClient.DeleteFile(ctx, file.FileKey)
 				if err != nil {
 					logger.Error(err.Error())
 				}
@@ -407,7 +407,7 @@ func (s *detectTextServiceImpl) DeleteResult(ctx context.Context, id string) err
 				// logger.Error(err.Error())
 				return err
 			}
-			err = s.storageAPIClient.DeleteFile(job.OriginalFileKey)
+			err = s.storageAPIClient.DeleteFile(ctx, job.OriginalFileKey)
 			if err != nil {
 				logger.Error(err.Error())
 			}
