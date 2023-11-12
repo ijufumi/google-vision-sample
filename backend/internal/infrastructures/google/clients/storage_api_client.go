@@ -18,12 +18,12 @@ import (
 )
 
 type StorageAPIClient interface {
-	UploadFile(key string, file *os.File, contentType enums.ContentType) error
-	DownloadFile(key string) (*os.File, error)
-	QueryFiles(key string) ([]string, error)
-	DeleteFile(key string) error
-	SignedURL(key string) (string, error)
-	UpdateContentType(key, contentType string) error
+	UploadFile(ctx context.Context, key string, file *os.File, contentType enums.ContentType) error
+	DownloadFile(ctx context.Context, key string) (*os.File, error)
+	QueryFiles(ctx context.Context, key string) ([]string, error)
+	DeleteFile(ctx context.Context, key string) error
+	SignedURL(ctx context.Context, key string) (string, error)
+	UpdateContentType(ctx context.Context, key, contentType string) error
 	SetupCORSOnBucket() error
 }
 
@@ -34,11 +34,12 @@ func NewStorageAPIClient(config *configs.Config) StorageAPIClient {
 }
 
 type storageAPIClient struct {
+	baseClient
 	config    *configs.Config
 	jwtConfig *jwt.Config
 }
 
-func (c *storageAPIClient) UploadFile(key string, file *os.File, contentType enums.ContentType) error {
+func (c *storageAPIClient) UploadFile(ctx context.Context, key string, file *os.File, contentType enums.ContentType) error {
 	client, err := c.newClient()
 	if err != nil {
 		return errors.Wrap(err, "StorageAPIClient#UploadFile")
@@ -70,7 +71,7 @@ func (c *storageAPIClient) UploadFile(key string, file *os.File, contentType enu
 	return nil
 }
 
-func (c *storageAPIClient) DownloadFile(key string) (*os.File, error) {
+func (c *storageAPIClient) DownloadFile(ctx context.Context, key string) (*os.File, error) {
 	client, err := c.newClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "StorageAPIClient#DownloadFile")
@@ -101,7 +102,7 @@ func (c *storageAPIClient) DownloadFile(key string) (*os.File, error) {
 	return tempFile, nil
 }
 
-func (c *storageAPIClient) SignedURL(key string) (string, error) {
+func (c *storageAPIClient) SignedURL(ctx context.Context, key string) (string, error) {
 	client, err := c.newClient()
 	if err != nil {
 		return "", errors.Wrap(err, "StorageAPIClient#SignedURL")
@@ -123,7 +124,7 @@ func (c *storageAPIClient) SignedURL(key string) (string, error) {
 	return signedURL, nil
 }
 
-func (c *storageAPIClient) QueryFiles(key string) ([]string, error) {
+func (c *storageAPIClient) QueryFiles(ctx context.Context, key string) ([]string, error) {
 	client, err := c.newClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "StorageAPIClient#QueryFiles")
@@ -150,7 +151,7 @@ func (c *storageAPIClient) QueryFiles(key string) ([]string, error) {
 	return files, nil
 }
 
-func (c *storageAPIClient) DeleteFile(key string) error {
+func (c *storageAPIClient) DeleteFile(ctx context.Context, key string) error {
 	client, err := c.newClient()
 	if err != nil {
 		return errors.Wrap(err, "StorageAPIClient#DeleteFile")
@@ -166,7 +167,7 @@ func (c *storageAPIClient) DeleteFile(key string) error {
 	return nil
 }
 
-func (c *storageAPIClient) UpdateContentType(key, contentType string) error {
+func (c *storageAPIClient) UpdateContentType(ctx context.Context, key, contentType string) error {
 	client, err := c.newClient()
 	if err != nil {
 		return errors.Wrap(err, "StorageAPIClient#UpdateContentType")
