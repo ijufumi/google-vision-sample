@@ -9,6 +9,7 @@ import (
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities/enums"
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/google/models/services"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/iterator"
 	"io"
@@ -44,31 +45,33 @@ func (c *storageAPIClient) UploadFile(ctx context.Context, key string, file *os.
 	if err != nil {
 		return errors.Wrap(err, "StorageAPIClient#UploadFile")
 	}
-	defer func() {
-		err := client.Close()
-		if err != nil {
-			fmt.Println(err)
-			//c.logger.Error("client closing error", zap.Error(err))
-		}
-	}()
 
-	object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
-	storageWriter := object.NewWriter(context.Background())
-	storageWriter.ContentType = string(contentType)
-	defer func() {
-		err := storageWriter.Close()
-		if err != nil {
-			fmt.Println(err)
-			//c.logger.Error("writer closing error", zap.Error(err))
-		}
-	}()
+	return c.Process(ctx, func(logger *zap.Logger) error {
+		defer func() {
+			err := client.Close()
+			if err != nil {
+				logger.Error("client closing error", zap.Error(err))
+			}
+		}()
 
-	if size, err := io.Copy(storageWriter, file); err != nil {
-		return errors.Wrap(err, "StorageAPIClient#UploadFile")
-	} else if size == 0 {
-		return errors.New("written size was 0")
-	}
-	return nil
+		object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
+		storageWriter := object.NewWriter(context.Background())
+		storageWriter.ContentType = string(contentType)
+		defer func() {
+			err := storageWriter.Close()
+			if err != nil {
+				logger.Error("writer closing error", zap.Error(err))
+			}
+		}()
+
+		if size, err := io.Copy(storageWriter, file); err != nil {
+			return errors.Wrap(err, "StorageAPIClient#UploadFile")
+		} else if size == 0 {
+			return errors.New("written size was 0")
+		}
+
+		return nil
+	})
 }
 
 func (c *storageAPIClient) DownloadFile(ctx context.Context, key string) (*os.File, error) {
