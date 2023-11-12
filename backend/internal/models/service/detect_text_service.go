@@ -14,7 +14,6 @@ import (
 	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
 	"gopkg.in/gographics/imagick.v2/imagick"
-	"gorm.io/gorm"
 	"io"
 	"os"
 	"path/filepath"
@@ -37,7 +36,6 @@ func NewDetectTextService(
 	inputFileRepository repositories.InputFileRepository,
 	outputFileRepository repositories.OutputFileRepository,
 	imageConversionService ImageConversionService,
-	db *gorm.DB,
 ) DetectTextService {
 	return &detectTextServiceImpl{
 		storageAPIClient:        storageAPIClient,
@@ -47,7 +45,6 @@ func NewDetectTextService(
 		inputFileRepository:     inputFileRepository,
 		outputFileRepository:    outputFileRepository,
 		imageConversionService:  imageConversionService,
-		db:                      db,
 	}
 }
 
@@ -428,5 +425,4 @@ type detectTextServiceImpl struct {
 	inputFileRepository     repositories.InputFileRepository
 	outputFileRepository    repositories.OutputFileRepository
 	imageConversionService  ImageConversionService
-	db                      *gorm.DB
 }
