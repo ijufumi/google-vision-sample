@@ -32,9 +32,9 @@ func (c *visionAPIClient) DetectText(logger *zap.Logger, key string) (string, er
 		_ = client.Close()
 	}()
 
-	imageUri := MakeToGCSUri(c.config.Google.Storage.Bucket, key)
+	imageUri := makeToGCSUri(c.config.Google.Storage.Bucket, key)
 	outputKey := fmt.Sprintf("%s-output-%d.json", key, time.Now().UTC().Unix())
-	outputUri := MakeToGCSUri(c.config.Google.Storage.Bucket, outputKey)
+	outputUri := makeToGCSUri(c.config.Google.Storage.Bucket, outputKey)
 
 	logger.Info(fmt.Sprintf("imageUri is %s", imageUri))
 	logger.Info(fmt.Sprintf("outputUri is %s", outputUri))

@@ -110,20 +110,29 @@ func (c *storageAPIClient) SignedURL(ctx context.Context, key string) (string, e
 	if err != nil {
 		return "", errors.Wrap(err, "StorageAPIClient#SignedURL")
 	}
-	defer func() {
-		_ = client.Close()
-	}()
-	option := &storage.SignedURLOptions{
-		Scheme:     storage.SigningSchemeV4,
-		PrivateKey: c.jwtConfig.PrivateKey,
-		Expires:    time.Now().UTC().Add(time.Duration(c.config.Google.Storage.SignedURL.ExpireSec) * time.Second),
-		Method:     http.MethodGet,
-	}
-	signedURL, err := client.Bucket(c.config.Google.Storage.Bucket).SignedURL(key, option)
+	signedURL := ""
+	err = c.Process(ctx, func(logger *zap.Logger) error {
+		defer func() {
+			_ = client.Close()
+		}()
+		option := &storage.SignedURLOptions{
+			Scheme:     storage.SigningSchemeV4,
+			PrivateKey: c.jwtConfig.PrivateKey,
+			Expires:    time.Now().UTC().Add(time.Duration(c.config.Google.Storage.SignedURL.ExpireSec) * time.Second),
+			Method:     http.MethodGet,
+		}
+		_signedURL, err := client.Bucket(c.config.Google.Storage.Bucket).SignedURL(key, option)
+		if err != nil {
+			return errors.Wrap(err, "StorageAPIClient#SignedURL")
+		}
+		signedURL = _signedURL
+		logger.Info(fmt.Sprintf("[%s]signed url is %s", key, signedURL))
+		return nil
+	})
+
 	if err != nil {
-		return "", errors.Wrap(err, "StorageAPIClient#SignedURL")
+		return "", err
 	}
-	//c.logger.Info(fmt.Sprintf("[%s]signed url is %s", key, signedURL))
 	return signedURL, nil
 }
 
@@ -224,6 +233,6 @@ func (c *storageAPIClient) newClient() (*storage.Client, error) {
 	return service, nil
 }
 
-func MakeToGCSUri(bucket, key string) string {
+func makeToGCSUri(bucket, key string) string {
 	return fmt.Sprintf("gs://%s/%s", bucket, key)
 }
