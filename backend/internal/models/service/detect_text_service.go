@@ -276,7 +276,7 @@ func (s *detectTextServiceImpl) createInputFile(ctx context.Context, logger *zap
 }
 
 func (s *detectTextServiceImpl) detectText(ctx context.Context, logger *zap.Logger, inputFileKey string) (string, *os.File, error) {
-	outputKey, err := s.visionAPIClient.DetectText(logger, inputFileKey)
+	outputKey, err := s.visionAPIClient.DetectText(ctx, inputFileKey)
 	if err != nil {
 		logger.Error(err.Error())
 		return "", nil, err

@@ -13,7 +13,7 @@ import (
 )
 
 type VisionAPIClient interface {
-	DetectText(logger *zap.Logger, key string) (string, error)
+	DetectText(ctx context.Context, key string) (string, error)
 }
 
 func NewVisionAPIClient(config *configs.Config) VisionAPIClient {
@@ -22,7 +22,7 @@ func NewVisionAPIClient(config *configs.Config) VisionAPIClient {
 	}
 }
 
-func (c *visionAPIClient) DetectText(logger *zap.Logger, key string) (string, error) {
+func (c *visionAPIClient) DetectText(ctx context.Context, key string) (string, error) {
 	client, err := c.newClient()
 	if err != nil {
 		return "", errors.Wrap(err, "VisionAPIClient#DetectText")
@@ -35,45 +35,51 @@ func (c *visionAPIClient) DetectText(logger *zap.Logger, key string) (string, er
 	imageUri := makeToGCSUri(c.config.Google.Storage.Bucket, key)
 	outputKey := fmt.Sprintf("%s-output-%d.json", key, time.Now().UTC().Unix())
 	outputUri := makeToGCSUri(c.config.Google.Storage.Bucket, outputKey)
+	err = c.Process(ctx, func(logger *zap.Logger) error {
 
-	logger.Info(fmt.Sprintf("imageUri is %s", imageUri))
-	logger.Info(fmt.Sprintf("outputUri is %s", outputUri))
-	request := &visionpb.AsyncBatchAnnotateImagesRequest{
-		Requests: []*visionpb.AnnotateImageRequest{
-			&visionpb.AnnotateImageRequest{
-				Image: &visionpb.Image{
-					Source: &visionpb.ImageSource{ImageUri: imageUri},
-				},
-				Features: []*visionpb.Feature{
-					&visionpb.Feature{Type: visionpb.Feature_TEXT_DETECTION},
-				},
-				ImageContext: &visionpb.ImageContext{
-					LanguageHints: []string{"ja"},
+		logger.Info(fmt.Sprintf("imageUri is %s", imageUri))
+		logger.Info(fmt.Sprintf("outputUri is %s", outputUri))
+		request := &visionpb.AsyncBatchAnnotateImagesRequest{
+			Requests: []*visionpb.AnnotateImageRequest{
+				&visionpb.AnnotateImageRequest{
+					Image: &visionpb.Image{
+						Source: &visionpb.ImageSource{ImageUri: imageUri},
+					},
+					Features: []*visionpb.Feature{
+						&visionpb.Feature{Type: visionpb.Feature_TEXT_DETECTION},
+					},
+					ImageContext: &visionpb.ImageContext{
+						LanguageHints: []string{"ja"},
+					},
 				},
 			},
-		},
-		OutputConfig: &visionpb.OutputConfig{
-			GcsDestination: &visionpb.GcsDestination{
-				Uri: outputUri,
+			OutputConfig: &visionpb.OutputConfig{
+				GcsDestination: &visionpb.GcsDestination{
+					Uri: outputUri,
+				},
 			},
-		},
-	}
-	operation, err := client.AsyncBatchAnnotateImages(context.Background(), request)
-	if err != nil {
-		return "", errors.Wrap(err, "VisionAPIClient#DetectText")
-	}
-	response, err := operation.Wait(context.Background())
-	if err != nil {
-		return "", errors.Wrap(err, "VisionAPIClient#DetectText")
-	}
+		}
+		operation, err := client.AsyncBatchAnnotateImages(context.Background(), request)
+		if err != nil {
+			return errors.Wrap(err, "VisionAPIClient#DetectText")
+		}
+		response, err := operation.Wait(context.Background())
+		if err != nil {
+			return errors.Wrap(err, "VisionAPIClient#DetectText")
+		}
 
-	fmt.Println(response)
-	logger.Debug(fmt.Sprintf("%+v", response))
+		logger.Debug(fmt.Sprintf("%+v", response))
+		return nil
+	})
+	if err != nil {
+		return "", err
+	}
 
 	return outputKey, nil
 }
 
 type visionAPIClient struct {
+	baseClient
 	config *configs.Config
 }
 
