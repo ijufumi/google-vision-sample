@@ -68,7 +68,9 @@ func (c *visionAPIClient) DetectText(ctx context.Context, key string) (string, e
 			return errors.Wrap(err, "VisionAPIClient#DetectText")
 		}
 
-		logger.Debug(fmt.Sprintf("%+v", response))
+		if logger.Level() == zap.DebugLevel {
+			logger.Debug(fmt.Sprintf("%+v", response))
+		}
 		return nil
 	})
 	if err != nil {

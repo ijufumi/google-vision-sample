@@ -82,26 +82,35 @@ func (c *storageAPIClient) DownloadFile(ctx context.Context, key string) (*os.Fi
 	defer func() {
 		_ = client.Close()
 	}()
-	fmt.Println(fmt.Sprintf("key is %s", key))
-	object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
-	storageReader, err := object.NewReader(context.Background())
+
+	var tempFile *os.File
+	err = c.Process(ctx, func(logger *zap.Logger) error {
+		fmt.Println(fmt.Sprintf("key is %s", key))
+		object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
+		storageReader, err := object.NewReader(context.Background())
+		if err != nil {
+			return errors.Wrap(err, "StorageAPIClient#DownloadFile#NewReader")
+		}
+		defer func() {
+			_ = storageReader.Close()
+		}()
+		tempFile, err = utils.NewTempFile()
+		if err != nil {
+			return errors.Wrap(err, "StorageAPIClient#DownloadFile#NewTempFile")
+		}
+		if _, err = io.Copy(tempFile, storageReader); err != nil {
+			return errors.Wrap(err, "StorageAPIClient#DownloadFile#Copy")
+		}
+		_, err = tempFile.Seek(0, 0)
+		if err != nil {
+			return errors.Wrap(err, "StorageAPIClient#DownloadFile#Seek")
+		}
+		return nil
+	})
 	if err != nil {
-		return nil, errors.Wrap(err, "StorageAPIClient#DownloadFile#NewReader")
+		return nil, err
 	}
-	defer func() {
-		_ = storageReader.Close()
-	}()
-	tempFile, err := utils.NewTempFile()
-	if err != nil {
-		return nil, errors.Wrap(err, "StorageAPIClient#DownloadFile#NewTempFile")
-	}
-	if _, err = io.Copy(tempFile, storageReader); err != nil {
-		return nil, errors.Wrap(err, "StorageAPIClient#DownloadFile#Copy")
-	}
-	_, err = tempFile.Seek(0, 0)
-	if err != nil {
-		return nil, errors.Wrap(err, "StorageAPIClient#DownloadFile#Seek")
-	}
+
 	return tempFile, nil
 }
 
@@ -152,7 +161,7 @@ func (c *storageAPIClient) QueryFiles(ctx context.Context, key string) ([]string
 	for {
 		obj, err := objects.Next()
 		if err != nil {
-			if err == iterator.Done {
+			if errors.Is(err, iterator.Done) {
 				break
 			}
 			return nil, errors.Wrap(err, "StorageAPIClient#QueryFiles#Next")
