@@ -55,7 +55,7 @@ func (c *storageAPIClient) UploadFile(ctx context.Context, key string, file *os.
 		}()
 
 		object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
-		storageWriter := object.NewWriter(context.Background())
+		storageWriter := object.NewWriter(ctx)
 		storageWriter.ContentType = string(contentType)
 		defer func() {
 			err := storageWriter.Close()
@@ -87,7 +87,7 @@ func (c *storageAPIClient) DownloadFile(ctx context.Context, key string) (*os.Fi
 	err = c.Process(ctx, func(logger *zap.Logger) error {
 		fmt.Println(fmt.Sprintf("key is %s", key))
 		object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
-		storageReader, err := object.NewReader(context.Background())
+		storageReader, err := object.NewReader(ctx)
 		if err != nil {
 			return errors.Wrap(err, "StorageAPIClient#DownloadFile#NewReader")
 		}
@@ -156,7 +156,7 @@ func (c *storageAPIClient) QueryFiles(ctx context.Context, key string) ([]string
 	query := &storage.Query{
 		Prefix: key,
 	}
-	objects := client.Bucket(c.config.Google.Storage.Bucket).Objects(context.Background(), query)
+	objects := client.Bucket(c.config.Google.Storage.Bucket).Objects(ctx, query)
 	files := make([]string, 0)
 	for {
 		obj, err := objects.Next()
@@ -181,7 +181,7 @@ func (c *storageAPIClient) DeleteFile(ctx context.Context, key string) error {
 		_ = client.Close()
 	}()
 	object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
-	err = object.Delete(context.Background())
+	err = object.Delete(ctx)
 	if err != nil {
 		return errors.Wrap(err, "StorageAPIClient#DeleteFile#Delete")
 	}
@@ -196,13 +196,15 @@ func (c *storageAPIClient) UpdateContentType(ctx context.Context, key, contentTy
 	defer func() {
 		_ = client.Close()
 	}()
-	fmt.Println(fmt.Sprintf("key is %s", key))
-	object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
-	_, err = object.Update(context.Background(), storage.ObjectAttrsToUpdate{ContentType: contentType})
-	if err != nil {
-		return errors.Wrap(err, "StorageAPIClient#UpdateContentType#Update")
-	}
-	return nil
+	return c.Process(ctx, func(logger *zap.Logger) error {
+		logger.Info(fmt.Sprintf("key is %s", key))
+		object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
+		_, err = object.Update(ctx, storage.ObjectAttrsToUpdate{ContentType: contentType})
+		if err != nil {
+			return errors.Wrap(err, "StorageAPIClient#UpdateContentType#Update")
+		}
+		return nil
+	})
 }
 
 func (c *storageAPIClient) SetupCORSOnBucket() error {
