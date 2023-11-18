@@ -127,19 +127,19 @@ func (s *detectTextServiceImpl) DetectTexts(ctx context.Context, file *os.File, 
 	}
 
 	go func() {
-		_ = s.Process(ctx, func(logger *zap.Logger) error {
-			job, err := s.jobRepository.GetByID(ctx, id)
+		_ = s.ProcessWithNewContext(ctx, func(ctx2 context.Context, logger *zap.Logger) error {
+			job, err := s.jobRepository.GetByID(ctx2, id)
 			if err != nil {
 				logger.Error(fmt.Sprintf("%v was occurred.", err))
 			}
-			err = s.processDetectText(ctx, logger, id, tempFileForWork)
+			err = s.processDetectText(ctx2, logger, id, tempFileForWork)
 			if err != nil {
 				logger.Error(fmt.Sprintf("%v was occurred.", err))
 				job.Status = enums.JobStatus_Failed
 			} else {
 				job.Status = enums.JobStatus_Succeeded
 			}
-			_ = s.jobRepository.Update(ctx, job)
+			_ = s.jobRepository.Update(ctx2, job)
 			_ = os.Remove(tempFileForWork.Name())
 			return nil
 		})

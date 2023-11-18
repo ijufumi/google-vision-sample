@@ -15,6 +15,12 @@ func (s *baseService) Process(ctx context.Context, f func(logger *zap.Logger) er
 	return f(logger)
 }
 
+func (s *baseService) ProcessWithNewContext(ctx context.Context, f func(ctx context.Context, logger *zap.Logger) error) error {
+	ctx2 := contextManager.NewContext(ctx)
+	logger := contextManager.GetLogger(ctx2)
+	return f(ctx2, logger)
+}
+
 func (s *baseService) Transaction(ctx context.Context, f func(ctx context.Context) error) error {
 	newDB := contextManager.GetDB(ctx)
 	return newDB.Transaction(func(tx *gorm.DB) error {
