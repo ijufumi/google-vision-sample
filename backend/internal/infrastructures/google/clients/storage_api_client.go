@@ -85,7 +85,7 @@ func (c *storageAPIClient) DownloadFile(ctx context.Context, key string) (*os.Fi
 
 	var tempFile *os.File
 	err = c.Process(ctx, func(logger *zap.Logger) error {
-		fmt.Println(fmt.Sprintf("key is %s", key))
+		logger.Info(fmt.Sprintf("key is %s", key))
 		object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
 		storageReader, err := object.NewReader(ctx)
 		if err != nil {
@@ -180,12 +180,15 @@ func (c *storageAPIClient) DeleteFile(ctx context.Context, key string) error {
 	defer func() {
 		_ = client.Close()
 	}()
-	object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
-	err = object.Delete(ctx)
-	if err != nil {
-		return errors.Wrap(err, "StorageAPIClient#DeleteFile#Delete")
-	}
-	return nil
+	return c.Process(ctx, func(logger *zap.Logger) error {
+		logger.Info(fmt.Sprintf("key is %s", key))
+		object := client.Bucket(c.config.Google.Storage.Bucket).Object(key)
+		err = object.Delete(ctx)
+		if err != nil {
+			return errors.Wrap(err, "StorageAPIClient#DeleteFile#Delete")
+		}
+		return nil
+	})
 }
 
 func (c *storageAPIClient) UpdateContentType(ctx context.Context, key, contentType string) error {
