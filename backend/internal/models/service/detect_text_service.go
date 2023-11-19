@@ -149,7 +149,7 @@ func (s *detectTextServiceImpl) DetectTexts(ctx context.Context, file *os.File, 
 
 func (s *detectTextServiceImpl) processDetectText(ctx context.Context, logger *zap.Logger, id string, inputFile *os.File) error {
 	contentType := s.imageConversionService.DetectContentType(inputFile.Name())
-	// s.logger.Info(fmt.Sprintf("Content-Type is %s", contentType))
+	logger.Info(fmt.Sprintf("Content-Type is %s", contentType))
 	switch {
 	case contentType == enums.ContentType_Pdf:
 		imageFiles, err := s.imageConversionService.ConvertPdfToImages(inputFile.Name())
