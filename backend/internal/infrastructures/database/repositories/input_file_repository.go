@@ -48,7 +48,8 @@ func (r *inputFileRepository) GetByJobID(ctx context.Context, jobID string) ([]*
 	return results.ToModel(), nil
 }
 
-func (r *inputFileRepository) Create(ctx context.Context, entity ...*models.InputFile) error {
+func (r *inputFileRepository) Create(ctx context.Context, model ...*models.InputFile) error {
+	entity := entities.FromInputFilesModel(model)
 	return r.Transaction(ctx, func(tx *gorm.DB) error {
 		if err := tx.Create(&entity).Error; err != nil {
 			return errors.Wrap(err, "InputFileRepository#Create")
@@ -57,7 +58,8 @@ func (r *inputFileRepository) Create(ctx context.Context, entity ...*models.Inpu
 	})
 }
 
-func (r *inputFileRepository) Update(ctx context.Context, entity *models.InputFile) error {
+func (r *inputFileRepository) Update(ctx context.Context, model *models.InputFile) error {
+	entity := entities.FromInputFileModel(model)
 	return r.Transaction(ctx, func(tx *gorm.DB) error {
 		if err := tx.Save(&entity).Error; err != nil {
 			return errors.Wrap(err, "InputFileRepository#Update")

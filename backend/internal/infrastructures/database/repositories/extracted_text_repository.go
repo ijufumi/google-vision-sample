@@ -32,10 +32,11 @@ func (r *extractedTextRepository) GetByID(ctx context.Context, id string) (*mode
 	return result.ToModel(), nil
 }
 
-func (r *extractedTextRepository) Create(ctx context.Context, entity ...*models.ExtractedText) error {
-	if len(entity) == 0 {
+func (r *extractedTextRepository) Create(ctx context.Context, model ...*models.ExtractedText) error {
+	if len(model) == 0 {
 		return nil
 	}
+	entity := entities.FromExtractedTextsModel(model)
 	return r.Transaction(ctx, func(tx *gorm.DB) error {
 		if err := tx.Create(&entity).Error; err != nil {
 			return errors.Wrap(err, "ExtractedTextRepository#Create")

@@ -32,7 +32,8 @@ func (r *outputFileRepository) GetByJobID(ctx context.Context, jobID string) ([]
 	return results.ToModel(), nil
 }
 
-func (r *outputFileRepository) Create(ctx context.Context, entity ...*models.OutputFile) error {
+func (r *outputFileRepository) Create(ctx context.Context, model ...*models.OutputFile) error {
+	entity := entities.FromOutputFilesModel(model)
 	return r.Transaction(ctx, func(tx *gorm.DB) error {
 		if err := tx.Create(&entity).Error; err != nil {
 			return errors.Wrap(err, "OutputFileRepository#Create")
