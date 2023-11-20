@@ -47,10 +47,11 @@ func SetLogger(ctx context.Context, logger *zap.Logger) context.Context {
 
 func GetDB(ctx context.Context) *gorm.DB {
 	d := ctx.Value(contextKey_Tx)
-	if d != nil {
-		return d.(*gorm.DB)
-	}
-	d = ctx.Value(contextKey_DB)
+	return d.(*gorm.DB)
+}
+
+func GetTx(ctx context.Context) *gorm.DB {
+	d := ctx.Value(contextKey_DB)
 	return d.(*gorm.DB)
 }
 
@@ -60,6 +61,11 @@ func SetDB(ctx context.Context, db *gorm.DB) context.Context {
 
 func SetTx(ctx context.Context, tx *gorm.DB) context.Context {
 	return context.WithValue(ctx, contextKey_Tx, tx)
+}
+
+func HasTx(ctx context.Context) bool {
+	d := ctx.Value(contextKey_Tx)
+	return d != nil
 }
 
 func NewContext(ctx context.Context) context.Context {

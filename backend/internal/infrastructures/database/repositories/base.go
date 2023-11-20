@@ -9,6 +9,12 @@ import (
 type baseRepository struct{}
 
 func (r *baseRepository) Transaction(ctx context.Context, f func(tx *gorm.DB) error) error {
-	tx := contextManager.GetDB(ctx)
-	return f(tx)
+	if contextManager.HasTx(ctx) {
+		tx := contextManager.GetTx(ctx)
+		return f(tx)
+	}
+	db := contextManager.GetDB(ctx)
+	return db.Transaction(func(tx *gorm.DB) error {
+		return f(tx)
+	})
 }
