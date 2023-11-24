@@ -46,17 +46,17 @@ create table if not exists output_files
 
 create table if not exists extracted_texts
 (
-    id             varchar(26)      not null primary key,
-    job_id         varchar(26)      not null references jobs (id),
-    input_file_id  varchar(26)      not null references input_files (id),
-    output_file_id varchar(26)      not null references output_files (id),
-    text           varchar(255)     not null,
-    top            double precision not null,
-    bottom         double precision not null,
-    "left"         double precision not null,
-    "right"        double precision not null,
-    created_at     timestamp        not null,
-    updated_at     timestamp        not null,
+    id             varchar(26)  not null primary key,
+    job_id         varchar(26)  not null references jobs (id),
+    input_file_id  varchar(26)  not null references input_files (id),
+    output_file_id varchar(26)  not null references output_files (id),
+    text           varchar(255) not null,
+    top            decimal      not null,
+    bottom         decimal      not null,
+    "left"         decimal      not null,
+    "right"        decimal      not null,
+    created_at     timestamp    not null,
+    updated_at     timestamp    not null,
     deleted_at     timestamp
 );
 

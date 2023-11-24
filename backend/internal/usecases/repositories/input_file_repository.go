@@ -2,13 +2,13 @@ package repositories
 
 import (
 	"github.com/ijufumi/google-vision-sample/internal/models/entities"
-	"gorm.io/gorm"
+	"golang.org/x/net/context"
 )
 
 type InputFileRepository interface {
-	GetByID(db *gorm.DB, iD string) (*entities.InputFile, error)
-	GetByJobID(db *gorm.DB, jobID string) ([]*entities.InputFile, error)
-	Create(db *gorm.DB, entity ...*entities.InputFile) error
-	Update(db *gorm.DB, entity *entities.InputFile) error
-	DeleteByJobID(db *gorm.DB, jobID string) error
+	GetByID(ctx context.Context, iD string) (*entities.InputFile, error)
+	GetByJobID(ctx context.Context, jobID string) ([]*entities.InputFile, error)
+	Create(ctx context.Context, entity ...*entities.InputFile) error
+	Update(ctx context.Context, entity *entities.InputFile) error
+	DeleteByJobID(ctx context.Context, jobID string) error
 }

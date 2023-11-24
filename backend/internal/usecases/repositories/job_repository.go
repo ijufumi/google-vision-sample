@@ -1,14 +1,14 @@
 package repositories
 
 import (
+	"context"
 	"github.com/ijufumi/google-vision-sample/internal/models/entities"
-	"gorm.io/gorm"
 )
 
 type JobRepository interface {
-	GetAll(db *gorm.DB) ([]*entities.Job, error)
-	GetByID(db *gorm.DB, id string) (*entities.Job, error)
-	Create(db *gorm.DB, entity *entities.Job) error
-	Update(db *gorm.DB, entity *entities.Job) error
-	Delete(db *gorm.DB, id string) error
+	GetAll(ctx context.Context) ([]*entities.Job, error)
+	GetByID(ctx context.Context, id string) (*entities.Job, error)
+	Create(ctx context.Context, entity *entities.Job) error
+	Update(ctx context.Context, entity *entities.Job) error
+	Delete(ctx context.Context, id string) error
 }

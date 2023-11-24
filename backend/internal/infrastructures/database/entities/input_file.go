@@ -18,24 +18,32 @@ type InputFile struct {
 	Width       uint
 	Height      uint
 	Status      enums.InputFileStatus
-	OutputFiles []*OutputFile
+	OutputFiles OutputFiles
 }
 
 type InputFiles []*InputFile
 
-func FromInputFileModel(inputFile *models.InputFile) *InputFile {
+func FromInputFilesModel(inputFilesModel models.InputFiles) InputFiles {
+	var inputFiles InputFiles
+	for _, inputFile := range inputFilesModel {
+		inputFiles = append(inputFiles, FromInputFileModel(inputFile))
+	}
+	return inputFiles
+}
+
+func FromInputFileModel(inputFileModel *models.InputFile) *InputFile {
 	return &InputFile{
-		ID:          inputFile.ID,
-		JobID:       inputFile.JobID,
-		PageNo:      0, // fixme: set correct number
-		FileKey:     inputFile.FileKey,
-		FileName:    inputFile.FileName,
-		ContentType: inputFile.ContentType,
-		Size:        inputFile.Size,
-		Width:       0,   // fixme: set correct number
-		Height:      0,   // fixme: set correct number
-		Status:      "",  // fixme: set correct status
-		OutputFiles: nil, // fixme: set correct value
+		ID:          inputFileModel.ID,
+		JobID:       inputFileModel.JobID,
+		PageNo:      inputFileModel.PageNo,
+		FileKey:     inputFileModel.FileKey,
+		FileName:    inputFileModel.FileName,
+		ContentType: inputFileModel.ContentType,
+		Size:        inputFileModel.Size,
+		Width:       inputFileModel.Width,
+		Height:      inputFileModel.Height,
+		Status:      inputFileModel.Status,
+		OutputFiles: FromOutputFilesModel(inputFileModel.OutputFiles),
 	}
 }
 
@@ -49,7 +57,7 @@ func (e *InputFile) ToModel() *models.InputFile {
 		Size:        e.Size,
 		CreatedAt:   e.CreatedAt.Unix(),
 		UpdatedAt:   e.UpdatedAt.Unix(),
-		OutputFiles: nil, // fixme: set correct value
+		OutputFiles: e.OutputFiles.ToModel(),
 	}
 }
 

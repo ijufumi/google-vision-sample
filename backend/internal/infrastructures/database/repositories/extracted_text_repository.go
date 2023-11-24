@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"context"
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/entities"
 	models "github.com/ijufumi/google-vision-sample/internal/models/entities"
 	repositoryInterface "github.com/ijufumi/google-vision-sample/internal/usecases/repositories"
@@ -13,30 +14,42 @@ func NewExtractedTextRepository() repositoryInterface.ExtractedTextRepository {
 }
 
 type extractedTextRepository struct {
+	baseRepository
 }
 
-func (r *extractedTextRepository) GetByID(db *gorm.DB, id string) (*models.ExtractedText, error) {
+func (r *extractedTextRepository) GetByID(ctx context.Context, id string) (*models.ExtractedText, error) {
 	var result *entities.ExtractedText
-	if err := db.Where("id = ?", id).Find(result).Error; err != nil {
-		return nil, errors.Wrap(err, "ExtractedTextRepository#GetByJobID")
+	err := r.Transaction(ctx, func(tx *gorm.DB) error {
+		if err := tx.Where("id = ?", id).Find(result).Error; err != nil {
+			return errors.Wrap(err, "ExtractedTextRepository#GetByJobID")
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
-	entity := &models.ExtractedText{}
-	return entity, nil
+
+	return result.ToModel(), nil
 }
 
-func (r *extractedTextRepository) Create(db *gorm.DB, entity ...*models.ExtractedText) error {
-	if len(entity) == 0 {
+func (r *extractedTextRepository) Create(ctx context.Context, model ...*models.ExtractedText) error {
+	if len(model) == 0 {
 		return nil
 	}
-	if err := db.Create(&entity).Error; err != nil {
-		return errors.Wrap(err, "ExtractedTextRepository#Create")
-	}
-	return nil
+	entity := entities.FromExtractedTextsModel(model)
+	return r.Transaction(ctx, func(tx *gorm.DB) error {
+		if err := tx.Create(&entity).Error; err != nil {
+			return errors.Wrap(err, "ExtractedTextRepository#Create")
+		}
+		return nil
+	})
 }
 
-func (r *extractedTextRepository) DeleteByOutputFileID(db *gorm.DB, outputFileID string) error {
-	if err := db.Where("output_file_id = ?", outputFileID).Delete(&entities.ExtractedText{}).Error; err != nil {
-		return errors.Wrap(err, "ExtractedTextRepository#DeleteByOutputFileID")
-	}
-	return nil
+func (r *extractedTextRepository) DeleteByOutputFileID(ctx context.Context, outputFileID string) error {
+	return r.Transaction(ctx, func(tx *gorm.DB) error {
+		if err := tx.Where("output_file_id = ?", outputFileID).Delete(&entities.ExtractedText{}).Error; err != nil {
+			return errors.Wrap(err, "ExtractedTextRepository#DeleteByOutputFileID")
+		}
+		return nil
+	})
 }

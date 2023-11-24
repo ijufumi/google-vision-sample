@@ -15,6 +15,12 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
 
+      # test
+      - name: test
+        run: |
+          cd backend
+          go test
+
       # build a image
       - name: build a image
         env:

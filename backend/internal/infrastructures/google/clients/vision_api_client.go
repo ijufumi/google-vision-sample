@@ -6,13 +6,14 @@ import (
 	"context"
 	"fmt"
 	"github.com/ijufumi/google-vision-sample/internal/common/configs"
-	"github.com/ijufumi/google-vision-sample/internal/infrastructures/google/options"
+	"github.com/ijufumi/google-vision-sample/internal/infrastructures/google/models/services"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 	"time"
 )
 
 type VisionAPIClient interface {
-	DetectText(key string) (string, error)
+	DetectText(ctx context.Context, key string) (string, error)
 }
 
 func NewVisionAPIClient(config *configs.Config) VisionAPIClient {
@@ -21,7 +22,7 @@ func NewVisionAPIClient(config *configs.Config) VisionAPIClient {
 	}
 }
 
-func (c *visionAPIClient) DetectText(key string) (string, error) {
+func (c *visionAPIClient) DetectText(ctx context.Context, key string) (string, error) {
 	client, err := c.newClient()
 	if err != nil {
 		return "", errors.Wrap(err, "VisionAPIClient#DetectText")
@@ -31,53 +32,61 @@ func (c *visionAPIClient) DetectText(key string) (string, error) {
 		_ = client.Close()
 	}()
 
-	imageUri := MakeToGCSUri(c.config.Google.Storage.Bucket, key)
+	imageUri := makeToGCSUri(c.config.Google.Storage.Bucket, key)
 	outputKey := fmt.Sprintf("%s-output-%d.json", key, time.Now().UTC().Unix())
-	outputUri := MakeToGCSUri(c.config.Google.Storage.Bucket, outputKey)
+	outputUri := makeToGCSUri(c.config.Google.Storage.Bucket, outputKey)
+	err = c.Process(ctx, func(logger *zap.Logger) error {
 
-	// c.logger.Info(fmt.Sprintf("imageUri is %s", imageUri))
-	// c.logger.Info(fmt.Sprintf("outputUri is %s", outputUri))
-	request := &visionpb.AsyncBatchAnnotateImagesRequest{
-		Requests: []*visionpb.AnnotateImageRequest{
-			&visionpb.AnnotateImageRequest{
-				Image: &visionpb.Image{
-					Source: &visionpb.ImageSource{ImageUri: imageUri},
-				},
-				Features: []*visionpb.Feature{
-					&visionpb.Feature{Type: visionpb.Feature_TEXT_DETECTION},
-				},
-				ImageContext: &visionpb.ImageContext{
-					LanguageHints: []string{"ja"},
+		logger.Info(fmt.Sprintf("imageUri is %s", imageUri))
+		logger.Info(fmt.Sprintf("outputUri is %s", outputUri))
+		request := &visionpb.AsyncBatchAnnotateImagesRequest{
+			Requests: []*visionpb.AnnotateImageRequest{
+				&visionpb.AnnotateImageRequest{
+					Image: &visionpb.Image{
+						Source: &visionpb.ImageSource{ImageUri: imageUri},
+					},
+					Features: []*visionpb.Feature{
+						&visionpb.Feature{Type: visionpb.Feature_TEXT_DETECTION},
+					},
+					ImageContext: &visionpb.ImageContext{
+						LanguageHints: []string{"ja"},
+					},
 				},
 			},
-		},
-		OutputConfig: &visionpb.OutputConfig{
-			GcsDestination: &visionpb.GcsDestination{
-				Uri: outputUri,
+			OutputConfig: &visionpb.OutputConfig{
+				GcsDestination: &visionpb.GcsDestination{
+					Uri: outputUri,
+				},
 			},
-		},
-	}
-	operation, err := client.AsyncBatchAnnotateImages(context.Background(), request)
-	if err != nil {
-		return "", errors.Wrap(err, "VisionAPIClient#DetectText")
-	}
-	response, err := operation.Wait(context.Background())
-	if err != nil {
-		return "", errors.Wrap(err, "VisionAPIClient#DetectText")
-	}
+		}
+		operation, err := client.AsyncBatchAnnotateImages(context.Background(), request)
+		if err != nil {
+			return errors.Wrap(err, "VisionAPIClient#DetectText")
+		}
+		response, err := operation.Wait(context.Background())
+		if err != nil {
+			return errors.Wrap(err, "VisionAPIClient#DetectText")
+		}
 
-	fmt.Println(response)
-	//c.logger.Info(fmt.Sprintf("%+v", response))
+		if logger.Level() == zap.DebugLevel {
+			logger.Debug(fmt.Sprintf("%+v", response))
+		}
+		return nil
+	})
+	if err != nil {
+		return "", err
+	}
 
 	return outputKey, nil
 }
 
 type visionAPIClient struct {
+	baseClient
 	config *configs.Config
 }
 
 func (c *visionAPIClient) newClient() (*vision.ImageAnnotatorClient, error) {
-	option := options.GetCredentialOption(c.config)
+	option := services.GetCredentialOption(c.config)
 	service, err := vision.NewImageAnnotatorClient(context.Background(), option)
 	if err != nil {
 		return nil, errors.Wrap(err, "VisionAPIClient#newClient")

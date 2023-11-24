@@ -1,12 +1,12 @@
 package repositories
 
 import (
-	"github.com/ijufumi/google-vision-sample/internal/models/entities"
-	"gorm.io/gorm"
+	"context"
+	models "github.com/ijufumi/google-vision-sample/internal/models/entities"
 )
 
 type ExtractedTextRepository interface {
-	GetByID(db *gorm.DB, id string) (*entities.ExtractedText, error)
-	Create(db *gorm.DB, entity ...*entities.ExtractedText) error
-	DeleteByOutputFileID(db *gorm.DB, outputFileID string) error
+	GetByID(ctx context.Context, id string) (*models.ExtractedText, error)
+	Create(ctx context.Context, entity ...*models.ExtractedText) error
+	DeleteByOutputFileID(ctx context.Context, outputFileID string) error
 }

@@ -62,10 +62,10 @@ entity ExtractedTexts {
   * input_file_id: ULID <<FK>>
   * output_file_id: ULID <<FK>>
   * text: string
-  * top: number
-  * bottom: number
-  * left: number
-  * right: number
+  * top: decimal
+  * bottom: decimal
+  * left: decimal
+  * right: decimal
   * created_at: datetime
   * updated_at: datetime
     deleted_at: datetime

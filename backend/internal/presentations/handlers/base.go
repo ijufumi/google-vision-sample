@@ -11,7 +11,7 @@ type baseHandler struct {
 }
 
 func (h *baseHandler) Process(ginCtx *gin.Context, process func(ctx context.Context, logger *zap.Logger) error) error {
-	ctx := contextManager.GetContextWithLogger(ginCtx)
+	ctx := contextManager.GetContext(ginCtx)
 	logger := contextManager.GetLogger(ctx)
 	return process(ctx, logger)
 }

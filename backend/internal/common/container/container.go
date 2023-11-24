@@ -3,7 +3,6 @@ package container
 import (
 	"github.com/ijufumi/google-vision-sample/internal/common/configs"
 	"github.com/ijufumi/google-vision-sample/internal/common/loggers"
-	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/db"
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/database/repositories"
 	"github.com/ijufumi/google-vision-sample/internal/infrastructures/google/clients"
 	"github.com/ijufumi/google-vision-sample/internal/models/service"
@@ -39,8 +38,6 @@ type container struct {
 }
 
 func (c *container) provide() {
-	// logger
-	_ = c.container.Provide(loggers.NewLogger)
 	// config
 	_ = c.container.Provide(configs.New)
 	// handlers
@@ -53,7 +50,6 @@ func (c *container) provide() {
 	_ = c.container.Provide(service.NewConfigurationService)
 	_ = c.container.Provide(service.NewImageConversionService)
 	// database
-	_ = c.container.Provide(db.NewDB)
 	_ = c.container.Provide(repositories.NewJobRepository)
 	_ = c.container.Provide(repositories.NewExtractedTextRepository)
 	_ = c.container.Provide(repositories.NewInputFileRepository)
