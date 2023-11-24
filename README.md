@@ -9,37 +9,49 @@ It uses [Text Annotation API](https://cloud.google.com/vision/docs/ocr) for OCR.
 ```
 .
 ├── backend
-│ ├── cmd
-│ │ ├── app
-│ │ └── db
-│ ├── configs
-│ ├── docs
-│ ├── migration
-│ ├── pkg
-│ │ ├── configs
-│ │ ├── container
-│ │ ├── gateways
-│ │ │ ├── database
-│ │ │ └── google
-│ │ ├── http
-│ │ │ ├── handlers
-│ │ │ └── router
-│ │ ├── loggers
-│ │ ├── models
-│ │ ├── services
-│ │ └── utils
-│ └── scripts
+│   ├── cmd
+│   │   ├── app
+│   │   └── db
+│   ├── configs
+│   ├── docs
+│   │   ├── db
+│   │   └── infra
+│   ├── internal
+│   │   ├── common
+│   │   │   ├── configs
+│   │   │   ├── container
+│   │   │   ├── context
+│   │   │   ├── loggers
+│   │   │   └── utils
+│   │   ├── infrastructures
+│   │   │   ├── database
+│   │   │   └── google
+│   │   ├── models
+│   │   │   ├── entities
+│   │   │   ├── service
+│   │   │   └── value
+│   │   ├── presentations
+│   │   │   ├── handlers
+│   │   │   ├── middlewares
+│   │   │   └── router
+│   │   └── usecases
+│   │       └── repositories
+│   ├── migration
+│   └── scripts
 ├── deployment
+│   ├── aws
+│   └── gcp
 ├── docs
 └── frontend
-  ├── public
-  └── src
-    ├── components
-    ├── configs
-    ├── models
-    ├── pages
-    ├── repositories
-    └── usecases
+    ├── public
+    └── src
+        ├── components
+        ├── configs
+        ├── models
+        ├── pages
+        ├── repositories
+        └── usecases
+
 ```
 
 ### `backend`
@@ -66,45 +78,56 @@ This directory is storing system documentation. like PlatUML file.
 
 This directory is for migration files to execute `golang-migrate` commands.
 
-### `backend/pkg/configs`
+### `backend/internal/common/configs`
 
 This package has configurations of an application.
 
-### `backend/pkg/container`
+### `backend/internal/common/container`
 
 This package has a DI container.
 
-### `backend/pkg/gateways/database`
+### `backend/internal/common/context`
+
+T.B.D
+
+### `backend/internal/common/logger`
+
+T.B.D
+
+### `backend/internal/common/utils`
+
+This package has utilities.
+
+### `backend/internal/infrastructures/database`
 
 This package is for database. such as connection, repositories and entities.
 
-### `backend/pkg/gateways/google`
+### `backend/internal/infrastructures/google`
 
 This package is for google api. like a storage api and vision api.
 
-### `backend/pkg/http/handlers`
-
-This package has all controllers of http endpoint.
-
-### `backend/pkg/http/router`
-
-This package determines uri path of http endpoint.
-
-### `backend/pkg/loggers`
-
-This package has wrapper of `zap.logger`.
-
-### `backend/pkg/models`
+### `backend/internal/models/entities`
 
 This package has input / output models for API.
 
-### `backend/pkg/services`
+### `backend/internal/models/services`
 
 This package has business logic services.
 
-### `backend/pkg/utils`
 
-This package has utilities.
+### `backend/internal/presentations/handlers`
+
+This package has all controllers of http endpoint.
+
+### `backend/internal/presentations/middlewares`
+
+T.B.D
+
+### `backend/internal/presentations/router`
+
+This package determines uri path of http endpoint.
+
+
 
 ### `backend/scripts`
 
