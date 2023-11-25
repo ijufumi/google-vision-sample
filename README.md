@@ -121,21 +121,23 @@ This package has all controllers of http endpoint.
 
 ### `backend/internal/presentations/middlewares`
 
-T.B.D
+This package has originality middleware of GIN.
 
 ### `backend/internal/presentations/router`
 
 This package determines uri path of http endpoint.
 
-
-
 ### `backend/scripts`
 
 This directory has scripts for several purpose.
 
-### `deployment`
+### `deployment/aws`
 
-In the future, this directory will have IaC files.
+This code creates necessary resources on AWS.
+
+### `deployment/gcp`
+
+This code creates necessary resources on GCP.
 
 ### `docs`
 
