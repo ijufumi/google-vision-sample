@@ -15,9 +15,10 @@ type Router interface {
 func NewRouter(c container.Container) Router {
 	config := container.Invoke[*configs.Config](c)
 
-	r := gin.Default()
+	r := gin.New()
 	r.RedirectTrailingSlash = false
 	r.RedirectFixedPath = false
+	r.Use(gin.Recovery())
 	r.Use(middlewares.ResponseHeaders())
 	r.Use(middlewares.CORS())
 	r.Use(middlewares.Logger())
