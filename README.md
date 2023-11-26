@@ -88,11 +88,11 @@ This package has a DI container.
 
 ### `backend/internal/common/context`
 
-T.B.D
+This package has a context manager of `gin.Context` and `context.Context`
 
 ### `backend/internal/common/logger`
 
-T.B.D
+This package has a builder of `zap.Logger`
 
 ### `backend/internal/common/utils`
 
