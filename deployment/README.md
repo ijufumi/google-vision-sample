@@ -1,4 +1,4 @@
-# deployment
+# Deployment
 
 ## Overall
 
@@ -9,14 +9,19 @@ T.B.D
 
 ## GCP
 
-- GCPで使っているもの（作ってるもの）
-- コンソールで前もって作らないといけないもの
+- Necessarity to create before IaC
+  - Project
+  - User account & credentials
+- Create by IaC
+  - Storage
 
 T.B.D
 
 ## AWS
 
-- AWSで使っているもの（作ってるもの）
-- コンソールで前もって作らないといけないもの
+- Necessarity to create before IaC
+  - Domain
+  - Certification
+- Create by IaC
 
 T.B.D
