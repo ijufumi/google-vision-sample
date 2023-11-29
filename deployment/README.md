@@ -23,5 +23,13 @@ T.B.D
   - Domain
   - Certification
 - Create by IaC
+  - VPC
+  - ECS on EC2
+  - S3
+  - Cloudfront
+  - ALB
+  - Secrets
+  - Route53
+  - ECR
 
 T.B.D
