@@ -15,8 +15,6 @@ T.B.D
 - Create by IaC
   - Storage
 
-T.B.D
-
 ## AWS
 
 - Necessarity to create before IaC
@@ -32,4 +30,3 @@ T.B.D
   - Route53
   - ECR
 
-T.B.D
