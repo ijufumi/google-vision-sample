@@ -25,7 +25,7 @@ require (
 	golang.org/x/oauth2 v0.13.0
 	google.golang.org/api v0.147.0
 	google.golang.org/grpc v1.58.3
-	google.golang.org/protobuf v1.31.0
+	google.golang.org/protobuf v1.33.0
 	gopkg.in/gographics/imagick.v2 v2.6.3
 	gorm.io/driver/postgres v1.5.3
 	gorm.io/gorm v1.25.5
