@@ -1,4 +1,4 @@
-FROM golang:1.21-bookworm as build
+FROM golang:1.26-bookworm as build
 
 RUN apt update && apt install -y libmagickwand-dev \
 && rm -rf /var/cache/apt

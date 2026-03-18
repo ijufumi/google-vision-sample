@@ -13,7 +13,12 @@ jobs:
     steps:
       # Initial setup
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
+
+      # setup
+      - name: setup
+        run: |
+          apt-get install libmagickcore-dev
 
       # test
       - name: test
