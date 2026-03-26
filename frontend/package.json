@@ -67,7 +67,8 @@
     "underscore": "^1.13.8",
     "serialize-javascript": "^6.0.2",
     "@babel/helpers": "^7.26.10",
-    "@babel/runtime": "^7.26.10"
+    "@babel/runtime": "^7.26.10",
+    "picomatch": "^2.3.2"
   },
   "browserslist": {
     "production": [
