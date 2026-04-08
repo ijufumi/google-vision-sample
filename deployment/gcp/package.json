@@ -19,7 +19,12 @@
   "overrides": {
     "picomatch": "^2.3.2",
     "validator": "^13.15.22",
-    "brace-expansion": "^2.0.3"
+    "brace-expansion": "^2.0.3",
+    "lodash": "^4.18.1",
+    "minimatch@>=5.0.0 <6.0.0": "^5.1.8",
+    "minimatch@>=9.0.0 <10.0.0": "^9.0.7",
+    "glob@>=10.2.0 <11.0.0": "^10.5.0",
+    "tmp": "^0.2.4"
   },
   "engines": {
     "node": ">=16.0"
