@@ -1,0 +1,27 @@
+# Dependabot configuration
+#
+# This file primarily exists to suppress Dependabot security alerts for
+# packages that are bundled inside `cdktf` via `bundledDependencies`, which
+# cannot be overridden from this repository's `package.json` `overrides`
+# field. The vulnerabilities only affect dev-time tooling used to synthesize
+# Terraform HCL (`deployment/gcp` is a private CDKTF workspace and never ships
+# to production), so the residual risk is tolerable.
+#
+# Re-evaluate this configuration when `cdktf` upgrades its bundled `archiver`
+# tree upstream (currently cdktf@0.21.0 bundles archiver@7.0.1 with vulnerable
+# lodash / minimatch / glob / brace-expansion versions).
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/deployment/gcp"
+    schedule:
+      interval: "weekly"
+    # Disable version-update PRs; security-update PRs are still emitted
+    # automatically for non-ignored packages.
+    open-pull-requests-limit: 0
+    ignore:
+      - dependency-name: "archiver"
+      - dependency-name: "lodash"
+      - dependency-name: "minimatch"
+      - dependency-name: "glob"
+      - dependency-name: "brace-expansion"
