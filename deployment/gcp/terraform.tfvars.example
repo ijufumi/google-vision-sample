@@ -1,0 +1,11 @@
+# Path to the GCP service account key JSON file
+credentials_file = "/path/to/credentials.json"
+
+# GCP project ID
+project = ""
+
+# Storage bucket location (default: us-west1)
+location = "us-west1"
+
+# Storage bucket name
+bucket_name = ""
