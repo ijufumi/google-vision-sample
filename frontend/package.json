@@ -19,7 +19,7 @@
     "typescript": "^5.6.2",
     "web-vitals": "^4.2.3",
     "webpack": "^5.105.4",
-    "webpack-dev-server": "^5.2.3"
+    "webpack-dev-server": "^5.2.4"
   },
   "dependencies": {
     "evergreen-ui": "^7.1.9",
